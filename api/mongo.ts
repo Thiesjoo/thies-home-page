@@ -3,9 +3,11 @@ import { connectToDatabase } from "../extra/db";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	res.json({
-		message: await (await connectToDatabase("twitchtestbot"))
+		ok: true,
+		data: await (await connectToDatabase("twitchtestbot"))
 			.collection("users")
 			.find({})
+			.sort({ counter: -1 })
 			.toArray(),
 	});
 }

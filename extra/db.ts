@@ -15,7 +15,7 @@ export async function connectToDatabase(db: string) {
 	// If no connection is cached, create a new one
 	cachedClient = await MongoClient.connect(process.env.MONGO_URL, {
 		useNewUrlParser: true,
-		useUnifiedTopology: false,
+		useUnifiedTopology: true,
 	});
 
 	// Select the database through the connection,
