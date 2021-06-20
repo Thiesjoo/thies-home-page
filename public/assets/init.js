@@ -27,7 +27,7 @@ async function getGithubInfo() {
   try {
     const fetchResp = await fetch("api/github_data")
     const response = await fetchResp.json()
-    contentWithId(GIT_COMMIT_SEARCH_VALUE, response.sha.slice(0, 8))
+    contentWithId(GIT_COMMIT_SEARCH_VALUE, response.sha.slice(0, 7))
     titleWithId(GIT_COMMIT_SEARCH_VALUE, response.sha)
   } catch (e) {
     contentWithId(GIT_COMMIT_SEARCH_VALUE, "????")

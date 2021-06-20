@@ -24,6 +24,7 @@ export default function (req: VercelRequest, res: VercelResponse) {
 }
 
 function generateResponse(res: VercelResponse) {
+	res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
 	res.json({
 		ok: true,
 		tag: user.discriminator,

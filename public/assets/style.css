@@ -29,10 +29,16 @@ body {
 }
 
 .container {
-	width: 80%;
+	max-width: 80%;
 	margin: 0 auto;
 	padding: 0;
 	position: relative;
+}
+
+@media only screen and (max-width: 1000px) {
+	.container {
+		max-width: 100%;
+	}
 }
 
 .header_menu {
@@ -58,7 +64,7 @@ body {
 }
 
 .intro {
-	height: 400px;
+	/* height: 400px; */
 	background: #2c2f33;
 	margin-top: 70px;
 	text-align: center;
@@ -66,7 +72,7 @@ body {
 }
 
 .intro h1 {
-	font-size: 3em;
+	font-size: clamp(1rem, -0.875rem + 8.333vw, 3.5rem);
 	color: #fff;
 	font-weight: bold;
 	text-transform: uppercase;
@@ -76,6 +82,7 @@ body {
 
 .buttons {
 	display: flex;
+	flex-flow: row wrap;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
