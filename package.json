@@ -4,9 +4,11 @@
 	"description": "This is the main page for [thies.dev](https://thies.dev)",
 	"main": "index.js",
 	"dependencies": {
-		"discord.js": "^12.5.3"
+		"discord.js": "^12.5.3",
+		"mongodb": "^3.6.9"
 	},
 	"devDependencies": {
+		"@types/mongodb": "^3.6.18",
 		"@vercel/node": "^1.11.1",
 		"vercel": "^23.0.1"
 	},
