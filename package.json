@@ -1,0 +1,25 @@
+{
+  "name": "thies-home-page",
+  "version": "1.0.0",
+  "description": "This is the main page for [thies.dev](https://thies.dev)",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.5.3"
+  },
+  "devDependencies": {
+    "@vercel/node": "^1.11.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thiesjoo/thiesjoo.github.io.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Thiesjoo/thiesjoo.github.io/issues"
+  },
+  "homepage": "https://github.com/Thiesjoo/thiesjoo.github.io#readme"
+}
