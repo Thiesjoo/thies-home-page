@@ -26,8 +26,9 @@ export default function (req: VercelRequest, res: VercelResponse) {
 function generateResponse(res: VercelResponse) {
 	res.json({
 		ok: true,
-		tag: user.tag,
+		tag: user.discriminator,
 		avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
 		name: user.username,
+		id: user.id,
 	});
 }
