@@ -5,6 +5,15 @@
 			Intial data from: {{ initialTime | date }}. Last updated:
 			{{ lastUpdatedTime | date }}
 		</p>
+		<p>
+			Deze lijst heeft: Alle chatters van de afgelopen 20 minuten en de
+			viewerlijst van twitch zelf!
+			<em
+				>(This list has all chatters from the previous 20 minutes and the twitch
+				viewerlist)</em
+			>
+		</p>
+		<hr style="height:20px" />
 		<ul>
 			<li v-for="(item, index) in users" :key="index">{{ item }}</li>
 		</ul>

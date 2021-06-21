@@ -76,7 +76,7 @@ body {
 
 @media only screen and (max-width: 1000px) {
 	.container {
-		max-width: 100%;
+		max-width: 95%;
 	}
 }
 
