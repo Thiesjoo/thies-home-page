@@ -1,3 +1,4 @@
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import { MongoClient } from "mongodb";
 
 // Create cached connection variable
@@ -23,4 +24,9 @@ export async function connectToDatabase(db: string) {
 	let database = cachedClient.db(db);
 
 	return database;
+}
+
+/** Function for vercel to not hang */
+export default function(req: VercelRequest, res: VercelResponse) {
+	res.json({});
 }
