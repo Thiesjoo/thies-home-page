@@ -32,127 +32,41 @@ body {
 	}
 }
 
-.intro {
-	/* height: 400px; */
-	background: #2c2f33;
-	margin-top: 70px;
-	text-align: center;
-	padding-top: 70px;
-}
-
-.intro h1 {
-	font-size: clamp(1rem, -0.875rem + 8.333vw, 3.5rem);
-	color: #fff;
-	font-weight: bold;
-	text-transform: uppercase;
-	text-align: center;
-	margin-bottom: 20px;
-}
-
-.buttons {
-	display: flex;
-	flex-flow: row wrap;
-	width: 100%;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn {
-	margin: 10%;
-	background: #7289da;
-	border-radius: 5px;
-	line-height: 20px;
-	text-transform: uppercase;
-	font-weight: bold;
-	letter-spacing: 0.1em;
-	padding: 25px 30px;
-}
-
-.btn a {
-	color: #fff;
-	text-decoration: none;
-	font-weight: bold;
-	font-size: 21px;
-	text-align: center;
-}
-
-a i {
-	margin-right: 0.5em;
-}
-
-.about {
-	background: #23272a;
-}
-
-.about_title h2 {
-	font-size: 2em;
-	font-weight: bold;
-	padding: 20px 0;
-	text-align: center;
-	color: #fff;
-}
-
-.about_title h2:before,
-.about_title h2:after {
-	content: "";
-	display: block;
-	width: 60px;
-	height: 3px;
-	background: #7289da;
-	margin: 15px auto 10px auto;
-}
-
-.about_content .txt {
-	font-size: 17px;
-	color: #d2d8ea;
-	line-height: 27px;
-	margin: 0;
-	padding: 30px 120px 78px;
-}
-
-.info {
-	height: 346px;
-	background: #2c2f33;
-	margin-top: 0px;
-	text-align: center;
-	padding-top: 70px;
-}
-
-.info_title h2 {
-	font-size: 2em;
-	color: #fff;
-	font-weight: bold;
-	text-transform: uppercase;
-	text-align: center;
-	margin-bottom: 70px;
-}
-
-.info h2:before,
-.info h2:after {
-	content: "";
-	display: block;
-	width: 60px;
-	height: 3px;
-	background: #7289da;
-	margin: 15px auto 15px auto;
-}
-
-.info .btn {
-	margin: 0px 30px;
-	padding: 20px 10px;
-}
-
-.info .btn a {
-	color: #fff;
-	font-size: 14px;
-	text-align: center;
-	padding: 30px 0px 0px 0px;
-}
-
 footer {
 	width: 100%;
 	text-align: center;
 	position: fixed;
 	left: 0;
 	bottom: 0;
+}
+
+.header {
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	background: #23272a;
+	padding: 15px 0;
+	z-index: 10;
+}
+
+.header_menu {
+	text-align: center;
+}
+
+.header_menu ul {
+	list-style-type: none;
+}
+
+.header_menu ul li {
+	display: inline-block;
+	margin: 10px;
+}
+
+.header_menu ul li a {
+	color: #fff;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 20px;
 }
