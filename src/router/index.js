@@ -15,6 +15,12 @@ const routes = [
     name: 'GuanTheBot ranking',
     component: () => import(/* webpackChunkName: "about" */ '../views/Ranking.vue')
   },
+
+  {
+    path: '/users',
+    name: 'Twitch user list',
+    component: () => import(/* webpackChunkName: "users" */ '../views/Users.vue')
+  },
 ]
 
 const router = new VueRouter({

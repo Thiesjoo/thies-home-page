@@ -8,6 +8,9 @@
 						<li>
 							<router-link to="/ranking">GuanTheBot Ranking</router-link>
 						</li>
+						<li>
+							<router-link to="/users">Twitch User List</router-link>
+						</li>
 					</ul>
 				</nav>
 			</div>
