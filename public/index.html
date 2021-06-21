@@ -10,46 +10,24 @@
 	widepeepoHappy
 	👀
 -->
-<html lang="en">
+<html lang="">
 	<head>
-		<meta charset="UTF-8" />
+		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<!-- <link rel="icon" href="<%= BASE_URL %>favicon_FALLBACK.ico" /> -->
 		<title>Showcase website | thies.dev</title>
-
-		<script src="https://unpkg.com/vue/dist/vue.js"></script>
-		<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 		<link href="assets/fontawesome/css/all.min.css" rel="stylesheet" />
-
-		<link rel="stylesheet" href="assets/index/index.css" />
-
-		<script src="assets/index/index.js" defer></script>
 	</head>
 	<body>
-		<div id="app">
-			<header class="header">
-				<div class="container">
-					<nav class="header_menu">
-						<ul>
-							<li><router-link to="/about">Home</router-link></li>
-							<li>
-								<router-link to="/ranking">GuanTheBot Ranking</router-link>
-							</li>
-						</ul>
-					</nav>
-				</div>
-			</header>
-
-			<!-- route outlet -->
-			<!-- component matched by the route will render here -->
-			<router-view></router-view>
-
-			<footer>
-				Code can be found
-				<a target="_blank" href="https://github.com/Thiesjoo/thies-home-page"
-					>HERE</a
-				>. Deployment: <span id="github_sha"></span>
-			</footer>
-		</div>
+		<noscript>
+			<strong
+				>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+				properly without JavaScript enabled. Please enable it to
+				continue.</strong
+			>
+		</noscript>
+		<div id="app"></div>
+		<!-- built files will be auto injected -->
 	</body>
 </html>
