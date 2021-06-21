@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { connectToDatabase } from "../extra/db";
+import { connectToDatabase } from "./extra/db";
 
-export default async function (req: VercelRequest, res: VercelResponse) {
+export default async function(req: VercelRequest, res: VercelResponse) {
 	res.json({
 		ok: true,
 		data: await (await connectToDatabase("twitchtestbot"))
