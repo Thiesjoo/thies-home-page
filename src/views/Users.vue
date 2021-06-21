@@ -103,7 +103,7 @@ export default {
 			}
 
 			if (
-				!this.users.includes(name) && // No dupes
+				!this.users[type].includes(name) && // No dupes
 				!name.startsWith("justinfan") && // Anon twitch user.
 				!BOTLIST.includes(name)
 			) {
