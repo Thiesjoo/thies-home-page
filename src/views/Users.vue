@@ -91,14 +91,11 @@ export default {
 	created() {
 		console.log("Registering callback");
 		client.on("message", (channel, tags, message, self) => {
-			console.log(tags)
 			let name = tags["display-name"].toLowerCase();
 			let type = "user";
 			if (tags.mod) {
 				type = "mod";
-			} else if (
-			tags?.badges?.vip
-			) {
+			} else if (tags?.badges?.vip) {
 				type = "vip";
 			}
 
