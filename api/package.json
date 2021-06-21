@@ -1,9 +1,4 @@
 {
-	"name": "thies-home-page",
-	"version": "1.0.0",
-	"description": "This is the main page for [thies.dev](https://thies.dev)",
-	"author": "",
-	"scripts": {},
 	"dependencies": {
 		"axios": "^0.21.1",
 		"discord.js": "^12.5.3",

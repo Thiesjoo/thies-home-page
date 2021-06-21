@@ -146,8 +146,9 @@ function filterArrayBasedOnType(arr, type) {
 .content {
   display: flex;
   width: 100%;
-  flex-flow: row;
+  flex-flow: row wrap;
   justify-content: space-evenly;
+  align-items: center;
   padding-bottom: 10%;
 }
 
@@ -165,10 +166,10 @@ function filterArrayBasedOnType(arr, type) {
 
 .extraList li::before {
   content: "\2022"; /* Add content: \2022 is the CSS Code/unicode for a bullet */
-  font-weight: bolder; /* If you want it to be bold */
-  display: inline-block; /* Needed to add space between the bullet and the text */
-  width: 1em; /* Also needed for space (tweak if needed) */
-  margin-left: -1em; /* Also needed for space (tweak if needed) */
+  font-weight: bolder;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
 }
 
 .mod::before {

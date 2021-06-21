@@ -7,18 +7,18 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'About me!',
     component: Home
   },
   {
     path: '/ranking',
-    name: 'GuanTheBot ranking',
+    name: 'GuanTheBot Typo Ranking',
     component: () => import(/* webpackChunkName: "about" */ '../views/Ranking.vue')
   },
 
   {
     path: '/users',
-    name: 'Twitch user list',
+    name: 'Twitch Viewer list',
     component: () => import(/* webpackChunkName: "users" */ '../views/Users.vue')
   },
 ]

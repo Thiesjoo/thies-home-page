@@ -2,7 +2,7 @@
 	"name": "thies-home-page",
 	"version": "1.0.0",
 	"description": "This is the main page for [thies.dev](https://thies.dev)",
-	"author": "",
+	"author": "Thies Nieborg",
 	"scripts": {
 		"serve": "vue-cli-service serve",
 		"build": "vue-cli-service build",
@@ -29,13 +29,10 @@
 		"last 2 versions",
 		"not dead"
 	],
-	"bugs": {
-		"url": "https://github.com/Thiesjoo/thiesjoo.github.io/issues"
-	},
-	"homepage": "https://github.com/Thiesjoo/thiesjoo.github.io#readme",
+	"homepage": "https://thies.dev",
 	"license": "ISC",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Thiesjoo/thiesjoo.github.io.git"
+		"url": "git+https://github.com/Thiesjoo/thies-home-page.git"
 	}
 }
