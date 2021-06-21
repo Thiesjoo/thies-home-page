@@ -13,9 +13,20 @@
 				viewerlist)</em
 			>
 		</p>
-		<hr style="height:20px" />
 		<ul>
-			<li v-for="(item, index) in users" :key="index">{{ item }}</li>
+			<li
+				style=" list-style-type: none;"
+				v-for="(type, index) in types"
+				:key="index"
+			>
+				<hr style="height:20px" />
+				<h3 style="font-weight: 800;">{{ userFriendlyTypes[type] }}</h3>
+				<ul>
+					<li v-for="(item, index1) in users[type]" :key="index1">
+						{{ item }}
+					</li>
+				</ul>
+			</li>
 		</ul>
 	</div>
 </template>
@@ -33,15 +44,28 @@ const BOTLIST = [
 	"discord_for_streamers",
 	"soundalerts",
 	"streamelements",
+	"streamlabs",
+	"carbot14xyz",
 ];
 
 export default {
 	data() {
 		return {
-			users: [],
+			users: {
+				mod: [],
+				vip: [],
+				user: [],
+			},
 			user: "",
 			initialTime: null,
 			lastUpdatedTime: null,
+
+			types: ["mod", "vip", "user"],
+			userFriendlyTypes: {
+				mod: "Mods 🍤",
+				vip: "Vips 🦐",
+				user: "Users 🥺",
+			},
 		};
 	},
 	async mounted() {
@@ -59,16 +83,34 @@ export default {
 		}
 		this.initialTime = new Date();
 		this.lastUpdatedTime = new Date();
-		this.users = data.data;
+
+		this.types.forEach((x) => {
+			this.users[x] = filterArrayBasedOnType(data.data, x);
+		});
 	},
 	created() {
 		console.log("Registering callback");
 		client.on("message", (channel, tags, message, self) => {
-			addNewUser(this.users, this.time, tags["display-name"]);
-		});
+			let name = tags["display-name"].toLowerCase();
+			let type = "user";
+			if (tags.mod === "1") {
+				type = "mod";
+			} else if (
+				typeof tags.badges === "string" &&
+				tags.badges.startsWith("vip")
+			) {
+				type = "vip";
+			}
 
-		client.on("join", (channel, username) => {
-			addNewUser(this.users, this.time, username);
+			if (
+				!this.users.includes(name) && // No dupes
+				!name.startsWith("justinfan") && // Anon twitch user.
+				!BOTLIST.includes(name)
+			) {
+				this.users[type].push(name);
+				this.users[type].sort();
+				time = new Date();
+			}
 		});
 	},
 	beforeDestroy() {
@@ -77,17 +119,8 @@ export default {
 	},
 };
 
-function addNewUser(users, time, tags) {
-	const name = tags.toLowerCase();
-	if (
-		!users.includes(name) &&
-		!name.startsWith("justinfan") &&
-		!BOTLIST.includes(name)
-	) {
-		users.push(name);
-		users.sort();
-		time = new Date();
-	}
+function filterArrayBasedOnType(arr, type) {
+	return arr.filter((x) => x.type === type).map((x) => x.name);
 }
 </script>
 
