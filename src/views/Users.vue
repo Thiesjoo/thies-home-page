@@ -17,6 +17,15 @@ const client = new TwitchChatClient({
 	channels: [],
 });
 
+const BOTLIST = [
+	"guanthebot",
+	"madestoutbot",
+	"cloudlog",
+	"discord_for_streamers",
+	"soundalerts",
+	"streamelements",
+];
+
 export default {
 	data() {
 		return {
@@ -46,13 +55,11 @@ export default {
 	created() {
 		console.log("Registering callback");
 		client.on("message", (channel, tags, message, self) => {
-			console.log(tags);
-			const name = tags["display-name"].toLowerCase();
-			if (!this.users.includes(name)) {
-				this.users.push(name);
-				this.users.sort();
-				this.lastUpdatedTime = new Date();
-			}
+			addNewUser(this.users, this.time, tags["display-name"]);
+		});
+
+		client.on("join", (channel, username) => {
+			addNewUser(this.users, this.time, username);
 		});
 	},
 	beforeDestroy() {
@@ -60,6 +67,19 @@ export default {
 		client.disconnect();
 	},
 };
+
+function addNewUser(users, time, tags) {
+	const name = tags.toLowerCase();
+	if (
+		!users.includes(name) &&
+		!name.startsWith("justinfan") &&
+		!BOTLIST.includes(name)
+	) {
+		users.push(name);
+		users.sort();
+		time = new Date();
+	}
+}
 </script>
 
 <style></style>
