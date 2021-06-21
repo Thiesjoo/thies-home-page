@@ -2,27 +2,41 @@
 	"name": "thies-home-page",
 	"version": "1.0.0",
 	"description": "This is the main page for [thies.dev](https://thies.dev)",
+	"author": "",
+	"scripts": {
+		"serve": "vue-cli-service serve",
+		"build": "vue-cli-service build",
+		"start": "vercel dev"
+	},
 	"main": "index.js",
 	"dependencies": {
+		"core-js": "^3.6.5",
 		"discord.js": "^12.5.3",
-		"mongodb": "^3.6.9"
+		"mongodb": "^3.6.9",
+		"vue": "^2.6.11",
+		"vue-router": "^3.5.1"
 	},
 	"devDependencies": {
 		"@types/mongodb": "^3.6.18",
 		"@vercel/node": "^1.11.1",
-		"vercel": "^23.0.1"
+		"@vue/cli-plugin-babel": "~4.5.0",
+		"@vue/cli-plugin-router": "^4.5.13",
+		"@vue/cli-service": "~4.5.0",
+		"vercel": "^23.0.1",
+		"vue-template-compiler": "^2.6.11"
 	},
-	"scripts": {
-		"start": "vercel dev"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Thiesjoo/thiesjoo.github.io.git"
-	},
-	"author": "",
-	"license": "ISC",
+	"browserslist": [
+		"> 1%",
+		"last 2 versions",
+		"not dead"
+	],
 	"bugs": {
 		"url": "https://github.com/Thiesjoo/thiesjoo.github.io/issues"
 	},
-	"homepage": "https://github.com/Thiesjoo/thiesjoo.github.io#readme"
+	"homepage": "https://github.com/Thiesjoo/thiesjoo.github.io#readme",
+	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Thiesjoo/thiesjoo.github.io.git"
+	}
 }

@@ -1,37 +1,74 @@
-/*Fonts*/
-@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,700&display=swap");
+<template>
+	<div>
+		<section class="intro container">
+			<h1>GuanTheThird | Thies</h1>
+			<div class="buttons">
+				<div class="btn" style="order: 0" id="discord_id" :title="discordID">
+					<a href="#"
+						><i class="fab fa-discord"></i>GuanTheThird#<span>{{
+							discordTag
+						}}</span></a
+					>
+				</div>
+				<div class="btn" style="order: 1">
+					<a href="https://github.com/thiesjoo" target="_blank"
+						><i class="fas fa-terminal"></i>My Github</a
+					>
+				</div>
+			</div>
+		</section>
+		<section class="about container">
+			<div class="about_title">
+				<h2>About</h2>
+			</div>
+			<div class="about_content">
+				<p class="txt">
+					jojo!
+					<img
+						src="https://cdn.betterttv.net/emote/5c0e1a3c6c146e7be4ff5c0c/2x"
+					/>
+				</p>
+			</div>
+		</section>
+	</div>
+	<!-- <section class="info container">
+  <div class="info_title">
+    <h2>Meer informatie</h2>
+  </div>
+  <div class="buttons">
+    <div class="btn">
+      <a href="#"><i class="fas fa-star"></i>asd</a>
+    </div>
+    <div class="btn">
+      <a href="#"><i class="fas fa-headset"></i> asd2</a>
+    </div>
+  </div>
+</section> -->
+</template>
 
-/*Base*/
-* {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	box-sizing: border-box;
-	font: 100%;
-	font-weight: normal;
-	outline: none;
-	vertical-align: baseline;
-}
-
-body {
-	height: 800px;
-	background: #99aab5;
-	font-family: "Montserrat", sans-serif;
-}
-
-.container {
-	max-width: 80%;
-	margin: 0 auto;
-	padding: 0;
-	position: relative;
-}
-
-@media only screen and (max-width: 1000px) {
-	.container {
-		max-width: 100%;
-	}
-}
-
+<script>
+import { changeFavicon } from "@/helpers/favoicon";
+const MyComponent = {
+	name: "Home",
+	data() {
+		return { discordTag: "....", discordID: "...." };
+	},
+	async mounted() {
+		try {
+			const fetchResp = await fetch("api/discord_tag");
+			const response = await fetchResp.json();
+			this.discordTag = response.tag;
+			this.discordID = response.id;
+			changeFavicon(response.avatar);
+		} catch (e) {
+			this.discordTag = "????";
+			this.discordID = "????";
+		}
+	},
+};
+export default MyComponent;
+</script>
+<style>
 .intro {
 	/* height: 400px; */
 	background: #2c2f33;
@@ -148,11 +185,4 @@ a i {
 	text-align: center;
 	padding: 30px 0px 0px 0px;
 }
-
-footer {
-	width: 100%;
-	text-align: center;
-	position: fixed;
-	left: 0;
-	bottom: 0;
-}
+</style>
