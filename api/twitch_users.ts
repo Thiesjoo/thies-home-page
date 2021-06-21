@@ -17,6 +17,7 @@ const BOTLIST = [
 	"streamelements",
 	"streamlabs",
 	"carbot14xyz",
+	"commanderroot",
 ];
 
 const TypeList = ["mod", "vip", "user"];
@@ -59,6 +60,7 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 		res.setHeader("Cache-Control", "max-age=30, stale-while-revalidate=60");
 		return res.json({
 			message: `Returns (SORTED) users in chat from the past 20 minutes + users in viewerlist - bots`,
+			time: Date.now(),
 			data: filterBotsAndDuplicates([...recentMessages, ...viewerList], user),
 		});
 	} catch (e) {
