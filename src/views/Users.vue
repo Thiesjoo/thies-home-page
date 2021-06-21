@@ -91,13 +91,13 @@ export default {
 	created() {
 		console.log("Registering callback");
 		client.on("message", (channel, tags, message, self) => {
+			console.log(tags)
 			let name = tags["display-name"].toLowerCase();
 			let type = "user";
-			if (tags.mod === "1") {
+			if (tags.mod) {
 				type = "mod";
 			} else if (
-				typeof tags.badges === "string" &&
-				tags.badges.startsWith("vip")
+			tags?.badges?.vip
 			) {
 				type = "vip";
 			}
@@ -109,7 +109,7 @@ export default {
 			) {
 				this.users[type].push(name);
 				this.users[type].sort();
-				time = new Date();
+				this.time = new Date();
 			}
 		});
 	},
