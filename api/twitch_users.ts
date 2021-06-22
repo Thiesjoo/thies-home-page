@@ -5,7 +5,7 @@
  *
  * Client should subscribe to messages in IRC and add those users to the list. Everything from here will be cached for 60 seconds?
  *
- * Filter out bots, dupes and broadcaster
+ * Filter out bots, dupes and broadcaster (https://twitchinsights.net/bots)
  */
 
 const BOTLIST = [
@@ -18,6 +18,8 @@ const BOTLIST = [
 	"streamlabs",
 	"carbot14xyz",
 	"commanderroot",
+	"tiddly",
+	"violets_tv",
 ];
 
 const TypeList = ["mod", "vip", "user"];

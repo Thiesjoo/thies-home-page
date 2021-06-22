@@ -63,6 +63,7 @@ const client = new TwitchChatClient({
   channels: [],
 });
 
+/** The frontend list doesn't really have to be in sync with backend, because lurking bots will not chat */
 const BOTLIST = [
   "guanthebot",
   "madestoutbot",
@@ -73,6 +74,8 @@ const BOTLIST = [
   "streamlabs",
   "carbot14xyz",
   "commanderroot",
+  "tiddly",
+  "violets_tv",
 ];
 
 export default {
@@ -161,12 +164,18 @@ function filterArrayBasedOnType(arr, type) {
   padding-top: 1em;
 }
 
-.twitchLike {
-  order: 1;
+.twitchList {
+  order: 0;
+  margin-bottom: 50px;
 }
 
 .liveList {
   order: 2;
+}
+
+.twitchList,
+.liveList {
+  max-width: 500px;
 }
 
 .extraList {
