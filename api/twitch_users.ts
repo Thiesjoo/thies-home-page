@@ -69,13 +69,7 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 			message: `Returns users in chat from the past 20 minutes + users in viewerlist - bots. (Sorted = sorted based on type then name. Unsorted is: Entire viewerlist + people who chatted)`,
 			time: Date.now(),
 			data: processed,
-			sorted: [...processed].sort((a, b) => {
-				//Sort first based on type, then name
-				if (a.type === b.type) {
-					return b.name < a.name ? 1 : -1;
-				}
-				return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
-			}),
+			sorted: sort(processed),
 		});
 	} catch (e) {
 		console.error(e);
@@ -87,22 +81,24 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 function combineViewers(data: {
 	chatters: { [key: string]: string[] };
 }): User[] {
-	return Object.entries(data.chatters)
-		.map((chatCategory) => {
-			let type = "user";
-			if (chatCategory[0] === "moderators") {
-				type = "mod";
-			} else if (chatCategory[0] === "vips") {
-				type = "vip";
-			}
-			return chatCategory[1].map((chatter) => {
-				return {
-					name: chatter,
-					type,
-				};
-			}) as User[];
-		})
-		.reduce((acc, val) => acc.concat(val), []);
+	return sort(
+		Object.entries(data.chatters)
+			.map((chatCategory) => {
+				let type = "user";
+				if (chatCategory[0] === "moderators") {
+					type = "mod";
+				} else if (chatCategory[0] === "vips") {
+					type = "vip";
+				}
+				return chatCategory[1].map((chatter) => {
+					return {
+						name: chatter,
+						type,
+					};
+				}) as User[];
+			})
+			.reduce((acc, val) => acc.concat(val), [])
+	);
 }
 
 /**
@@ -157,5 +153,15 @@ function filterBotsAndDuplicates(users: User[], broadcaster?: string): User[] {
 		}
 		already.add(x.name);
 		return true;
+	});
+}
+
+function sort(arr: User[]) {
+	return [...arr].sort((a, b) => {
+		//Sort first based on type, then name
+		if (a.type === b.type) {
+			return b.name < a.name ? 1 : -1;
+		}
+		return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
 	});
 }
