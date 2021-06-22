@@ -16,6 +16,9 @@
     <div class="content">
       <div class="twitchList">
         <h2 style="font-weight: 800">TwitchList</h2>
+        <p>
+          <em>Normale twitch viewerlist met alle chatters er nog bij</em>
+        </p>
         <ul>
           <li
             style="list-style-type: none"
@@ -34,7 +37,12 @@
       </div>
       <div class="liveList">
         <h2 style="font-weight: 800">LiveList</h2>
-        <p><em>Nieuwe gebruikers komen aan de onderkant van de lijst</em></p>
+        <p>
+          <em
+            >Dit is de twitch viewerlist, met daarna alle chatters. Nieuwe
+            gebruikers komen aan de onderkant van de lijst</em
+          >
+        </p>
         <ul class="extraList">
           <li
             v-for="(item, index1) in allUsers"
@@ -105,7 +113,7 @@ export default {
     this.lastUpdatedTime = new Date();
     this.allUsers = data.data;
     this.types.forEach((x) => {
-      this.users[x] = filterArrayBasedOnType(data.data, x);
+      this.users[x] = filterArrayBasedOnType(data.sorted, x);
     });
   },
   created() {
@@ -150,6 +158,7 @@ function filterArrayBasedOnType(arr, type) {
   justify-content: space-evenly;
   align-items: center;
   padding-bottom: 10%;
+  padding-top: 1em;
 }
 
 .twitchLike {
@@ -161,6 +170,7 @@ function filterArrayBasedOnType(arr, type) {
 }
 
 .extraList {
+  margin-top: 1em;
   list-style: none; /* Remove default bullets */
 }
 

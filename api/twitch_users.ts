@@ -58,10 +58,22 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 		]);
 
 		res.setHeader("Cache-Control", "max-age=30, stale-while-revalidate=60");
+		const processed = filterBotsAndDuplicates(
+			[...viewerList, ...recentMessages],
+			user
+		);
+
 		return res.json({
-			message: `Returns (SORTED) users in chat from the past 20 minutes + users in viewerlist - bots`,
+			message: `Returns users in chat from the past 20 minutes + users in viewerlist - bots. (Sorted = sorted based on type then name. Unsorted is: Entire viewerlist + people who chatted)`,
 			time: Date.now(),
-			data: filterBotsAndDuplicates([...recentMessages, ...viewerList], user),
+			data: processed,
+			sorted: [...processed].sort((a, b) => {
+				//Sort first based on type, then name
+				if (a.type === b.type) {
+					return b.name < a.name ? 1 : -1;
+				}
+				return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
+			}),
 		});
 	} catch (e) {
 		console.error(e);
@@ -133,23 +145,15 @@ function getUsersFromIRC(
 function filterBotsAndDuplicates(users: User[], broadcaster?: string): User[] {
 	const already = new Set();
 	if (broadcaster) already.add(broadcaster);
-	return users
-		.filter((x) => {
-			if (
-				already.has(x.name) ||
-				BOTLIST.includes(x.name) ||
-				x.name.endsWith("bot")
-			) {
-				return false;
-			}
-			already.add(x.name);
-			return true;
-		})
-		.sort((a, b) => {
-			//Sort first based on type, then name
-			if (a.type === b.type) {
-				return b.name < a.name ? 1 : -1;
-			}
-			return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
-		});
+	return users.filter((x) => {
+		if (
+			already.has(x.name) ||
+			BOTLIST.includes(x.name) ||
+			x.name.endsWith("bot")
+		) {
+			return false;
+		}
+		already.add(x.name);
+		return true;
+	});
 }
