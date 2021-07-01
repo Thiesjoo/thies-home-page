@@ -5,7 +5,7 @@
  *
  * Client should subscribe to messages in IRC and add those users to the list. Everything from here will be cached for 60 seconds?
  *
- * Filter out bots, dupes and broadcaster
+ * Filter out bots, dupes and broadcaster (https://twitchinsights.net/bots)
  */
 
 const BOTLIST = [
@@ -19,6 +19,8 @@ const BOTLIST = [
 	"carbot14xyz",
 	"commanderroot",
 	"anotherttvviewer",
+	"tiddly",
+	"violets_tv",
 ];
 
 const TypeList = ["mod", "vip", "user"];
@@ -59,10 +61,16 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 		]);
 
 		res.setHeader("Cache-Control", "max-age=30, stale-while-revalidate=60");
+		const processed = filterBotsAndDuplicates(
+			[...viewerList, ...recentMessages],
+			user
+		);
+
 		return res.json({
-			message: `Returns (SORTED) users in chat from the past 20 minutes + users in viewerlist - bots`,
+			message: `Returns users in chat from the past 20 minutes + users in viewerlist - bots. (Sorted = sorted based on type then name. Unsorted is: Entire viewerlist + people who chatted)`,
 			time: Date.now(),
-			data: filterBotsAndDuplicates([...recentMessages, ...viewerList], user),
+			data: processed,
+			sorted: sort(processed),
 		});
 	} catch (e) {
 		console.error(e);
@@ -74,22 +82,24 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 function combineViewers(data: {
 	chatters: { [key: string]: string[] };
 }): User[] {
-	return Object.entries(data.chatters)
-		.map((chatCategory) => {
-			let type = "user";
-			if (chatCategory[0] === "moderators") {
-				type = "mod";
-			} else if (chatCategory[0] === "vips") {
-				type = "vip";
-			}
-			return chatCategory[1].map((chatter) => {
-				return {
-					name: chatter,
-					type,
-				};
-			}) as User[];
-		})
-		.reduce((acc, val) => acc.concat(val), []);
+	return sort(
+		Object.entries(data.chatters)
+			.map((chatCategory) => {
+				let type = "user";
+				if (chatCategory[0] === "moderators") {
+					type = "mod";
+				} else if (chatCategory[0] === "vips") {
+					type = "vip";
+				}
+				return chatCategory[1].map((chatter) => {
+					return {
+						name: chatter,
+						type,
+					};
+				}) as User[];
+			})
+			.reduce((acc, val) => acc.concat(val), [])
+	);
 }
 
 /**
@@ -134,23 +144,25 @@ function getUsersFromIRC(
 function filterBotsAndDuplicates(users: User[], broadcaster?: string): User[] {
 	const already = new Set();
 	if (broadcaster) already.add(broadcaster);
-	return users
-		.filter((x) => {
-			if (
-				already.has(x.name) ||
-				BOTLIST.includes(x.name) ||
-				x.name.endsWith("bot")
-			) {
-				return false;
-			}
-			already.add(x.name);
-			return true;
-		})
-		.sort((a, b) => {
-			//Sort first based on type, then name
-			if (a.type === b.type) {
-				return b.name < a.name ? 1 : -1;
-			}
-			return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
-		});
+	return users.filter((x) => {
+		if (
+			already.has(x.name) ||
+			BOTLIST.includes(x.name) ||
+			x.name.endsWith("bot")
+		) {
+			return false;
+		}
+		already.add(x.name);
+		return true;
+	});
+}
+
+function sort(arr: User[]) {
+	return [...arr].sort((a, b) => {
+		//Sort first based on type, then name
+		if (a.type === b.type) {
+			return b.name < a.name ? 1 : -1;
+		}
+		return TypeList.indexOf(a.type) > TypeList.indexOf(b.type) ? 1 : -1;
+	});
 }
