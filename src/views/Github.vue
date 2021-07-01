@@ -3,7 +3,6 @@
 <script>
 export default {
   mounted() {
-    console.log("wutface");
     window.location.href = `https://github.com/thiesjoo/${window.location.pathname
       .replace("/gh/", "")
       .replace("/gh", "")}`;

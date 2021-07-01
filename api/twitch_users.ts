@@ -18,6 +18,7 @@ const BOTLIST = [
 	"streamlabs",
 	"carbot14xyz",
 	"commanderroot",
+	"anotherttvviewer",
 ];
 
 const TypeList = ["mod", "vip", "user"];
