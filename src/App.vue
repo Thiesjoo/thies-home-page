@@ -46,7 +46,6 @@ export default {
     $route: {
       immediate: true,
       handler(to, from) {
-        console.log(to);
         document.title = to.name || "thies.dev";
       },
     },
