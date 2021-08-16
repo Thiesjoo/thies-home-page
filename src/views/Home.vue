@@ -39,7 +39,7 @@
       </div>
       <div class="buttons">
         <div class="btn">
-          <a href="https://github.com/thiesjoo/guanthebot"
+          <a href="https://github.com/thiesjoo/guanthebot" target="_blank"
             ><i class="fas fa-robot"></i>GuanTheBot</a
           >
           is a Twitch/Discord text bot. It detects typo's in certain emotes and
@@ -48,7 +48,7 @@
         </div>
 
         <div class="btn">
-          <a href="https://github.com/thiesjoo/PWS"
+          <a href="https://github.com/thiesjoo/PWS" target="_blank"
             ><i class="fas fa-scroll"></i>PWS</a
           >
           is a boid simulation I did for my swarm intelligence profile paper.
@@ -57,7 +57,7 @@
         </div>
 
         <div class="btn">
-          <a href="https://github.com/thiesjoo/linuxinstall"
+          <a href="https://github.com/thiesjoo/linuxinstall" target="_blank"
             ><i class="fas fa-server"></i>linuxinstall</a
           >
           is a bash script that customizes and install a new ubuntu installation
@@ -167,8 +167,7 @@ a i {
   color: #d2d8ea;
   line-height: 27px;
   margin: 0;
-
-  padding: 30px 120px 78px;
+  padding: 30px 60px 78px;
 }
 
 .info {
@@ -200,7 +199,7 @@ a i {
 }
 
 .info .btn {
-  margin: 0px 30px;
+  margin: 20px 30px;
   padding: 20px 10px;
 }
 
