@@ -13,7 +13,7 @@
 	"dependencies": {
 		"chokidar": "^3.5.2",
 		"core-js": "^3.6.5",
-		"moment": "^2.29.1",
+		"date-fns": "^2.23.0",
 		"tmi.js": "^1.8.3",
 		"vue": "^2.6.11",
 		"vue-router": "^3.5.1"
@@ -22,9 +22,10 @@
 		"@types/tmi.js": "^1.7.1",
 		"@vue/cli-plugin-babel": "~4.5.0",
 		"@vue/cli-plugin-router": "^4.5.13",
-		"@vue/cli-service": "~4.5.0",
+		"@vue/cli-service": "^4.5.13",
 		"vercel": "^23.1.2",
-		"vue-template-compiler": "^2.6.11"
+		"vue-template-compiler": "^2.6.11",
+		"webpack-bundle-analyzer": "^4.4.2"
 	},
 	"browserslist": [
 		"> 1%",

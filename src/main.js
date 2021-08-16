@@ -2,18 +2,18 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import router from './router'
+import { nl } from "date-fns/locale"
+import { format } from "date-fns"
+// require('moment/locale/nl');
+
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
 
 
-import moment from 'moment'
-
 Vue.filter('date', function (value) {
   if (value) {
-    const mom = moment(value);
-    mom.locale("nl");
-    return mom.format('LTS');
+    return format(value, "HH:mm:ss", { locale: nl })
   }
 })
 
