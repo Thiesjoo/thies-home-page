@@ -18,11 +18,16 @@
     <router-view style="margin-top: 80px"> </router-view>
     <footer>
       Made by
-      <a href="https://github.com/Thiesjoo/" target="_blank">Me (:</a>. Code can
-      be found
-      <a target="_blank" href="https://github.com/Thiesjoo/thies-home-page"
-        >HERE</a
-      >. Deployment:
+      <a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank"
+        >Me (:</a
+      >.
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://github.com/Thiesjoo/thies-home-page"
+        >Code</a
+      >
+      is on github. Deployment:
       <span :title="githubSHA">{{ githubSHA.slice(0, 7) }}</span>
     </footer>
   </div>
