@@ -58,12 +58,17 @@
 </template>
 
 <script lang="ts">
+import { filterArrayBasedOnType } from "@/helpers/filter";
 import { formatDate } from "@/helpers/formatDate";
+import {
+  disconnect,
+  getClient,
+  initTMIClient,
+  joinChannel,
+} from "@/helpers/tmi";
 import { defineComponent } from "@vue/runtime-core";
-import { Client as TwitchChatClient } from "tmi.js";
-const client = new TwitchChatClient({
-  channels: [],
-});
+
+const pause = initTMIClient();
 
 type UserTypes = "user" | "mod" | "vip";
 type User = {
@@ -106,11 +111,11 @@ const comp = defineComponent({
   } {
     return {
       users: {
-        mod: [] as string[],
-        vip: [] as string[],
-        user: [] as string[],
+        mod: [],
+        vip: [],
+        user: [],
       },
-      allUsers: [] as User[],
+      allUsers: [],
       initialTime: null,
       lastUpdatedTime: null,
       user: "",
@@ -136,15 +141,12 @@ const comp = defineComponent({
     },
   },
   async mounted() {
-    console.log("Connecting to twitch");
-    await client.connect();
-
     console.log(this.$route.query);
 
     const { user } = this.$route.query;
     const parsedUser = (Array.isArray(user) ? user[0] : user) || "madestout";
     this.user = parsedUser;
-    client.join(parsedUser);
+    pause.then(() => joinChannel(parsedUser));
 
     const resp = await fetch(`api/twitch_users?user=${parsedUser}`);
     const data = await resp.json();
@@ -160,6 +162,9 @@ const comp = defineComponent({
   },
   created() {
     console.log("Registering callback");
+    const client = getClient();
+    if (!client) return;
+
     client.on("message", (channel, tags, message, self) => {
       let name = tags["display-name"]?.toLowerCase() || tags.username || "";
       let type: UserTypes = "user";
@@ -183,18 +188,11 @@ const comp = defineComponent({
   },
   beforeDestroy() {
     console.log("Disconnecting from twitch");
-    client.disconnect();
+    disconnect();
   },
 });
 
 export default comp;
-
-function filterArrayBasedOnType<T, K>(
-  arr: { type: T; name: K }[],
-  type: T
-): K[] {
-  return arr.filter((x) => x.type === type).map((x) => x.name);
-}
 </script>
 
 <style>
