@@ -7,13 +7,6 @@
             <li v-for="item in routes" :key="item.name">
               <router-link :to="item.path">{{ item.name }}</router-link>
             </li>
-            <!-- <li><router-link to="/">Home</router-link></li>
-            <li>
-              <router-link to="/ranking">GuanTheBot Ranking</router-link>
-            </li>
-            <li>
-              <router-link to="/users">Twitch User List</router-link>
-            </li> -->
           </ul>
         </nav>
       </div>
@@ -42,7 +35,10 @@ import { routes } from "./router/routes";
 
 export default defineComponent({
   data() {
-    return { githubSHA: ".......", routes };
+    return { githubSHA: "......." };
+  },
+  computed: {
+    routes: () => routes.filter((x) => !x.exclude),
   },
   async mounted() {
     try {

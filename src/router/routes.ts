@@ -20,5 +20,6 @@ export const routes = [
 		name: "Github Redirect",
 		component: () =>
 			import(/* webpackChunkName: "github" */ "../views/Github.vue"),
+		exclude: true,
 	},
 ];
