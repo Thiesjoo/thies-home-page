@@ -2,8 +2,8 @@
   <div class="container">
     <h1>User list for {{ user }}</h1>
     <p>
-      Intial data from: {{ initialTime | date }}. Last updated:
-      {{ lastUpdatedTime | date }}
+      Intial data from: {{ initTime }}. Last updated:
+      {{ updateTime }}
     </p>
     <p>
       Deze lijst heeft: Alle chatters van de afgelopen 20 minuten en de
@@ -57,11 +57,19 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { formatDate } from "@/helpers/formatDate";
+import { defineComponent } from "@vue/runtime-core";
 import { Client as TwitchChatClient } from "tmi.js";
 const client = new TwitchChatClient({
   channels: [],
 });
+
+type UserTypes = "user" | "mod" | "vip";
+type User = {
+  name: string;
+  type: UserTypes;
+};
 
 /** The frontend list doesn't really have to be in sync with backend, because lurking bots will not chat */
 const BOTLIST = [
@@ -78,19 +86,34 @@ const BOTLIST = [
   "violets_tv",
 ];
 
-export default {
-  data() {
+const comp = defineComponent({
+  data(): {
+    users: {
+      mod: string[];
+      vip: string[];
+      user: string[];
+    };
+    allUsers: User[];
+    user: string;
+    initialTime: Date | null;
+    lastUpdatedTime: Date | null;
+    types: UserTypes[];
+    userFriendlyTypes: {
+      mod: string;
+      vip: string;
+      user: string;
+    };
+  } {
     return {
       users: {
-        mod: [],
-        vip: [],
-        user: [],
+        mod: [] as string[],
+        vip: [] as string[],
+        user: [] as string[],
       },
-      allUsers: [],
-      user: "",
+      allUsers: [] as User[],
       initialTime: null,
       lastUpdatedTime: null,
-
+      user: "",
       types: ["mod", "vip", "user"],
       userFriendlyTypes: {
         mod: "Mods 🍤",
@@ -99,15 +122,31 @@ export default {
       },
     };
   },
+  computed: {
+    initTime: function () {
+      //@ts-ignore
+      return this.initialTime !== null ? formatDate(this.initialTime) : "---";
+    },
+    updateTime: function () {
+      //@ts-ignore
+      return this.lastUpdatedTime !== null
+        ? //@ts-ignore
+          formatDate(this.lastUpdatedTime)
+        : "---";
+    },
+  },
   async mounted() {
     console.log("Connecting to twitch");
     await client.connect();
 
-    const { user = "madestout" } = this.$route.query;
-    this.user = user;
-    client.join(user);
+    console.log(this.$route.query);
 
-    const resp = await fetch(`api/twitch_users?user=${user}`);
+    const { user } = this.$route.query;
+    const parsedUser = (Array.isArray(user) ? user[0] : user) || "madestout";
+    this.user = parsedUser;
+    client.join(parsedUser);
+
+    const resp = await fetch(`api/twitch_users?user=${parsedUser}`);
     const data = await resp.json();
     if (!data.data) {
       return;
@@ -122,8 +161,8 @@ export default {
   created() {
     console.log("Registering callback");
     client.on("message", (channel, tags, message, self) => {
-      let name = tags["display-name"].toLowerCase();
-      let type = "user";
+      let name = tags["display-name"]?.toLowerCase() || tags.username || "";
+      let type: UserTypes = "user";
       if (tags.mod) {
         type = "mod";
       } else if (tags?.badges?.vip) {
@@ -138,7 +177,7 @@ export default {
         this.users[type].push(name);
         this.users[type].sort();
         this.allUsers.push({ name, type });
-        this.time = new Date();
+        this.lastUpdatedTime = new Date();
       }
     });
   },
@@ -146,9 +185,14 @@ export default {
     console.log("Disconnecting from twitch");
     client.disconnect();
   },
-};
+});
 
-function filterArrayBasedOnType(arr, type) {
+export default comp;
+
+function filterArrayBasedOnType<T, K>(
+  arr: { type: T; name: K }[],
+  type: T
+): K[] {
   return arr.filter((x) => x.type === type).map((x) => x.name);
 }
 </script>

@@ -4,13 +4,16 @@
       <div class="container">
         <nav class="header_menu">
           <ul>
-            <li><router-link to="/">Home</router-link></li>
+            <li v-for="item in routes" :key="item.name">
+              <router-link :to="item.path">{{ item.name }}</router-link>
+            </li>
+            <!-- <li><router-link to="/">Home</router-link></li>
             <li>
               <router-link to="/ranking">GuanTheBot Ranking</router-link>
             </li>
             <li>
               <router-link to="/users">Twitch User List</router-link>
-            </li>
+            </li> -->
           </ul>
         </nav>
       </div>
@@ -34,9 +37,12 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from "@vue/runtime-core";
+import { routes } from "./router/routes";
+
+export default defineComponent({
   data() {
-    return { githubSHA: "......." };
+    return { githubSHA: ".......", routes };
   },
   async mounted() {
     try {
@@ -55,7 +61,7 @@ export default {
       },
     },
   },
-};
+});
 </script>
 
 <style>
