@@ -3,16 +3,23 @@
  * @param {*} src The link to the PNG image
  */
 export function changeFavicon(src: string) {
-	const link = document.createElement("link");
-	const oldLink = document.getElementById("dynamic-favicon");
+	const existing = document.getElementById("favoicon");
+	if (existing) {
+		existing.setAttribute("href", src);
+		return;
+	}
 
-	link.id = "dynamic-favicon";
-	link.rel = "shortcut icon";
-	link.href = src;
-	link.type = "image/png";
+	const oldLink = document.getElementById("dynamic-favicon");
 	if (oldLink) {
 		document.head.removeChild(oldLink);
 	}
+
+	// Create a new one
+	const link = document.createElement("link");
+	link.id = "dynamic-favicon";
+	link.rel = "icon";
+	link.href = src;
+	link.type = "image/png";
 
 	document.head.appendChild(link);
 }
