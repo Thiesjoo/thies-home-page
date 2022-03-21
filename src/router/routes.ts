@@ -24,4 +24,14 @@ export const routes = [
 			import(/* webpackChunkName: "github" */ "../views/Github.vue"),
 		exclude: true,
 	},
+	{
+		path: "/home",
+		name: "Momentum Dash 2.0",
+		component: () =>
+			import(/* webpackChunkName: "github" */ "../views/Dash.vue"),
+		exclude: true,
+		meta: {
+			header: false,
+		},
+	},
 ];

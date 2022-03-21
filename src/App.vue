@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <header class="header">
+    <header class="header" v-if="show">
       <div class="container">
         <nav class="header_menu">
           <ul>
@@ -11,18 +11,11 @@
         </nav>
       </div>
     </header>
-    <router-view style="margin-top: 80px"> </router-view>
-    <footer>
+    <router-view style="margin-top: 80px"></router-view>
+    <footer v-if="show">
       Made by
-      <a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank"
-        >Me (:</a
-      >.
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://github.com/Thiesjoo/thies-home-page"
-        >Code</a
-      >
+      <a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank">Me (:</a>.
+      <a target="_blank" rel="noreferrer" href="https://github.com/Thiesjoo/thies-home-page">Code</a>
       is on github. Deployment:
       <span :title="githubSHA">{{ githubSHA.slice(0, 7) }}</span>
     </footer>
@@ -39,6 +32,11 @@ export default defineComponent({
   },
   computed: {
     routes: () => routes.filter((x) => !x.exclude),
+    show: function () {
+      let header = this.$route.meta.header;
+      console.log(header)
+      return (header === undefined ? true : header)
+    }
   },
   async mounted() {
     try {

@@ -185,7 +185,6 @@ export default comp;
   width: 100%;
   flex-flow: row wrap;
   justify-content: space-evenly;
-  /* align-items: center; */
   padding-bottom: 10%;
   padding-top: 1em;
 }
