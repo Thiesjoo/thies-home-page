@@ -4,11 +4,6 @@ export const routes = [
 		name: "About me!",
 		component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
 	},
-	// {
-	//   path: '/ranking',
-	//   name: 'GuanTheBot Typo Ranking',
-	//   component: () => import(/* webpackChunkName: "about" */ '../views/Ranking.vue')
-	// },
 	{
 		path: "/users",
 		name: "Twitch Viewer list",
