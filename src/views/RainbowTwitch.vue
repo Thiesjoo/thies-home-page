@@ -22,7 +22,6 @@
 <script lang="ts">
 import { getClient, initTMIClient, joinChannel } from "@/helpers/tmi";
 import { defineComponent } from "@vue/runtime-core";
-import { Client } from "tmi.js";
 
 let finalToken = "";
 

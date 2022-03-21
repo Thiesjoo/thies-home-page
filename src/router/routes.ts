@@ -15,6 +15,7 @@ export const routes = [
 		name: "Twitch Chat Tricks",
 		component: () =>
 			import(/* webpackChunkName: "rainbow" */ "../views/RainbowTwitch.vue"),
+		exclude: true,
 	},
 	{
 		path: "/gh*",

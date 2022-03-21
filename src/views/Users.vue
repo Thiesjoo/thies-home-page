@@ -2,16 +2,16 @@
   <div class="container">
     <h1>User list for {{ user }}</h1>
     <p>
-      Intial data from: {{ initTime }}. Last updated:
+      Initial data from: {{ initTime }}. Last updated:
       {{ updateTime }}
     </p>
     <p>
       Deze lijst heeft: Alle chatters van de afgelopen 20 minuten en de
       viewerlijst van twitch zelf!
-      <em
-        >(This list has all chatters from the previous 20 minutes and the twitch
-        viewerlist)</em
-      >
+      <em>
+        (This list has all chatters from the previous 20 minutes and the twitch
+        viewerlist)
+      </em>
     </p>
     <div class="content">
       <div class="twitchList">
@@ -20,17 +20,11 @@
           <em>Normale twitch viewerlist met alle chatters er nog bij</em>
         </p>
         <ul>
-          <li
-            style="list-style-type: none"
-            v-for="(type, index) in types"
-            :key="index"
-          >
+          <li style="list-style-type: none" v-for="(type, index) in types" :key="index">
             <hr style="height: 20px" />
             <h3 style="font-weight: 800">{{ userFriendlyTypes[type] }}</h3>
-            <ul>
-              <li v-for="(item, index1) in users[type]" :key="index1">
-                {{ item }}
-              </li>
+            <ul class="extraList">
+              <li v-for="(item, index1) in users[type]" :key="index1" :class="type">{{ item }}</li>
             </ul>
           </li>
         </ul>
@@ -38,19 +32,13 @@
       <div class="liveList">
         <h2 style="font-weight: 800">LiveList</h2>
         <p>
-          <em
-            >Dit is de twitch viewerlist, met daarna alle chatters. Nieuwe
-            gebruikers komen aan de onderkant van de lijst</em
-          >
+          <em>
+            Dit is de twitch viewerlist, met daarna alle chatters. Nieuwe
+            gebruikers komen aan de onderkant van de lijst
+          </em>
         </p>
         <ul class="extraList">
-          <li
-            v-for="(item, index1) in allUsers"
-            :key="index1"
-            :class="item.type"
-          >
-            {{ item.name }}
-          </li>
+          <li v-for="(item, index1) in allUsers" :key="index1" :class="item.type">{{ item.name }}</li>
         </ul>
       </div>
     </div>
@@ -136,13 +124,11 @@ const comp = defineComponent({
       //@ts-ignore
       return this.lastUpdatedTime !== null
         ? //@ts-ignore
-          formatDate(this.lastUpdatedTime)
+        formatDate(this.lastUpdatedTime)
         : "---";
     },
   },
   async mounted() {
-    console.log(this.$route.query);
-
     const { user } = this.$route.query;
     const parsedUser = (Array.isArray(user) ? user[0] : user) || "madestout";
     this.user = parsedUser;
@@ -161,7 +147,6 @@ const comp = defineComponent({
     });
   },
   created() {
-    console.log("Registering callback");
     const client = getClient();
     if (!client) return;
 
@@ -187,7 +172,6 @@ const comp = defineComponent({
     });
   },
   beforeDestroy() {
-    console.log("Disconnecting from twitch");
     disconnect();
   },
 });
@@ -201,7 +185,7 @@ export default comp;
   width: 100%;
   flex-flow: row wrap;
   justify-content: space-evenly;
-  align-items: center;
+  /* align-items: center; */
   padding-bottom: 10%;
   padding-top: 1em;
 }
@@ -217,6 +201,7 @@ export default comp;
 
 .twitchList,
 .liveList {
+  width: 70%;
   max-width: 500px;
 }
 
