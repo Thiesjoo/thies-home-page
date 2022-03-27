@@ -11,7 +11,8 @@
         </nav>
       </div>
     </header>
-    <router-view style="margin-top: 80px"></router-view>
+    <div v-if="show" style="margin-top: 80px;"></div>
+    <router-view></router-view>
     <footer v-if="show">
       Made by
       <a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank">Me (:</a>.

@@ -7,6 +7,19 @@
       <h3 class="greeting">Good morning, Thies.</h3>
     </div>
   </div>
+
+  <div class="widget">
+    <div class="p-2">
+      <div
+        class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
+      >
+        <span
+          class="inline-flex bg-purple-600 text-white rounded-full h-6 px-3 justify-center items-center"
+        >POS</span>
+        <span class="inline-flex px-2">{{ balance }}</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -23,11 +36,17 @@ export default defineComponent({
   data() {
     return {
       interval: null,
-      time: getCurrentTime()
+      time: getCurrentTime(),
+      balance: '...'
     }
   },
   beforeDestroy() {
     clearInterval(this.interval)
+  },
+  mounted() {
+    fetch("/api/external/via").then(x => x.json()).then(x => {
+      this.balance = (x.balance / 100).toLocaleString('nl-NL', { style: "currency", 'currency': "EUR" })
+    })
   },
   created() {
     this.interval = setInterval(() => {
@@ -95,5 +114,12 @@ body {
   line-height: 1;
   padding: 0;
   margin: 0;
+}
+
+.widget {
+  position: absolute;
+  right: 0;
+  margin: 1em;
+  top: 0;
 }
 </style>
