@@ -31,7 +31,7 @@ import axios from "axios";
 import ms from "ms";
 import { parse } from "irc-message";
 
-export default async function(req: VercelRequest, res: VercelResponse) {
+export default async function (req: VercelRequest, res: VercelResponse) {
 	if (typeof req.query.user === "object") return;
 	if (!req.query.user)
 		return res
@@ -48,23 +48,11 @@ export default async function(req: VercelRequest, res: VercelResponse) {
 		return getUsersFromIRC(data);
 	};
 
-	const userReq = async () => {
-		return combineViewers(
-			(await axios(`https://tmi.twitch.tv/group/user/${user}/chatters`)).data
-		);
-	};
-
 	try {
-		const [recentMessages, viewerList] = await Promise.all([
-			recentReq(),
-			userReq(),
-		]);
+		const [recentMessages] = await Promise.all([recentReq()]);
 
 		res.setHeader("Cache-Control", "max-age=30, stale-while-revalidate=60");
-		const processed = filterBotsAndDuplicates(
-			[...viewerList, ...recentMessages],
-			user
-		);
+		const processed = filterBotsAndDuplicates([...recentMessages], user);
 
 		return res.json({
 			message: `Returns users in chat from the past 20 minutes + users in viewerlist - bots. (Sorted = sorted based on type then name. Unsorted is: Entire viewerlist + people who chatted)`,
