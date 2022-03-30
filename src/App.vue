@@ -76,7 +76,7 @@ export default defineComponent({
 }
 
 body {
-  height: 800px;
+  height: 100vh;
   background: #99aab5;
   font-family: "Montserrat", sans-serif;
 }

@@ -65,6 +65,9 @@ export default defineComponent({
     clearInterval(this.interval)
   },
   mounted() {
+    fetch("http://localhost:6969/api/users/me", { mode: 'cors', credentials: 'include' }).then(x => x.json()).then(console.log)
+
+
     fetch("/api/external/via").then(x => x.json()).then(x => {
       this.balance = (x.balance / 100).toLocaleString('nl-NL', { style: "currency", 'currency': "EUR" })
     })
@@ -141,6 +144,7 @@ body {
   position: absolute;
   right: 0;
   margin: 1em;
+  max-width: 10%;
   top: 0;
 }
 </style>
