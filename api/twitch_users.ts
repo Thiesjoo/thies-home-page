@@ -42,7 +42,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 	const recentReq = async () => {
 		const data = (
 			await axios(
-				`https://recent-messages.robotty.de/api/v2/recent-messages/${user}?limit=100&hide_moderation_messages=true&hide_moderated_messages=true`
+				`https://recent-messages.robotty.de/api/v2/recent-messages/${user}?limit=1000&hide_moderation_messages=true&hide_moderated_messages=true`
 			)
 		).data;
 		return getUsersFromIRC(data);
@@ -98,7 +98,7 @@ function combineViewers(data: {
  */
 function getUsersFromIRC(
 	irc: { messages: string[] },
-	maxDate = +ms("20m")
+	maxDate = +ms("1h")
 ): User[] {
 	const current = Date.now() - maxDate;
 	return irc.messages
