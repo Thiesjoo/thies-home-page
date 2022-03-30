@@ -6,31 +6,21 @@
       {{ updateTime }}
     </p>
     <p>
-      Deze lijst heeft: Alle chatters van de afgelopen 20 minuten en de
-      viewerlijst van twitch zelf!
-      <em
-        >(This list has all chatters from the previous 20 minutes and the twitch
-        viewerlist)</em
-      >
+      Deze lijst heeft: Alle chatters van het afgelopen uur!
+      <em>(This list has all chatters from the previous hour!)</em>
     </p>
     <div class="content">
       <div class="twitchList">
         <h2 style="font-weight: 800">TwitchList</h2>
         <p>
-          <em>Normale twitch viewerlist met alle chatters er nog bij</em>
+          <em>Alle actieve chatters van het afgelopen uur</em>
         </p>
         <ul>
-          <li
-            style="list-style-type: none"
-            v-for="(type, index) in types"
-            :key="index"
-          >
+          <li style="list-style-type: none" v-for="(type, index) in types" :key="index">
             <hr style="height: 20px" />
             <h3 style="font-weight: 800">{{ userFriendlyTypes[type] }}</h3>
             <ul>
-              <li v-for="(item, index1) in users[type]" :key="index1">
-                {{ item }}
-              </li>
+              <li v-for="(item, index1) in users[type]" :key="index1">{{ item }}</li>
             </ul>
           </li>
         </ul>
@@ -38,19 +28,13 @@
       <div class="liveList">
         <h2 style="font-weight: 800">LiveList</h2>
         <p>
-          <em
-            >Dit is de twitch viewerlist, met daarna alle chatters. Nieuwe
-            gebruikers komen aan de onderkant van de lijst</em
-          >
+          <em>
+            Alle chatters van het afgelopen uur. Nieuwe
+            gebruikers komen aan de onderkant van de lijst
+          </em>
         </p>
         <ul class="extraList">
-          <li
-            v-for="(item, index1) in allUsers"
-            :key="index1"
-            :class="item.type"
-          >
-            {{ item.name }}
-          </li>
+          <li v-for="(item, index1) in allUsers" :key="index1" :class="item.type">{{ item.name }}</li>
         </ul>
       </div>
     </div>
@@ -131,7 +115,7 @@ const comp = defineComponent({
       //@ts-ignore
       return this.lastUpdatedTime !== null
         ? //@ts-ignore
-          formatDate(this.lastUpdatedTime)
+        formatDate(this.lastUpdatedTime)
         : "---";
     },
   },
