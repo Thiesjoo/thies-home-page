@@ -10,15 +10,13 @@
 
   <div class="widget">
     <POS />
-    <Base color="purple" val="69 live">
-      <font-awesome-icon :icon="['fab', 'twitch']" />
-    </Base>
+    <TwitchFollow />
   </div>
 </template>
 
 <script>
 import { defineComponent } from "@vue/runtime-core";
-import Base from "@/widgets/Base.vue";
+import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
 
 function getCurrentTime() {
@@ -47,10 +45,9 @@ export default defineComponent({
       this.time = getCurrentTime();
     }, 1000);
   },
-  components: { Base, POS }
+  components: { TwitchFollow, POS }
 });
 </script>
-
 <style>
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro",
