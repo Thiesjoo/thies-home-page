@@ -2,8 +2,11 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import "axios";
 import axios from "axios";
 
+let baseURL = "http://localhost:6969";
+baseURL = "https://auth.thies.dev/";
+
 export default async function (req: VercelRequest, res: VercelResponse) {
-	const token = req.cookies.accesstoken;
+	let token = req.cookies.accesstoken;
 
 	if (!token) {
 		res.status(401);
@@ -12,14 +15,13 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 	}
 
 	console.log(token);
-
 	try {
 		const result = (
 			await axios({
-				url: "http://localhost:6969/api/users/me/providers/twitch",
+				url: baseURL + "/api/users/me/providers/twitch",
 				headers: {
-					authorization: `Bearer ${token}`,
-					"X-Secret": "thisisatest",
+					Authorization: `Bearer ${token}`,
+					"X-Secret": process.env.secret,
 				},
 				method: "GET",
 			})

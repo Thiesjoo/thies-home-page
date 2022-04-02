@@ -9,42 +9,17 @@
   </div>
 
   <div class="widget">
-    <div class="p-2">
-      <div
-        class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
-      >
-        <span
-          class="inline-flex bg-purple-600 text-white rounded-full h-6 px-3 justify-center items-center"
-        >POS</span>
-        <span class="inline-flex px-2">{{ balance }}</span>
-      </div>
-    </div>
-    <div class="p-2">
-      <div
-        class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
-      >
-        <span class="inline-flex rounded-full h-6 px-3 justify-center items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="64"
-            height="64"
-            style="transform: scale(0.5);"
-          >
-            <path
-              d="M5.7 0L1.4 10.985V55.88h15.284V64h8.597l8.12-8.12h12.418l16.716-16.716V0H5.7zm51.104 36.3L47.25 45.85H31.967l-8.12 8.12v-8.12H10.952V5.73h45.85V36.3zM47.25 16.716v16.716h-5.73V16.716h5.73zm-15.284 0v16.716h-5.73V16.716h5.73z"
-              fill="#6441a4"
-              fill-rule="evenodd"
-            />
-          </svg>
-        </span>
-        <span class="inline-flex px-2">69 Live</span>
-      </div>
-    </div>
+    <POS />
+    <Base color="purple" val="69 live">
+      <font-awesome-icon :icon="['fab', 'twitch']" />
+    </Base>
   </div>
 </template>
 
 <script>
 import { defineComponent } from "@vue/runtime-core";
+import Base from "@/widgets/Base.vue";
+import POS from "@/widgets/POS.vue";
 
 function getCurrentTime() {
   return Intl.DateTimeFormat('nl-NL', {
@@ -58,25 +33,21 @@ export default defineComponent({
     return {
       interval: null,
       time: getCurrentTime(),
-      balance: '...'
-    }
+      balance: "..."
+    };
   },
   beforeDestroy() {
-    clearInterval(this.interval)
+    clearInterval(this.interval);
   },
   mounted() {
-    fetch("http://localhost:6969/api/users/me", { mode: 'cors', credentials: 'include' }).then(x => x.json()).then(console.log)
-
-
-    fetch("/api/external/via").then(x => x.json()).then(x => {
-      this.balance = (x.balance / 100).toLocaleString('nl-NL', { style: "currency", 'currency': "EUR" })
-    })
+    fetch("http://localhost:6969/api/users/me", { mode: "cors", credentials: "include" }).then(x => x.json()).then(console.log);
   },
   created() {
     this.interval = setInterval(() => {
-      this.time = getCurrentTime()
-    }, 1000)
-  }
+      this.time = getCurrentTime();
+    }, 1000);
+  },
+  components: { Base, POS }
 });
 </script>
 
