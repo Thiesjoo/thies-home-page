@@ -36,8 +36,12 @@ export default defineComponent({
     }
   },
   async created() {
-    this.value = typeof this.val === "function" ? await this.val() : this.val
-    this.loaded = true
+    try {
+      this.value = typeof this.val === "function" ? await this.val() : this.val
+      this.loaded = true
+    } catch (e) {
+      console.warn("Component with val: ", this.val, "failed to load with error: ", e)
+    }
   }
 });
 </script>

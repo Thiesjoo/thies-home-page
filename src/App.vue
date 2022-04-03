@@ -35,7 +35,6 @@ export default defineComponent({
     routes: () => routes.filter((x) => !x.exclude),
     show: function () {
       let header = this.$route.meta.header;
-      console.log(header)
       return (header === undefined ? true : header)
     }
   },

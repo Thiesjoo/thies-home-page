@@ -37,9 +37,6 @@ export default defineComponent({
   beforeDestroy() {
     clearInterval(this.interval);
   },
-  mounted() {
-    fetch("http://localhost:6969/api/users/me", { mode: "cors", credentials: "include" }).then(x => x.json()).then(console.log);
-  },
   created() {
     this.interval = setInterval(() => {
       this.time = getCurrentTime();

@@ -1,31 +1,11 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import "axios";
 import axios from "axios";
-
-const baseURL = process.env.BASEURL;
+import { getProviderCreds } from "./_getcredentials";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
-	let token = req.cookies.accesstoken;
-
-	if (!token) {
-		res.status(401);
-		res.json({ error: "No accesstoken found" });
-		return;
-	}
-
 	try {
-		const result = (
-			await axios({
-				url: baseURL + "/api/users/me/providers/twitch",
-				headers: {
-					Authorization: `Bearer ${token}`,
-					"X-Secret": process.env.secret,
-				},
-				method: "GET",
-			})
-		)?.data;
-
-		console.log("Twitch provider api:", result);
+		const result = await getProviderCreds(req, "twitch");
 
 		const twitch = await axios({
 			url: "https://api.twitch.tv/helix/streams/followed",
@@ -38,10 +18,9 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			},
 		});
 
-		console.log(twitch.data);
-		res.json({ ok: true, data: twitch.data.data.length });
+		res.json({ ok: true, data: twitch.data.data });
 	} catch (e) {
-		console.error(e);
-		res.json({ ok: false });
+		res.statusCode = 500;
+		res.json({ ok: false, error: e?.message });
 	}
 }
