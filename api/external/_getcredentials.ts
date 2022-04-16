@@ -1,7 +1,15 @@
 import { VercelRequest } from "@vercel/node";
 import axios from "axios";
 
-export async function getProviderCreds(req: VercelRequest, provider: string) {
+process.env.BASEURL = "https://auth.thies.dev";
+process.env.secret =
+	"akjshdkljahsdjklhaklsdhaklshjdjklahjoiu12098u301820lknmkb,nmb10109010101";
+
+export async function getProviderCredentials(
+	req: VercelRequest,
+	provider: string,
+	id?: string
+) {
 	let token = req.cookies.accesstoken;
 
 	if (!token) {
@@ -21,7 +29,10 @@ export async function getProviderCreds(req: VercelRequest, provider: string) {
 			clientid: string;
 		} = (
 			await axios({
-				url: process.env.BASEURL + "/api/users/me/providers/" + provider,
+				url: process.env.BASEURL + "/api/providers/me/" + provider,
+				params: {
+					id,
+				},
 				headers: {
 					Authorization: `Bearer ${token}`,
 					"X-Secret": process.env.secret,
@@ -31,6 +42,10 @@ export async function getProviderCreds(req: VercelRequest, provider: string) {
 		)?.data;
 		return result;
 	} catch (e) {
-		throw new Error("PROVIDER: " + e + " msg: " + e?.response?.data?.message);
+		throw new Error(
+			"PROVIDER (myapi): " + e + " msg: " + e?.response?.data?.message
+		);
 	}
 }
+
+export default getProviderCredentials;

@@ -1,13 +1,11 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import "axios";
 import axios from "axios";
-import { getProviderCreds } from "./_getcredentials";
+import getProviderCredentials from "./_getcredentials";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	try {
-		const result = await getProviderCreds(req, "twitch");
+		const result = await getProviderCredentials(req, "twitch");
 
-		// TODO: This only works for < 100 live channels
 		const liveUsersRequest = await axios({
 			url: "https://api.twitch.tv/helix/streams/followed",
 			params: {
