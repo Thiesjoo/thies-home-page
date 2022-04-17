@@ -42,7 +42,7 @@ export default defineComponent({
 		routes: () => routes.filter((x) => !x.exclude),
 		show: function () {
 			let header = this.$route.meta.header;
-			return header === undefined ? true : header;
+			return header === undefined ? false : header;
 		},
 	},
 	async mounted() {

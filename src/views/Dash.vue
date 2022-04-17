@@ -76,10 +76,16 @@ body {
 	color: #fff;
 }
 
-/* Momentum albums: https://www.flickr.com/photos/152977080@N03/albums/72157681812020976 */
 .background {
-	background: url("https://source.unsplash.com/random/1920x1080/?landscape");
+	background: url("https://source.unsplash.com/random/1920x1080/?landscape"),
+		linear-gradient(to right, #74ebd5 0%, #9face6 100%);
 	position: absolute;
+
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+	backface-visibility: hidden;
+
 	top: 0;
 	left: 0;
 	right: 0;
