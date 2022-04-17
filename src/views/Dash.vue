@@ -1,17 +1,21 @@
 <template>
-  <div class="background"></div>
+	<span
+		v-if="current > 0"
+		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
+	></span>
+	<div class="background"></div>
 
-  <div class="centered">
-    <div class="info">
-      <h2 class="time">{{ time }}</h2>
-      <h3 class="greeting">Good morning, Thies.</h3>
-    </div>
-  </div>
+	<div class="centered">
+		<div class="info">
+			<h2 class="time">{{ time }}</h2>
+			<h3 class="greeting">Good morning{{ name }}.</h3>
+		</div>
+	</div>
 
-  <div class="widget">
-    <POS />
-    <TwitchFollow />
-  </div>
+	<div class="widget">
+		<POS />
+		<TwitchFollow />
+	</div>
 </template>
 
 <script>
@@ -20,96 +24,115 @@ import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
 
 function getCurrentTime() {
-  return Intl.DateTimeFormat('nl-NL', {
-    hour: 'numeric',
-    minute: 'numeric',
-  }).format()
+	return Intl.DateTimeFormat("nl-NL", {
+		hour: "numeric",
+		minute: "numeric",
+	}).format();
 }
 
 export default defineComponent({
-  data() {
-    return {
-      interval: null,
-      time: getCurrentTime(),
-      balance: "..."
-    };
-  },
-  beforeDestroy() {
-    clearInterval(this.interval);
-  },
-  created() {
-    this.interval = setInterval(() => {
-      this.time = getCurrentTime();
-    }, 1000);
-  },
-  components: { TwitchFollow, POS }
+	data() {
+		return {
+			interval: null,
+			time: getCurrentTime(),
+			balance: "...",
+			name: "",
+			current: 0,
+		};
+	},
+
+	beforeDestroy() {
+		clearInterval(this.interval);
+		window.removeEventListener("currentlyLoadingRequests");
+	},
+	async created() {
+		this.interval = setInterval(() => {
+			this.time = getCurrentTime();
+		}, 1000);
+
+		const self = this;
+
+		window.addEventListener("currentlyLoadingRequests", function (e) {
+			self.current = window.currentlyLoadingRequests;
+		});
+
+		try {
+			const res = await (await fetch("/api/whoami")).json();
+			if (res.name) {
+				this.name = `, ${res.name}`;
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	},
+	components: { TwitchFollow, POS },
 });
 </script>
 <style>
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro",
-    "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-  text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
-  color: #fff;
+	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro",
+		"Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
+	color: #fff;
 }
 
 /* Momentum albums: https://www.flickr.com/photos/152977080@N03/albums/72157681812020976 */
 .background {
-  background: url("https://source.unsplash.com/random/1920x1080/?landscape");
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: transparent;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
+	background: url("https://source.unsplash.com/random/1920x1080/?landscape");
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: transparent;
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+	width: 100vw;
+	height: 100vh;
+	z-index: -1;
 }
 
 .centered {
-  height: 100vh;
+	height: 100vh;
 }
 
 .info {
-  flex-direction: column;
+	flex-direction: column;
 }
 
 .centered,
 .info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .time {
-  font-size: 1050%;
-  font-weight: 500;
-  letter-spacing: -5px;
+	font-size: 1050%;
+	font-weight: 500;
+	letter-spacing: -5px;
 }
 
 .greeting {
-  font-size: 3.375rem;
-  font-weight: 300;
+	font-size: 3.375rem;
+	font-weight: 300;
 }
 
 .time,
 .greeting {
-  cursor: default;
-  text-align: center;
-  line-height: 1;
-  padding: 0;
-  margin: 0;
+	cursor: default;
+	text-align: center;
+	line-height: 1;
+	padding: 0;
+	margin: 0;
 }
 
 .widget {
-  position: absolute;
-  right: 0;
-  margin: 1em;
-  max-width: 10%;
-  top: 0;
+	position: absolute;
+	right: 0;
+	margin: 1em;
+	max-width: 10%;
+	top: 0;
 }
 </style>

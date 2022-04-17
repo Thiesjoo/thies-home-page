@@ -12,9 +12,13 @@ const getURL = () => {
 const { fetch: originalFetch } = window;
 
 let currentlyFetching: Promise<Response> | null = null;
+window.currentlyLoadingRequests = 0;
 
 window.fetch = async (...args) => {
 	let [resource, config] = args;
+
+	window.currentlyLoadingRequests++;
+	window.dispatchEvent(new Event("currentlyLoadingRequests"));
 
 	const response = await originalFetch(resource, config);
 
@@ -28,9 +32,17 @@ window.fetch = async (...args) => {
 
 		const newResponse = await currentlyFetching;
 		if (newResponse.ok) {
-			return await originalFetch(resource, config);
+			const resp = await originalFetch(resource, config);
+			window.currentlyLoadingRequests--;
+			window.dispatchEvent(new Event("currentlyLoadingRequests"));
+
+			return resp;
+		} else {
+			throw new Error("Something went wrong with refreshing the tokens");
 		}
 	}
-	// response interceptor here
+	window.currentlyLoadingRequests--;
+	window.dispatchEvent(new Event("currentlyLoadingRequests"));
+
 	return response;
 };
