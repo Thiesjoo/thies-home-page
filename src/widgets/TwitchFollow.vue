@@ -19,20 +19,23 @@
 			<div
 				v-if="open"
 				@mouseover="open = true"
-				class="absolute flex flex-col items-center right-0 w-64 py-2 mt-2 bg-white bg-gray-100 rounded-md shadow-xl"
+				class="absolute flex flex-col items-center right-0 w-64 py-2 mt-2 e bg-gray-100 rounded-md shadow-xl"
 			>
 				<a
 					:href="'https://twitch.tv/' + item.url"
 					rel="nofollow"
-					class="grow inline-flex w-full px-1 py-3 text-sm text-gray-300 text-gray-700 hover:bg-gray-400 hover:text-white"
+					class="grow inline-flex w-full px-1 py-3 text-sm text-gray-700 hover:bg-gray-400 hover:text-white no-underline"
 					v-for="item in data"
 				>
 					<div class="px-4 w-36 items-center align-top">
-						<img :src="item.avatar" class="object-contain rounded-full" />
+						<img
+							:src="item.avatar"
+							class="object-contain rounded-full w-full h-auto shadow-md"
+						/>
 					</div>
 
 					<div class="flex flex-col w-full break-words" :title="item.title">
-						<b>{{ item.name }}</b>
+						<b class="font-bold">{{ item.name }}</b>
 						<i>{{ item.game_name }}</i>
 						<div class="inline-flex items-center">
 							<div class="w-3 h-3 rounded-full bg-red-600"></div>
