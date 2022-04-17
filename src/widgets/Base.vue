@@ -1,18 +1,20 @@
 <template>
-	<div class="p-2" v-if="loaded" @click="linkTo">
-		<div
-			class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm max-w-sm"
-		>
-			<span
-				class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center"
-				:class="[color ? 'bg-' + color + '-600' : '']"
-				style="max-width: 50%"
+	<Transition name="slide-fade">
+		<div class="p-2" v-if="loaded" @click="linkTo">
+			<div
+				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm max-w-sm"
 			>
-				<slot></slot>
-			</span>
-			<span class="inline-flex px-2">{{ value }}</span>
+				<span
+					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center"
+					:class="[color ? 'bg-' + color + '-600' : '']"
+					style="max-width: 50%"
+				>
+					<slot></slot>
+				</span>
+				<span class="inline-flex px-2">{{ getValue }}</span>
+			</div>
 		</div>
-	</div>
+	</Transition>
 </template>
 
 <script>
@@ -31,9 +33,14 @@ export default defineComponent({
 	},
 	data() {
 		return {
-			value: "...",
 			loaded: false,
+			precomputed: "...",
 		};
+	},
+	computed: {
+		getValue() {
+			return typeof this.val === "function" ? this.precomputed : this.val;
+		},
 	},
 	methods: {
 		linkTo() {
@@ -42,7 +49,8 @@ export default defineComponent({
 	},
 	async created() {
 		try {
-			this.value = typeof this.val === "function" ? await this.val() : this.val;
+			this.precomputed =
+				typeof this.val === "function" ? await this.val() : this.val;
 			this.loaded = true;
 		} catch (e) {
 			console.warn(
@@ -55,3 +63,24 @@ export default defineComponent({
 	},
 });
 </script>
+
+<style>
+/* we will explain what these classes do next! */
+/*
+  Enter and leave animations can use different
+  durations and timing functions.
+*/
+.slide-fade-enter-active {
+	transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+	transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+	transform: translateX(20px);
+	opacity: 0;
+}
+</style>

@@ -8,13 +8,17 @@
 	<div class="centered">
 		<div class="info">
 			<h2 class="time">{{ time }}</h2>
-			<h3 class="greeting">Good morning{{ name }}.</h3>
+			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
 
-	<div class="widget">
+	<div class="widget top-0 right-0">
 		<POS />
 		<TwitchFollow />
+	</div>
+
+	<div class="widget bottom-0 right-0">
+		<Pause />
 	</div>
 </template>
 
@@ -22,12 +26,23 @@
 import { defineComponent } from "@vue/runtime-core";
 import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
+import Pause from "@/widgets/Pause.vue";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
 		minute: "numeric",
 	}).format();
+}
+
+function getGreeting() {
+	const date = new Date();
+	let hours = date.getHours();
+	return hours < 12
+		? "morning"
+		: hours <= 18 && hours >= 12
+		? "afternoon"
+		: "night";
 }
 
 export default defineComponent({
@@ -38,9 +53,9 @@ export default defineComponent({
 			balance: "...",
 			name: "",
 			current: 0,
+			greeting: getGreeting(),
 		};
 	},
-
 	beforeDestroy() {
 		clearInterval(this.interval);
 		window.removeEventListener("currentlyLoadingRequests");
@@ -48,6 +63,7 @@ export default defineComponent({
 	async created() {
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
+			this.greeting = getGreeting();
 		}, 1000);
 
 		const self = this;
@@ -65,7 +81,7 @@ export default defineComponent({
 			console.error(e);
 		}
 	},
-	components: { TwitchFollow, POS },
+	components: { TwitchFollow, POS, Pause },
 });
 </script>
 <style>
@@ -74,6 +90,7 @@ body {
 		"Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
 	color: #fff;
+	overflow: hidden;
 }
 
 .background {
@@ -136,9 +153,11 @@ body {
 
 .widget {
 	position: absolute;
-	right: 0;
 	margin: 1em;
 	max-width: 10%;
-	top: 0;
+}
+
+.widget > * {
+	float: right;
 }
 </style>
