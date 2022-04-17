@@ -79,7 +79,7 @@ export default defineComponent({
 					};
 				})
 				.sort((a, b) => b.viewers - a.viewers);
-			return `${res.data.length} streams`;
+			return `${res.data.length} stream${res.data.length == 1 ? "" : "s"}`;
 		},
 	},
 	components: { Base },
