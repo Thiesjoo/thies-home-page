@@ -4,11 +4,6 @@ export const routes = [
 		name: "About me!",
 		component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
 	},
-	// {
-	//   path: '/ranking',
-	//   name: 'GuanTheBot Typo Ranking',
-	//   component: () => import(/* webpackChunkName: "about" */ '../views/Ranking.vue')
-	// },
 	{
 		path: "/users",
 		name: "Twitch Viewer list",
@@ -16,10 +11,27 @@ export const routes = [
 			import(/* webpackChunkName: "users" */ "../views/Users.vue"),
 	},
 	{
+		path: "/rainbow",
+		name: "Twitch Chat Tricks",
+		component: () =>
+			import(/* webpackChunkName: "rainbow" */ "../views/RainbowTwitch.vue"),
+		exclude: true,
+	},
+	{
 		path: "/gh*",
 		name: "Github Redirect",
 		component: () =>
 			import(/* webpackChunkName: "github" */ "../views/Github.vue"),
 		exclude: true,
+	},
+	{
+		path: "/home",
+		name: "Momentum Dash 2.0",
+		component: () =>
+			import(/* webpackChunkName: "github" */ "../views/Dash.vue"),
+		exclude: true,
+		meta: {
+			header: false,
+		},
 	},
 ];

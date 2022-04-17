@@ -6,6 +6,7 @@ export default function (req: VercelRequest, res: VercelResponse) {
 			.status(404)
 			.json({ ok: false, error: "Not currently deployed on vercel" });
 	}
+
 	res.json({
 		ok: true,
 		sha: process.env.VERCEL_GIT_COMMIT_SHA,
