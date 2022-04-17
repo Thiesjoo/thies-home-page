@@ -1,18 +1,18 @@
-import { VercelRequest } from "@vercel/node";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
 
 export async function getProviderCredentials(
 	req: VercelRequest,
+	res: VercelResponse,
 	provider: string,
 	id?: string
 ) {
 	let token = req.cookies.accesstoken;
-
-	if (!token) {
-		throw new Error("PROVIDER: No accesstoken found");
-	}
-
 	try {
+		if (!token) {
+			throw new Error("401 - No accesstoken");
+		}
+
 		const result: {
 			id: string;
 			accessToken: string;
@@ -38,9 +38,13 @@ export async function getProviderCredentials(
 		)?.data;
 		return result;
 	} catch (e) {
-		throw new Error(
+		console.error(
 			"PROVIDER (myapi): " + e + " msg: " + e?.response?.data?.message
 		);
+		res.statusCode = e?.message?.startsWith("401") ? 401 : 400;
+		res.json({ ok: false, error: e?.message });
+
+		return false;
 	}
 }
 

@@ -4,7 +4,8 @@ import getProviderCredentials from "./_getcredentials";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	try {
-		const result = await getProviderCredentials(req, "twitch");
+		const result = await getProviderCredentials(req, res, "twitch");
+		if (!result) return;
 
 		const liveUsersRequest = await axios({
 			url: "https://api.twitch.tv/helix/streams/followed",
