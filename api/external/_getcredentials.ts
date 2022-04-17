@@ -1,10 +1,6 @@
 import { VercelRequest } from "@vercel/node";
 import axios from "axios";
 
-process.env.BASEURL = "https://auth.thies.dev";
-process.env.secret =
-	"akjshdkljahsdjklhaklsdhaklshjdjklahjoiu12098u301820lknmkb,nmb10109010101";
-
 export async function getProviderCredentials(
 	req: VercelRequest,
 	provider: string,

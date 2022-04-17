@@ -6,7 +6,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 	const fetchRes = await axios({
 		url: "https://pos.svia.nl/api/account/",
 		headers: {
-			authorization: "Bearer",
+			authorization: "Bearer ",
 		},
 		method: "GET",
 	});
