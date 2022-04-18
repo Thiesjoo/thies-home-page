@@ -22,7 +22,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
@@ -45,10 +45,15 @@ function getGreeting() {
 		: "night";
 }
 
+function listener() {
+	//@ts-ignore
+	this.current = window.networking.currentlyLoadingRequests;
+}
+
 export default defineComponent({
 	data() {
 		return {
-			interval: null,
+			interval: null as number | null,
 			time: getCurrentTime(),
 			balance: "...",
 			name: "",
@@ -57,8 +62,8 @@ export default defineComponent({
 		};
 	},
 	beforeDestroy() {
-		clearInterval(this.interval);
-		window.removeEventListener("currentlyLoadingRequests");
+		if (this.interval) clearInterval(this.interval);
+		window.removeEventListener("currentlyLoadingRequests", listener.bind(this));
 	},
 	async created() {
 		this.interval = setInterval(() => {
@@ -68,9 +73,7 @@ export default defineComponent({
 
 		const self = this;
 
-		window.addEventListener("currentlyLoadingRequests", function (e) {
-			self.current = window.currentlyLoadingRequests;
-		});
+		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
 
 		try {
 			const res = await (await fetch("/api/whoami")).json();

@@ -8,7 +8,7 @@
 	<Base color="fuchsia" :val="text" link="https://ishetpauze.nl">Pauze</Base>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import Base from "@/widgets/Base.vue";
 
@@ -29,14 +29,17 @@ export default defineComponent({
 			return "oeps";
 		},
 	},
-	data() {
+	data(): {
+		text: string;
+		interval: number | null;
+	} {
 		return {
 			interval: null,
 			text: pauseText(),
 		};
 	},
 	beforeDestroy() {
-		clearInterval(this.interval);
+		if (this.interval) clearInterval(this.interval);
 	},
 	created() {
 		const self = this;

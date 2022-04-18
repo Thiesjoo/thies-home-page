@@ -48,12 +48,23 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import Base from "@/widgets/Base.vue";
 
 export default defineComponent({
-	data() {
+	data(): {
+		open: boolean;
+		data: {
+			name: string;
+			url: string;
+			title: string;
+			game_name: string;
+			avatar: string;
+			stream_image: string;
+			viewers: number;
+		}[];
+	} {
 		return { open: false, data: [] };
 	},
 	methods: {
@@ -64,21 +75,21 @@ export default defineComponent({
 			if (!fetchRes.ok) throw new Error(fetchRes.statusText);
 
 			const res = await fetchRes.json();
-			this.data = res.data
-				.map((x) => {
-					return {
-						name: x.user_name,
-						url: x.user_login,
-						title: x.title,
-						game_name: x.game_name,
-						avatar: x.profile_image_url,
-						stream_image: x.thumbnail_url
-							.replace("{width}", "1920")
-							.replace("{height}", "1080"),
-						viewers: x.viewer_count,
-					};
-				})
-				.sort((a, b) => b.viewers - a.viewers);
+			this.data = res.data.map((x: any) => {
+				return {
+					name: x.user_name,
+					url: x.user_login,
+					title: x.title,
+					game_name: x.game_name,
+					avatar: x.profile_image_url,
+					stream_image: x.thumbnail_url
+						.replace("{width}", "1920")
+						.replace("{height}", "1080"),
+					viewers: x.viewer_count,
+				};
+			});
+			this.data.sort((a, b) => b.viewers - a.viewers);
+
 			return `${res.data.length} stream${res.data.length == 1 ? "" : "s"}`;
 		},
 	},
