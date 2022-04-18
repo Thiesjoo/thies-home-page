@@ -78,7 +78,7 @@ export default defineComponent({
 				this.name = `, ${res.name}`;
 			}
 		} catch (e) {
-			console.error(e);
+			console.error("WHOAMI failed: ", e);
 		}
 	},
 	components: { TwitchFollow, POS, Pause },

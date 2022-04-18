@@ -1,7 +1,7 @@
 <template>
 	<Base
 		color="cyan"
-		val="Besturingssystemen "
+		:val="getCurrentLesson"
 		link="https://datanose.nl/#timetable[195750](0,0)"
 		>Nu
 	</Base>
@@ -23,7 +23,12 @@ function pauseText() {
 }
 
 export default defineComponent({
-	methods: {},
+	methods: {
+		async getCurrentLesson() {
+			throw new Error("omegalul");
+			return "oeps";
+		},
+	},
 	data() {
 		return {
 			interval: null,

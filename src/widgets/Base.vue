@@ -17,21 +17,19 @@
 	</Transition>
 </template>
 
-<script>
-import { defineComponent } from "@vue/runtime-core";
+<script lang="ts">
+import { defineComponent } from "vue";
 
 export default defineComponent({
 	props: {
 		color: String,
 		val: {
 			type: [Function, String],
-			default() {
-				return "...";
-			},
+			default: "lol",
 		},
 		link: String,
 	},
-	data() {
+	data(): { loaded: boolean; precomputed: string } {
 		return {
 			loaded: false,
 			precomputed: "...",
@@ -44,7 +42,7 @@ export default defineComponent({
 	},
 	methods: {
 		linkTo() {
-			window.location.href = this.link;
+			if (this.link) window.location.href = this.link;
 		},
 	},
 	async created() {
@@ -55,7 +53,7 @@ export default defineComponent({
 		} catch (e) {
 			console.warn(
 				"Component with val: ",
-				this.val,
+				(this.val as Function).name,
 				"failed to load with error: ",
 				e
 			);
@@ -65,11 +63,6 @@ export default defineComponent({
 </script>
 
 <style>
-/* we will explain what these classes do next! */
-/*
-  Enter and leave animations can use different
-  durations and timing functions.
-*/
 .slide-fade-enter-active {
 	transition: all 0.3s ease-out;
 }
