@@ -11,57 +11,72 @@ const getURL = () => {
 
 const { fetch: originalFetch } = window;
 
+/** Current refresh fetch */
 let currentlyFetching: Promise<Response> | null = null;
+
 window.networking = {
 	currentlyLoadingRequests: 0,
 	failedFetches: 0,
+	failedRequests: 0,
 	authenticated: true,
+};
+
+async function refreshTokens() {
+	if (!currentlyFetching) {
+		currentlyFetching = originalFetch(getURL() + "/auth/refresh/access", {
+			credentials: "include",
+		});
+	}
+	try {
+		const newResponse = await currentlyFetching;
+		if (newResponse.ok) {
+			// We've acquired new tokens
+			currentlyFetching = null;
+			window.networking.authenticated = true;
+			return true;
+		} else {
+			throw new Error(await newResponse.json());
+		}
+	} catch (e) {
+		window.networking.authenticated = false;
+		window.networking.failedFetches++;
+		throw new Error(
+			"Something went wrong with refreshing the tokens. Error: " + e
+		);
+	}
+}
+
+const pendingRequest = (done: boolean) => {
+	window.networking.currentlyLoadingRequests += done ? -1 : 1;
+	window.dispatchEvent(new Event("currentlyLoadingRequests"));
 };
 
 window.fetch = async (...args) => {
 	let [resource, config] = args;
 
-	window.networking.currentlyLoadingRequests++;
-	window.dispatchEvent(new Event("currentlyLoadingRequests"));
+	pendingRequest(false);
 
 	try {
 		const response = await originalFetch(resource, config);
 
 		if (response.status === 401 && window.networking.authenticated) {
 			console.warn("Refreshing tokens");
-			if (!currentlyFetching) {
-				currentlyFetching = originalFetch(getURL() + "/auth/refresh/access", {
-					credentials: "include",
-				});
-			}
-			try {
-				const newResponse = await currentlyFetching;
-				if (newResponse.ok) {
-					window.networking.authenticated = true;
 
-					const resp = await originalFetch(resource, config);
-					window.networking.currentlyLoadingRequests--;
-					window.dispatchEvent(new Event("currentlyLoadingRequests"));
+			await refreshTokens();
 
-					return resp;
-				} else {
-					throw new Error("catch this MWUAHAHAH");
-				}
-			} catch (e) {
-				window.networking.authenticated = false;
-				window.networking.failedFetches++;
-				throw new Error("Something went wrong with refreshing the tokens");
-			}
+			// Retry original request when we've acquired new tokens
+			const resp = await originalFetch(resource, config);
+			pendingRequest(true);
+			return resp;
 		}
 
-		window.networking.currentlyLoadingRequests--;
-		window.dispatchEvent(new Event("currentlyLoadingRequests"));
+		pendingRequest(true);
 
 		return response;
 	} catch (e) {
 		window.networking.failedFetches++;
-		window.networking.currentlyLoadingRequests--;
-		window.dispatchEvent(new Event("currentlyLoadingRequests"));
+		pendingRequest(true);
+
 		throw e;
 	}
 };

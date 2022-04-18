@@ -11,6 +11,8 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import Base from "@/widgets/Base.vue";
+//@ts-ignore
+import { default as ms } from "ms";
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -25,7 +27,21 @@ function pauseText() {
 export default defineComponent({
 	methods: {
 		async getCurrentLesson() {
-			throw new Error("omegalul");
+			const fetchRes = await (await fetch("/api/external/via")).json();
+			console.log(fetchRes);
+			const arr: { type: string; start: string; end: string }[] = Object.values(
+				fetchRes.data
+			);
+
+			const findTime = new Date().getTime();
+			const slack = ms("15m") as number;
+			const eventRightNow = arr.find(
+				(x) =>
+					x.type == "VEVENT" &&
+					new Date(x.start).getTime() - slack < findTime &&
+					new Date(x.end).getTime() - slack > findTime
+			);
+
 			return "oeps";
 		},
 	},

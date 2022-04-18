@@ -3,6 +3,7 @@ declare global {
 		networking: {
 			currentlyLoadingRequests: number;
 			failedFetches: number;
+			failedRequests: number;
 			authenticated: boolean;
 		};
 	}

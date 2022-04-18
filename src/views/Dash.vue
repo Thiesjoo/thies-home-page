@@ -12,12 +12,12 @@
 		</div>
 	</div>
 
-	<div class="widget top-0 right-0">
+	<div v-if="authed" class="widget top-0 right-0">
 		<POS />
 		<TwitchFollow />
 	</div>
 
-	<div class="widget bottom-0 right-0">
+	<div v-if="authed" class="widget bottom-0 right-0">
 		<Pause />
 	</div>
 </template>
@@ -59,6 +59,8 @@ export default defineComponent({
 			name: "",
 			current: 0,
 			greeting: getGreeting(),
+
+			authed: false,
 		};
 	},
 	beforeDestroy() {
@@ -80,9 +82,9 @@ export default defineComponent({
 			if (res.name) {
 				this.name = `, ${res.name}`;
 			}
-		} catch (e) {
-			console.error("WHOAMI failed: ", e);
-		}
+
+			this.authed = true;
+		} catch (_) {}
 	},
 	components: { TwitchFollow, POS, Pause },
 });
