@@ -8,7 +8,6 @@ of this component-->
 		link="https://datanose.nl/#timetable[195750](0,0)"
 	>
 		<span :title="tooltip.location">{{in}}</span>
-		<!-- TODO: add hover with location and better description -->
 	</Base>
 	<div v-if="in">
 		<Base color="fuchsia" :val="text" link="https://ishetpauze.nl"
