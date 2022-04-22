@@ -11,38 +11,72 @@ const getURL = () => {
 
 const { fetch: originalFetch } = window;
 
+/** Current refresh fetch */
 let currentlyFetching: Promise<Response> | null = null;
-window.currentlyLoadingRequests = 0;
+
+window.networking = {
+	currentlyLoadingRequests: 0,
+	failedFetches: 0,
+	failedRequests: 0,
+	authenticated: true,
+};
+
+async function refreshTokens() {
+	if (!currentlyFetching) {
+		currentlyFetching = originalFetch(getURL() + "/auth/refresh/access", {
+			credentials: "include",
+		});
+	}
+	try {
+		const newResponse = await currentlyFetching;
+		if (newResponse.ok) {
+			// We've acquired new tokens
+			currentlyFetching = null;
+			window.networking.authenticated = true;
+			return true;
+		} else {
+			throw new Error(await newResponse.json());
+		}
+	} catch (e) {
+		window.networking.authenticated = false;
+		window.networking.failedFetches++;
+		throw new Error(
+			"Something went wrong with refreshing the tokens. Error: " + e
+		);
+	}
+}
+
+const pendingRequest = (done: boolean) => {
+	window.networking.currentlyLoadingRequests += done ? -1 : 1;
+	window.dispatchEvent(new Event("currentlyLoadingRequests"));
+};
 
 window.fetch = async (...args) => {
 	let [resource, config] = args;
 
-	window.currentlyLoadingRequests++;
-	window.dispatchEvent(new Event("currentlyLoadingRequests"));
+	pendingRequest(false);
 
-	const response = await originalFetch(resource, config);
+	try {
+		const response = await originalFetch(resource, config);
 
-	if (response.status === 401) {
-		console.warn("Refreshing tokens");
-		if (!currentlyFetching) {
-			currentlyFetching = originalFetch(getURL() + "/auth/refresh/access", {
-				credentials: "include",
-			});
-		}
+		if (response.status === 401 && window.networking.authenticated) {
+			console.warn("Refreshing tokens");
 
-		const newResponse = await currentlyFetching;
-		if (newResponse.ok) {
+			await refreshTokens();
+
+			// Retry original request when we've acquired new tokens
 			const resp = await originalFetch(resource, config);
-			window.currentlyLoadingRequests--;
-			window.dispatchEvent(new Event("currentlyLoadingRequests"));
-
+			pendingRequest(true);
 			return resp;
-		} else {
-			throw new Error("Something went wrong with refreshing the tokens");
 		}
-	}
-	window.currentlyLoadingRequests--;
-	window.dispatchEvent(new Event("currentlyLoadingRequests"));
 
-	return response;
+		pendingRequest(true);
+
+		return response;
+	} catch (e) {
+		window.networking.failedFetches++;
+		pendingRequest(true);
+
+		throw e;
+	}
 };

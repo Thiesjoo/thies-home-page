@@ -8,20 +8,25 @@
 	<div class="centered">
 		<div class="info">
 			<h2 class="time">{{ time }}</h2>
-			<h3 class="greeting">Good morning{{ name }}.</h3>
+			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
 
-	<div class="widget">
+	<div v-if="authed" class="widget top-0 right-0">
 		<POS />
 		<TwitchFollow />
 	</div>
+
+	<div v-if="authed" class="widget bottom-0 right-0">
+		<Pause />
+	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
+import Pause from "@/widgets/Pause.vue";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -30,42 +35,58 @@ function getCurrentTime() {
 	}).format();
 }
 
+function getGreeting() {
+	const date = new Date();
+	let hours = date.getHours();
+	return hours < 12
+		? "morning"
+		: hours <= 18 && hours >= 12
+		? "afternoon"
+		: "night";
+}
+
+function listener() {
+	//@ts-ignore
+	this.current = window.networking.currentlyLoadingRequests;
+}
+
 export default defineComponent({
 	data() {
 		return {
-			interval: null,
+			interval: null as number | null,
 			time: getCurrentTime(),
 			balance: "...",
 			name: "",
 			current: 0,
+			greeting: getGreeting(),
+
+			authed: false,
 		};
 	},
-
 	beforeDestroy() {
-		clearInterval(this.interval);
-		window.removeEventListener("currentlyLoadingRequests");
+		if (this.interval) clearInterval(this.interval);
+		window.removeEventListener("currentlyLoadingRequests", listener.bind(this));
 	},
 	async created() {
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
+			this.greeting = getGreeting();
 		}, 1000);
 
 		const self = this;
 
-		window.addEventListener("currentlyLoadingRequests", function (e) {
-			self.current = window.currentlyLoadingRequests;
-		});
+		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
 
 		try {
 			const res = await (await fetch("/api/whoami")).json();
 			if (res.name) {
 				this.name = `, ${res.name}`;
 			}
-		} catch (e) {
-			console.error(e);
-		}
+
+			this.authed = true;
+		} catch (_) {}
 	},
-	components: { TwitchFollow, POS },
+	components: { TwitchFollow, POS, Pause },
 });
 </script>
 <style>
@@ -74,6 +95,7 @@ body {
 		"Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
 	color: #fff;
+	overflow: hidden;
 }
 
 .background {
@@ -136,9 +158,11 @@ body {
 
 .widget {
 	position: absolute;
-	right: 0;
 	margin: 1em;
 	max-width: 10%;
-	top: 0;
+}
+
+.widget > * {
+	float: right;
 }
 </style>

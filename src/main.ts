@@ -1,6 +1,11 @@
 declare global {
 	interface Window {
-		currentlyLoadingRequests: any;
+		networking: {
+			currentlyLoadingRequests: number;
+			failedFetches: number;
+			failedRequests: number;
+			authenticated: boolean;
+		};
 	}
 }
 

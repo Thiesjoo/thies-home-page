@@ -2,7 +2,7 @@
 	<Base color="blue" :val="getBalance" link="https://pos.svia.nl/pos">POS</Base>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import Base from "@/widgets/Base.vue";
 

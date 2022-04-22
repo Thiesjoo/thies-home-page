@@ -30,7 +30,7 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { routes } from "./router/routes";
 
