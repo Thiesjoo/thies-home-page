@@ -2,6 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import "axios";
 import axios from "axios";
 import getProviderCredentials from "./_getcredentials";
+import { default as ms } from "ms";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	const result = await getProviderCredentials(req, res, "via");
@@ -36,9 +37,14 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 				method: "PATCH",
 			});
 		}
+		res.statusCode = 407;
+		res.setHeader("Content-Type", "application/json");
+		res.json({ error: "POS Creds expired" });
+		return;
 	}
 
 	res.statusCode = 200;
 	res.setHeader("Content-Type", "application/json");
+	res.setHeader("Cache-Control", "max-age=" + ms("5m").toString());
 	res.json({ balance });
 }

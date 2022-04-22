@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
 import getProviderCredentials from "./_getcredentials";
+import { default as ms } from "ms";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	try {
@@ -41,6 +42,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			};
 		});
 
+		res.setHeader("Cache-Control", "max-age=" + ms("1m").toString());
 		res.json({ ok: true, data: joined });
 	} catch (e) {
 		console.log(e);
