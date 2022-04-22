@@ -18,7 +18,7 @@
 	</div>
 
 	<div v-if="authed" class="widget bottom-0 right-0">
-		<Pause />
+		<Pauze />
 	</div>
 </template>
 
@@ -26,7 +26,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import TwitchFollow from "@/widgets/TwitchFollow.vue";
 import POS from "@/widgets/POS.vue";
-import Pause from "@/widgets/Pause.vue";
+import Pauze from "@/widgets/Pauze.vue";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -60,7 +60,8 @@ export default defineComponent({
 			current: 0,
 			greeting: getGreeting(),
 
-			authed: false,
+			//TODO: implement this in generic store
+			authed: true,
 		};
 	},
 	beforeDestroy() {
@@ -73,8 +74,6 @@ export default defineComponent({
 			this.greeting = getGreeting();
 		}, 1000);
 
-		const self = this;
-
 		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
 
 		try {
@@ -83,10 +82,10 @@ export default defineComponent({
 				this.name = `, ${res.name}`;
 			}
 
-			this.authed = true;
+			// this.authed = true;
 		} catch (_) {}
 	},
-	components: { TwitchFollow, POS, Pause },
+	components: { TwitchFollow, POS, Pauze },
 });
 </script>
 <style>

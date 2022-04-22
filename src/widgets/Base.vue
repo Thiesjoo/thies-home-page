@@ -11,7 +11,14 @@
 				>
 					<slot></slot>
 				</span>
-				<span class="inline-flex px-2">{{ getValue }}</span>
+				<div class="flex flex-col items-center">
+					<span class="inline-flex px-2" style="white-space: nowrap">{{
+						getValue
+					}}</span>
+					<span class="text-purple-400 text-xs text-center" v-if="subval">{{
+						subval
+					}}</span>
+				</div>
 			</div>
 		</div>
 	</Transition>
@@ -27,6 +34,7 @@ export default defineComponent({
 			type: [Function, String],
 			default: "lol",
 		},
+		subval: String,
 		link: String,
 	},
 	data(): { loaded: boolean; precomputed: string } {
@@ -45,7 +53,7 @@ export default defineComponent({
 			if (this.link) window.location.href = this.link;
 		},
 	},
-	async created() {
+	async mounted() {
 		try {
 			this.precomputed =
 				typeof this.val === "function" ? await this.val() : this.val;
