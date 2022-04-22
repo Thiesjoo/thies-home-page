@@ -11,7 +11,9 @@
 				>
 					<slot></slot>
 				</span>
-				<span class="inline-flex px-2">{{ getValue }}</span>
+				<span class="inline-flex px-2" style="white-space: nowrap">{{
+					getValue
+				}}</span>
 			</div>
 		</div>
 	</Transition>
