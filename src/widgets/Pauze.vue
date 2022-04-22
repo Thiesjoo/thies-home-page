@@ -4,6 +4,7 @@ of this component-->
 	<Base
 		color="cyan"
 		:val="getCurrentLesson"
+		:subval="tooltip.location"
 		link="https://datanose.nl/#timetable[195750](0,0)"
 	>
 		<span :title="tooltip.location">{{in}}</span>
@@ -29,7 +30,7 @@ function pauseText() {
 
 	if (t < 45) {
 		return [
-			`${45 - t} minute${45 - t > 1 ? "s" : ""}`,
+			`in ${45 - t} minute${45 - t > 1 ? "s" : ""}`,
 			"Break at every last quarter of an hour",
 		];
 	} else {
@@ -90,13 +91,6 @@ export default defineComponent({
 	},
 	methods: {
 		async getCurrentLesson() {
-			if (window.testing123) {
-				throw new Error(
-					"Vue is being very weird with infinite reloads. This function is executed 100 times each second, which is overloading everything"
-				);
-			}
-			window.testing123 = true;
-
 			const fetchRes = await (
 				await fetch("/api/external/rooster_parser")
 			).json();

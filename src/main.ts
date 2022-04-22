@@ -6,7 +6,6 @@ declare global {
 			failedRequests: number;
 			authenticated: boolean;
 		};
-		testing123: boolean;
 	}
 }
 
