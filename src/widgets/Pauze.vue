@@ -18,7 +18,7 @@ of this component-->
 </template>
 
 <script lang="ts">
-const baseTime = new Date("2022-04-21T07:00:00.000Z");
+const baseTime = new Date();
 
 import { defineComponent } from "@vue/runtime-core";
 import Base from "@/widgets/Base.vue";
