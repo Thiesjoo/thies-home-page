@@ -22,8 +22,10 @@ import router from "./router";
 
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import "./helpers/auto-refresh-tokens";
 
@@ -33,7 +35,7 @@ import "./index.css";
 //@ts-ignore
 window.env = ENV;
 
-library.add(faTwitch);
+library.add(faTwitch, faXmark);
 
 const app = createApp(App, { router });
 app.use(router);
