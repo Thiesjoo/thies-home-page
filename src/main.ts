@@ -6,6 +6,12 @@ declare global {
 			failedRequests: number;
 			authenticated: boolean;
 		};
+		env: {
+			VUE_APP_VERCEL_ENV: "production" | "preview" | "development";
+			VUE_APP_VERCEL_URL: string;
+			VUE_APP_VERCEL_GIT_COMMIT_SHA: string;
+			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
+		};
 	}
 }
 
@@ -22,6 +28,9 @@ import "./helpers/auto-refresh-tokens";
 
 /** Tailwind shizz */
 import "./index.css";
+
+//@ts-ignore
+window.env = ENV;
 
 library.add(faTwitch);
 

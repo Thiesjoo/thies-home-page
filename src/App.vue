@@ -36,7 +36,7 @@ import { routes } from "./router/routes";
 
 export default defineComponent({
 	data() {
-		return { githubSHA: "......." };
+		return { githubSHA: window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA };
 	},
 	computed: {
 		routes: () => routes.filter((x) => !x.exclude),
@@ -44,15 +44,6 @@ export default defineComponent({
 			let header = this.$route.meta.header;
 			return header === undefined ? false : header;
 		},
-	},
-	async mounted() {
-		try {
-			const fetchResp = await fetch("api/github_data");
-			const response = await fetchResp.json();
-			if (response.sha) this.githubSHA = response.sha;
-		} catch (e) {
-			this.githubSHA = "???????";
-		}
 	},
 	watch: {
 		$route: {
