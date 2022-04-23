@@ -13,19 +13,10 @@
 		</header>
 		<div v-if="show" style="margin-top: 80px"></div>
 		<router-view></router-view>
-		<footer v-if="show">
-			Made by
-			<a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank"
-				>Me (:</a
-			>.
-			<a
-				target="_blank"
-				rel="noreferrer"
-				href="https://github.com/Thiesjoo/thies-home-page"
-				>Code is on github.</a
-			>
-			Deployment:
-			<span :title="githubSHA">{{ githubSHA.slice(0, 7) }}</span>
+		<footer class="flex w-full fixed bottom-0 justify-center text-xs">
+			<div class="rounded p-1">
+				Version: <span :title="githubSHA">{{ githubSHA.slice(0, 7) }}</span>
+			</div>
 		</footer>
 	</div>
 </template>
@@ -36,7 +27,7 @@ import { routes } from "./router/routes";
 
 export default defineComponent({
 	data() {
-		return { githubSHA: window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA };
+		return { githubSHA: window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "6969420" };
 	},
 	computed: {
 		routes: () => routes.filter((x) => !x.exclude),
@@ -91,13 +82,17 @@ body {
 	}
 }
 
-footer {
+footer > div {
+	background-color: rgba(110, 231, 183, 0.4);
+}
+
+/* footer {
 	width: 100%;
 	text-align: center;
 	position: fixed;
 	left: 0;
 	bottom: 0;
-}
+} */
 
 .header {
 	position: fixed;
