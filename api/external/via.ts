@@ -45,6 +45,6 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
 	res.statusCode = 200;
 	res.setHeader("Content-Type", "application/json");
-	res.setHeader("Cache-Control", "max-age=" + ms("5m").toString());
+	res.setHeader("Cache-Control", "max-age=" + (ms("5m") / 1000).toString());
 	res.json({ balance });
 }

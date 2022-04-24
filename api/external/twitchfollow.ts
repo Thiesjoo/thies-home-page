@@ -42,7 +42,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			};
 		});
 
-		res.setHeader("Cache-Control", "max-age=" + ms("1m").toString());
+		res.setHeader("Cache-Control", "max-age=" + (ms("1m") / 1000).toString());
 		res.json({ ok: true, data: joined });
 	} catch (e) {
 		console.log(e);
