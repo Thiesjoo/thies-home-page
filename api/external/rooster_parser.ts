@@ -13,17 +13,6 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 		"max-age=0, s-maxage=" + ((ms("7d") as number) / 1000).toString()
 	);
 
-	// const arr = Object.values(parsed);
-
-	// const findTime = new Date().getTime();
-	// const slack = ms("15m") as number;
-	// eventRightNow: arr.find(
-	//   (x) =>
-	//     x.type == "VEVENT" &&
-	//     new Date(x.start).getTime() - slack < findTime &&
-	//     new Date(x.end).getTime() - slack > findTime
-	// ),
-
 	res.json({
 		data: parsed,
 	});

@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { Client, User } from "discord.js";
 const client = new Client();
 
-let user: User = null;
+let user: User | null = null;
 
 export default function (req: VercelRequest, res: VercelResponse) {
 	client.on("ready", async () => {
@@ -27,9 +27,9 @@ function generateResponse(res: VercelResponse) {
 	res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
 	res.json({
 		ok: true,
-		tag: user.discriminator,
-		avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
-		name: user.username,
-		id: user.id,
+		tag: user?.discriminator,
+		avatar: `https://cdn.discordapp.com/avatars/${user?.id}/${user?.avatar}.png`,
+		name: user?.username,
+		id: user?.id,
 	});
 }

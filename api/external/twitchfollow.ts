@@ -24,7 +24,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 		const profileImageRequest = await axios({
 			url: "https://api.twitch.tv/helix/users",
 			params: {
-				id: users.map((x) => x.user_id),
+				id: users.map((x: { user_id: string }) => x.user_id),
 			},
 			headers: {
 				"Client-Id": result.clientid,
@@ -34,7 +34,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 		const profileImages = profileImageRequest.data.data;
 
 		// Joining the profile images with correct users
-		const joined = users.map((x) => {
+		const joined = users.map((x: any) => {
 			return {
 				...x,
 				profile_image_url: profileImages.find((y) => y.id === x.user_id)
