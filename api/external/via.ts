@@ -25,17 +25,16 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
 			console.log("POS ERROR: ", e);
 			// Wipe the pos access token to prevent
-			await axios({
-				url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
-				params: {
-					accessToken: "",
-				},
-				headers: {
-					Authorization: `Bearer ${req.cookies.accesstoken}`,
-					"X-Secret": process.env.secret,
-				},
-				method: "PATCH",
-			});
+			try {
+				await axios({
+					url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
+					headers: {
+						Authorization: `Bearer ${req.cookies.accesstoken}`,
+						"X-Secret": process.env.secret,
+					},
+					method: "PATCH",
+				});
+			} catch (e) {}
 		}
 		res.statusCode = 407;
 		res.setHeader("Content-Type", "application/json");
