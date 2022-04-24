@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
+import { clickOutsideDirective } from "./helpers/clickOutside";
 import "./helpers/auto-refresh-tokens";
 
 /** Tailwind shizz */
@@ -34,10 +35,15 @@ import "./index.css";
 
 //@ts-ignore
 window.env = ENV;
+window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA =
+	window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
 library.add(faTwitch, faXmark);
 
 const app = createApp(App, { router });
 app.use(router);
+
+clickOutsideDirective(app);
+
 app.component("font-awesome-icon", FontAwesomeIcon);
 app.mount("#app");
