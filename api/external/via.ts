@@ -36,7 +36,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 				});
 			} catch (e) {}
 		}
-		res.statusCode = 407;
+		res.statusCode = 401;
 		res.setHeader("Content-Type", "application/json");
 		res.json({ error: "POS Creds expired" });
 		return;
