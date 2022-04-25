@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import Base from "@/widgets/Base.vue";
+import { Base } from "./";
 
 export default defineComponent({
 	data(): {

@@ -30,9 +30,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import TwitchFollow from "@/widgets/TwitchFollow.vue";
-import POS from "@/widgets/POS.vue";
-import Pauze from "@/widgets/Pauze.vue";
+import { POS, Pauze, TwitchFollow } from "@/components/widgets";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {

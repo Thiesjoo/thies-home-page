@@ -20,7 +20,7 @@ of this component-->
 const baseTime = new Date();
 
 import { defineComponent } from "@vue/runtime-core";
-import Base from "@/widgets/Base.vue";
+import { Base } from "./";
 //@ts-ignore
 import { default as ms } from "ms";
 

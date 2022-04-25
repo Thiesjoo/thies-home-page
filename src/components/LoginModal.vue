@@ -16,7 +16,7 @@
 							class="flex justify-between items-start p-5 rounded-t border-b dark:border-gray-600"
 						>
 							<h2 class="mt-6 text-center w-full text-3xl font-extrabold">
-								Log in to your account
+								{{ title }}
 							</h2>
 							<button
 								type="button"
@@ -47,10 +47,22 @@ export default defineComponent({
 			open: false,
 		};
 	},
+	computed: {
+		title() {
+			return window.networking.authenticated
+				? "Your profile"
+				: "Login to your account";
+		},
+	},
 	methods: {
 		toggle() {
 			this.open = !this.open;
 		},
+	},
+	mounted() {
+		if (this.$route.query.open) {
+			this.open = true;
+		}
 	},
 	components: { LoginForm },
 });

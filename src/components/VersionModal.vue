@@ -106,7 +106,7 @@
 												'text-rose-600': !authenticated,
 											}"
 										>
-											{{ authenticated ? "Yes!" : "No ):" }}
+											{{ authenticated ? "Yes!" : "No" }}
 										</td>
 									</tr>
 								</tbody>
@@ -126,6 +126,8 @@ function listener() {
 	this.failedFetches = window.networking.failedFetches;
 	//@ts-ignore
 	this.failedRequests = window.networking.failedRequests;
+	//@ts-ignore
+	this.authenticated = window.networking.authenticated;
 }
 
 export default defineComponent({
