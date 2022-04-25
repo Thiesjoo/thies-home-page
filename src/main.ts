@@ -24,7 +24,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faLock, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
 import "./helpers/auto-refresh-tokens";
@@ -37,7 +37,7 @@ window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA =
 	window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
-library.add(faTwitch, faXmark);
+library.add(faTwitch, faXmark, faLock);
 
 const app = createApp(App, { router });
 app.use(router);

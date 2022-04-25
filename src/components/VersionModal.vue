@@ -18,7 +18,7 @@
 							class="flex justify-between items-start p-5 rounded-t border-b dark:border-gray-600"
 						>
 							<h3
-								class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white"
+								class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white text-center w-full"
 							>
 								Current version: {{ VUE_APP_VERCEL_GIT_COMMIT_SHA }}
 							</h3>
