@@ -24,6 +24,7 @@
 				<a
 					:href="'https://twitch.tv/' + item.url"
 					rel="nofollow"
+					target="_parent"
 					class="grow inline-flex w-full px-1 py-3 text-sm text-gray-700 hover:bg-gray-400 hover:text-white no-underline"
 					v-for="item in data"
 				>

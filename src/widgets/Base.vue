@@ -50,7 +50,8 @@ export default defineComponent({
 	},
 	methods: {
 		linkTo() {
-			if (this.link) window.location.href = this.link;
+			//@ts-ignore
+			if (this.link) window.top.location.href = this.link;
 		},
 	},
 	async mounted() {
