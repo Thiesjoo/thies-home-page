@@ -11,7 +11,6 @@ declare global {
 			VUE_APP_VERCEL_URL: string;
 			VUE_APP_VERCEL_GIT_COMMIT_SHA: string;
 			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
-			//TODO: ^^ Add separate version page for all this info
 		};
 	}
 }

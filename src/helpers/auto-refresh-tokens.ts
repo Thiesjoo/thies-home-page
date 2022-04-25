@@ -1,8 +1,6 @@
 // This file overwrites fetch, and watches for 401 errors.
 // IF there is an 401 error, we try to refresh the token.
 
-//TODO: Implement something that prevents refresh spamming on invalid token
-
 const getURL = () => {
 	return window.location.origin.includes("localhost")
 		? "http://localhost:6969"

@@ -25,7 +25,7 @@ import Base from "@/widgets/Base.vue";
 import { default as ms } from "ms";
 
 function pauseText() {
-	const t = baseTime.getMinutes();
+	const t = new Date().getMinutes();
 
 	if (t < 45) {
 		return [
@@ -92,6 +92,7 @@ export default defineComponent({
 	},
 	methods: {
 		async getCurrentLesson() {
+			// TODO: Fix auto refresh on current lesson
 			const fetchRes = await (
 				await fetch("/api/external/rooster_parser")
 			).json();
