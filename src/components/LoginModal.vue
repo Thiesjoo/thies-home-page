@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="rounded p-1" @click="toggle">
-			<span>Login!</span>
+			<span>{{ popupTitle }}</span>
 		</div>
 		<div>
 			<!-- MODAL -->
@@ -52,6 +52,9 @@ export default defineComponent({
 			return window.networking.authenticated
 				? "Your profile"
 				: "Login to your account";
+		},
+		popupTitle() {
+			return window.networking.authenticated ? "Your profile" : "Login";
 		},
 	},
 	methods: {

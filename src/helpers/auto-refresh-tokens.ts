@@ -1,7 +1,7 @@
 // This file overwrites fetch, and watches for 401 errors.
 // IF there is an 401 error, we try to refresh the token.
 
-const getURL = () => {
+export const getBaseURL = () => {
 	return window.location.origin.includes("localhost")
 		? "http://localhost:6969"
 		: "https://auth.thies.dev";
@@ -21,7 +21,7 @@ window.networking = {
 
 async function refreshTokens() {
 	if (!currentlyFetching) {
-		currentlyFetching = originalFetch(getURL() + "/auth/refresh/access", {
+		currentlyFetching = originalFetch(getBaseURL() + "/auth/refresh/access", {
 			credentials: "include",
 		});
 	}
@@ -58,6 +58,10 @@ window.fetch = async (...args) => {
 		const response = await originalFetch(resource, config);
 
 		if (response.status === 401 && window.networking.authenticated) {
+			if (typeof resource == "string" && resource.includes("local/login")) {
+				console.log("Login request, not refreshing tokens");
+				return response;
+			}
 			console.warn("Refreshing tokens");
 
 			await refreshTokens();

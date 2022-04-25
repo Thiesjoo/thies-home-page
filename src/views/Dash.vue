@@ -12,6 +12,7 @@
 					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
 					>{{ seconds }}
 				</span>
+				<!-- TODO: on 11:00 the seconds get off centered -->
 				<h2 class="time">{{ time }}</h2>
 			</div>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
@@ -145,11 +146,12 @@ body {
 	font-size: 1050%;
 	font-weight: 500;
 	letter-spacing: -5px;
+	font-variant-numeric: tabular-nums lining-nums;
 }
 
 .seconds {
 	font-size: 120%;
-	margin-left: 3px;
+	margin-left: 4px;
 }
 
 .greeting {
