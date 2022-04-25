@@ -62,8 +62,8 @@ import { defineComponent } from "vue";
 export default defineComponent({
 	data() {
 		return {
-			email: "test@thies.dev",
-			password: "testA1test",
+			email: "",
+			password: "",
 			error: "",
 		};
 	},
