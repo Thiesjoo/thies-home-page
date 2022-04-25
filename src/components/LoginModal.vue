@@ -11,9 +11,9 @@
 				v-click-outside="toggle"
 			>
 				<div class="relative p-4 w-full max-w-2xl h-full md:h-auto z-100">
-					<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+					<div class="relative rounded-lg shadow bg-gray-700">
 						<div
-							class="flex justify-between items-start p-5 rounded-t border-b dark:border-gray-600"
+							class="flex justify-between items-start p-5 rounded-t border-b border-gray-600"
 						>
 							<h2 class="mt-6 text-center w-full text-3xl font-extrabold">
 								{{ title }}
@@ -21,13 +21,13 @@
 							<button
 								type="button"
 								@click="toggle"
-								class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+								class="text-gray-400 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center hover:bg-gray-600 hover:text-white"
 							>
 								<font-awesome-icon :icon="['fas', 'xmark']" size="lg" />
 							</button>
 						</div>
 						<div
-							class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-500 dark:text-gray-400"
+							class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-400"
 						>
 							<LoginForm />
 						</div>
