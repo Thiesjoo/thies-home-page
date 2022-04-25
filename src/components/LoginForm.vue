@@ -83,6 +83,7 @@ export default defineComponent({
 					headers: {
 						"Content-Type": "application/json",
 					},
+					credentials: "include",
 				});
 				const json = await fetchRes.json();
 				if (!json.access) {
