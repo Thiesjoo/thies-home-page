@@ -6,6 +6,13 @@ declare global {
 			failedRequests: number;
 			authenticated: boolean;
 		};
+		env: {
+			VUE_APP_VERCEL_ENV: "production" | "preview" | "development";
+			VUE_APP_VERCEL_URL: string;
+			VUE_APP_VERCEL_GIT_COMMIT_SHA: string;
+			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
+			//TODO: ^^ Add separate version page for all this info
+		};
 	}
 }
 
@@ -15,17 +22,28 @@ import router from "./router";
 
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
+import { clickOutsideDirective } from "./helpers/clickOutside";
 import "./helpers/auto-refresh-tokens";
 
 /** Tailwind shizz */
 import "./index.css";
 
-library.add(faTwitch);
+//@ts-ignore
+window.env = ENV;
+window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA =
+	window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
+
+library.add(faTwitch, faXmark);
 
 const app = createApp(App, { router });
 app.use(router);
+
+clickOutsideDirective(app);
+
 app.component("font-awesome-icon", FontAwesomeIcon);
 app.mount("#app");

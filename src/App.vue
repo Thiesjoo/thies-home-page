@@ -13,19 +13,8 @@
 		</header>
 		<div v-if="show" style="margin-top: 80px"></div>
 		<router-view></router-view>
-		<footer v-if="show">
-			Made by
-			<a href="https://github.com/Thiesjoo/" rel="noreferrer" target="_blank"
-				>Me (:</a
-			>.
-			<a
-				target="_blank"
-				rel="noreferrer"
-				href="https://github.com/Thiesjoo/thies-home-page"
-				>Code is on github.</a
-			>
-			Deployment:
-			<span :title="githubSHA">{{ githubSHA.slice(0, 7) }}</span>
+		<footer class="flex mx-2 fixed bottom-0 justify-center text-xs">
+			<VersionModalVue />
 		</footer>
 	</div>
 </template>
@@ -33,26 +22,15 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { routes } from "./router/routes";
+import VersionModalVue from "./components/VersionModal.vue";
 
 export default defineComponent({
-	data() {
-		return { githubSHA: "......." };
-	},
 	computed: {
 		routes: () => routes.filter((x) => !x.exclude),
 		show: function () {
 			let header = this.$route.meta.header;
 			return header === undefined ? false : header;
 		},
-	},
-	async mounted() {
-		try {
-			const fetchResp = await fetch("api/github_data");
-			const response = await fetchResp.json();
-			if (response.sha) this.githubSHA = response.sha;
-		} catch (e) {
-			this.githubSHA = "???????";
-		}
 	},
 	watch: {
 		$route: {
@@ -62,6 +40,7 @@ export default defineComponent({
 			},
 		},
 	},
+	components: { VersionModalVue },
 });
 </script>
 
@@ -100,12 +79,8 @@ body {
 	}
 }
 
-footer {
-	width: 100%;
-	text-align: center;
-	position: fixed;
-	left: 0;
-	bottom: 0;
+footer > div {
+	background-color: rgba(110, 231, 183, 0.4);
 }
 
 .header {
