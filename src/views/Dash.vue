@@ -7,7 +7,13 @@
 
 	<div class="centered">
 		<div class="info">
-			<h2 class="time">{{ time }}</h2>
+			<div>
+				<span
+					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
+					>{{ seconds }}
+				</span>
+				<h2 class="time">{{ time }}</h2>
+			</div>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
@@ -55,6 +61,7 @@ export default defineComponent({
 		return {
 			interval: null as number | null,
 			time: getCurrentTime(),
+			seconds: new Date().getSeconds(),
 			balance: "...",
 			name: "",
 			current: 0,
@@ -72,6 +79,7 @@ export default defineComponent({
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
 			this.greeting = getGreeting();
+			this.seconds = new Date().getSeconds();
 		}, 1000);
 
 		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
@@ -139,6 +147,11 @@ body {
 	font-size: 1050%;
 	font-weight: 500;
 	letter-spacing: -5px;
+}
+
+.seconds {
+	font-size: 120%;
+	margin-left: 3px;
 }
 
 .greeting {
