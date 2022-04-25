@@ -81,6 +81,7 @@ body {
 
 footer > div {
 	background-color: rgba(110, 231, 183, 0.4);
+	border-radius: 0.4em 0.4em 0 0;
 }
 
 .header {

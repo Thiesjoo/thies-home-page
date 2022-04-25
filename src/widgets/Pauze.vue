@@ -7,12 +7,12 @@ of this component-->
 		:subval="tooltip.location"
 		link="https://datanose.nl/#timetable[195750](0,0)"
 	>
-		<span :title="tooltip.location">{{in}}</span>
+		<span :title="tooltip.location">{{ inTime }}</span>
 	</Base>
-	<div v-if="in">
-		<Base color="fuchsia" :val="text" link="https://ishetpauze.nl"
-			><span :title="tooltip.pauze">Pauze</span></Base
-		>
+	<div v-if="inTime && !withSlack">
+		<Base color="fuchsia" :val="text" link="https://ishetpauze.nl">
+			<span :title="tooltip.pauze">Pauze</span>
+		</Base>
 	</div>
 </template>
 
@@ -71,7 +71,8 @@ export default defineComponent({
 		text: string;
 		interval: number | null;
 		inLesson: boolean;
-		in: string | null;
+		inTime: string | null;
+		withSlack: boolean;
 		tooltip: {
 			pauze: string;
 			location: string;
@@ -81,7 +82,8 @@ export default defineComponent({
 			interval: null,
 			text: pauseText()[0],
 			inLesson: false,
-			in: null,
+			inTime: null,
+			withSlack: false,
 			tooltip: {
 				location: "",
 				pauze: pauseText()[1],
@@ -97,18 +99,20 @@ export default defineComponent({
 
 			const currentEvent = getEventWithSlack(arr, ms("30s"));
 			if (currentEvent) {
-				this.in = "Nu";
+				this.inTime = "Nu";
 				this.tooltip.location = generateTooltip(currentEvent);
+				this.withSlack = false;
 
 				return `${currentEvent.summary}`;
 			}
 
 			const upcomingEvent = getEventWithSlack(arr, ms("15m"));
 			if (upcomingEvent) {
-				this.in = ms(
+				this.inTime = ms(
 					new Date(upcomingEvent.start).getTime() - baseTime.getTime()
 				);
 				this.tooltip.location = generateTooltip(upcomingEvent);
+				this.withSlack = true;
 
 				return upcomingEvent.summary;
 			}
