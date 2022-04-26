@@ -33,6 +33,8 @@ import {
 import { clickOutsideDirective } from "./helpers/clickOutside";
 import "./helpers/auto-refresh-tokens";
 
+import { VueReCaptcha } from "vue-recaptcha-v3";
+
 /** Tailwind shizz */
 import "./index.css";
 
@@ -45,6 +47,9 @@ library.add(faTwitch, faXmark, faLock, faArrowRightFromBracket);
 
 const app = createApp(App, { router });
 app.use(router);
+
+// For more options see below
+app.use(VueReCaptcha, { siteKey: "6LcpnaEfAAAAABlZfJ_rRIBUTgCuJHPRKNmm9768" });
 
 clickOutsideDirective(app);
 

@@ -65,7 +65,21 @@ export default defineComponent({
 	methods: {
 		toggle() {
 			this.open = !this.open;
+			if (!this.authed) {
+				//@ts-ignore
+				const recaptcha = this.$recaptchaInstance.value;
+				if (this.open) {
+					recaptcha.showBadge();
+				} else {
+					recaptcha.hideBadge();
+				}
+			}
 		},
+	},
+	async created() {
+		await this.$recaptchaLoaded();
+		//@ts-ignore
+		this.$recaptchaInstance.value.hideBadge();
 	},
 	mounted() {
 		if (this.$route.query.open) {

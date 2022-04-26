@@ -77,13 +77,18 @@
 							@click="renderLogin = !renderLogin"
 							class="font-medium text-gray-100 hover:text-gray-400"
 						>
-							{{ renderLogin ? "Register new account" : "Login to existing" }}
+							{{
+								renderLogin
+									? "Register new account"
+									: "Login to existing account"
+							}}
 						</a>
 					</div>
 					<div class="text-sm">
 						<a
 							href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 							style="text-decoration: none"
+							v-if="renderLogin"
 							class="font-medium text-gray-100 hover:text-gray-400"
 						>
 							Forgot your password?
@@ -145,6 +150,7 @@ export default defineComponent({
 				return;
 			}
 
+			await this.$recaptchaLoaded();
 			const body: { email: string; password: string; name?: string } = {
 				email: this.email,
 				password: this.password,
@@ -155,6 +161,9 @@ export default defineComponent({
 			}
 
 			try {
+				const recaptchaToken = await this.$recaptcha("Login");
+				console.log("Recaptcha token: ", recaptchaToken);
+
 				const fetchRes = await fetch(
 					getBaseURL() +
 						"/auth/local/" +
@@ -164,6 +173,7 @@ export default defineComponent({
 						body: JSON.stringify(body),
 						headers: {
 							"Content-Type": "application/json",
+							recaptcha: recaptchaToken,
 						},
 						credentials: "include",
 					}
