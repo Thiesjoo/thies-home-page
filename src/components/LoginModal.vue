@@ -29,7 +29,8 @@
 						<div
 							class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-400"
 						>
-							<LoginForm />
+							<ProfilePage v-if="authed" />
+							<LoginForm v-else />
 						</div>
 					</div>
 				</div>
@@ -40,6 +41,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoginForm from "./LoginForm.vue";
+import ProfilePage from "./ProfilePage.vue";
 
 export default defineComponent({
 	data() {
@@ -48,6 +50,9 @@ export default defineComponent({
 		};
 	},
 	computed: {
+		authed() {
+			return window.networking.authenticated;
+		},
 		title() {
 			return window.networking.authenticated
 				? "Your profile"
@@ -67,7 +72,7 @@ export default defineComponent({
 			this.open = true;
 		}
 	},
-	components: { LoginForm },
+	components: { LoginForm, ProfilePage },
 });
 </script>
 <style>
