@@ -161,8 +161,9 @@ export default defineComponent({
 			}
 
 			try {
-				const recaptchaToken = await this.$recaptcha("Login");
-				console.log("Recaptcha token: ", recaptchaToken);
+				const recaptchaToken = await this.$recaptcha(
+					!this.renderLogin ? "Register" : "Login"
+				);
 
 				const fetchRes = await fetch(
 					getBaseURL() +
