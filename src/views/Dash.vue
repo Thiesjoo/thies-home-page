@@ -20,6 +20,7 @@
 	</div>
 
 	<div v-if="authed" class="widget top-0 right-0">
+		<Spotify />
 		<POS />
 		<TwitchFollow />
 	</div>
@@ -31,7 +32,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { POS, Pauze, TwitchFollow } from "@/components/widgets";
+import * as Widgets from "@/components/widgets";
 import { windowEvent } from "@/helpers/constants";
 
 function getCurrentTime() {
@@ -93,7 +94,7 @@ export default defineComponent({
 			// this.authed = true;
 		} catch (_) {}
 	},
-	components: { TwitchFollow, POS, Pauze },
+	components: { ...Widgets },
 });
 </script>
 <style>

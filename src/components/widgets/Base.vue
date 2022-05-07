@@ -2,13 +2,13 @@
 	<Transition name="slide-fade">
 		<div class="p-2" v-if="loaded" @click="linkTo">
 			<div
-				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm max-w-sm"
+				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
 			>
 				<span
-					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center"
+					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center truncate"
 					:class="[color ? 'bg-' + color + '-600' : '']"
-					style="max-width: 50%"
 				>
+					<!-- style="max-width: 50%" -->
 					<slot></slot>
 				</span>
 				<div class="flex flex-col items-center">
