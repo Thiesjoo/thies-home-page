@@ -119,6 +119,7 @@
 	</div>
 </template>
 <script lang="ts">
+import { windowEvent } from "@/helpers/constants";
 import { defineComponent } from "vue";
 
 function listener() {
@@ -144,10 +145,10 @@ export default defineComponent({
 		},
 	},
 	beforeDestroy() {
-		window.removeEventListener("currentlyLoadingRequests", listener.bind(this));
+		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	created() {
-		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
+		window.addEventListener(windowEvent, listener.bind(this));
 	},
 });
 </script>

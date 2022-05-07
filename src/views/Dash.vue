@@ -32,6 +32,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { POS, Pauze, TwitchFollow } from "@/components/widgets";
+import { windowEvent } from "@/helpers/constants";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -72,7 +73,7 @@ export default defineComponent({
 	},
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
-		window.removeEventListener("currentlyLoadingRequests", listener.bind(this));
+		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	async created() {
 		this.interval = setInterval(() => {
@@ -81,7 +82,7 @@ export default defineComponent({
 			this.seconds = new Date().getSeconds();
 		}, 1000);
 
-		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
+		window.addEventListener(windowEvent, listener.bind(this));
 
 		try {
 			const res = await (await fetch("/api/whoami")).json();

@@ -111,7 +111,6 @@
 		</div>
 	</div>
 </template>
-<!-- TODO: Add recaptcha -->
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { defineComponent } from "vue";

@@ -39,27 +39,34 @@
 	</div>
 </template>
 <script lang="ts">
+import { windowEvent } from "@/helpers/constants";
 import { defineComponent } from "vue";
 import LoginForm from "./LoginForm.vue";
 import ProfilePage from "./ProfilePage.vue";
 
+function listener() {
+	//@ts-ignore
+	this.authed = window.networking.authenticated;
+}
+
 export default defineComponent({
-	data() {
+	data(): {
+		open: boolean;
+		authed: boolean;
+	} {
 		return {
 			open: false,
+			authed: window.networking.authenticated,
 		};
 	},
 	computed: {
-		authed() {
-			return window.networking.authenticated;
-		},
 		title() {
-			return window.networking.authenticated
-				? "Your profile"
-				: "Login to your account";
+			//@ts-ignore
+			return this.authed ? "Your profile" : "Login to your account";
 		},
 		popupTitle() {
-			return window.networking.authenticated ? "Your profile" : "Login";
+			//@ts-ignore
+			return this.authed ? "Your profile" : "Login";
 		},
 	},
 	methods: {
@@ -80,11 +87,15 @@ export default defineComponent({
 		await this.$recaptchaLoaded();
 		//@ts-ignore
 		this.$recaptchaInstance.value.hideBadge();
+		window.addEventListener(windowEvent, listener.bind(this));
 	},
 	mounted() {
 		if (this.$route.query.open) {
 			this.open = true;
 		}
+	},
+	beforeDestroy() {
+		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	components: { LoginForm, ProfilePage },
 });

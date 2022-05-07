@@ -1,6 +1,8 @@
 // This file overwrites fetch, and watches for 401 errors.
 // IF there is an 401 error, we try to refresh the token.
 
+import { windowEvent } from "./constants";
+
 export const getBaseURL = () => {
 	return window.location.origin.includes("localhost")
 		? "http://localhost:6969"
@@ -46,7 +48,7 @@ async function refreshTokens() {
 
 const pendingRequest = (done: boolean) => {
 	window.networking.currentlyLoadingRequests += done ? -1 : 1;
-	window.dispatchEvent(new Event("currentlyLoadingRequests"));
+	window.dispatchEvent(new Event(windowEvent));
 };
 
 window.fetch = async (...args) => {
