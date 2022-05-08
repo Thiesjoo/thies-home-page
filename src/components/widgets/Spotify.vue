@@ -35,7 +35,7 @@ import { Base } from "./";
 import errorCaptured from "./errorCaptured";
 
 /** How often to ping spotify for music change */
-const spotifyRefreshTimer = 3000;
+const spotifyRefreshTimer = 5000;
 /** How often to increase our own timer of the progress bar */
 const smoothProgressBar = 100;
 
@@ -129,6 +129,7 @@ export default defineComponent({
 
 				this.track = spotifyResult as CurrentlyPlaying;
 				this.refreshKey = !this.refreshKey;
+				this.pendingRequest = false;
 			} catch (e) {
 				console.error("spotify track request error ", e);
 			}
