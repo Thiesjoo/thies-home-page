@@ -132,7 +132,6 @@ export default defineComponent({
 			throw new Error("SAFE - Not in lesson!");
 		},
 	},
-
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
 	},

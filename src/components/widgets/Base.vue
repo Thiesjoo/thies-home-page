@@ -5,6 +5,7 @@
 				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
 			>
 				<span
+					v-if="showShort"
 					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center truncate"
 					:class="[color ? 'bg-' + color + '-600' : '']"
 				>
@@ -15,7 +16,7 @@
 						<slot name="content"></slot>
 					</span>
 					<span
-						class="text-purple-400 text-xs text-center"
+						class="text-purple-400 text-xs text-center w-full p-2 pb-0"
 						v-if="showSubcontent"
 					>
 						<slot name="subcontent"></slot>
@@ -39,6 +40,9 @@ export default defineComponent({
 		showSubcontent() {
 			return !!this.$slots.subcontent;
 		},
+		showShort() {
+			return !!this.$slots.short;
+		},
 	},
 	methods: {
 		linkTo() {
@@ -58,6 +62,7 @@ export default defineComponent({
 	transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
+/* TODO: This animation moves from the left, but some components are on the right */
 .slide-fade-enter-from,
 .slide-fade-leave-to {
 	transform: translateX(20px);

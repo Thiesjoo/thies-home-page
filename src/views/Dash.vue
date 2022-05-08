@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="current > 0"
+		v-if="current > 1"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background"></div>
@@ -19,8 +19,11 @@
 		</div>
 	</div>
 
+	<div v-if="authed" class="widget top-0 left-0">
+		<Spotify />
+	</div>
+
 	<div v-if="authed" class="widget top-0 right-0">
-		<!-- <Spotify /> -->
 		<POS />
 		<TwitchFollow />
 	</div>
@@ -176,9 +179,5 @@ body {
 	position: absolute;
 	margin: 1em;
 	max-width: 10%;
-}
-
-.widget > * {
-	float: right;
 }
 </style>
