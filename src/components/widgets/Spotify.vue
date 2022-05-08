@@ -17,7 +17,6 @@
 						<div class="w-full rounded-full h-2.5 bg-gray-600 mx-2">
 							<div
 								class="bg-green-200 h-2.5 rounded-full"
-								style="transition: all 0.4s linear"
 								:style="{ width: `${percentage}%` }"
 							></div>
 						</div>
@@ -35,22 +34,31 @@ import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 import errorCaptured from "./errorCaptured";
 
-const spotifyRefreshTimer = 1500;
+/** How often to ping spotify for music change */
+const spotifyRefreshTimer = 3000;
+/** How often to increase our own timer of the progress bar */
+const smoothProgressBar = 100;
 
-function secondsToTimeString(secs: number) {
-	const divisor_for_minutes = secs % (60 * 60);
-	const minutes = Math.floor(divisor_for_minutes / 60);
+/**
+ * Make a M:ss string from the amount of seconds
+ */
+function secondsToTimeString(secs: number | null): string {
+	if (!secs) {
+		return "0:00";
+	}
+	const minutes = Math.floor((secs % 3600) / 60);
+	const seconds = Math.floor(secs % 60)
+		.toString()
+		.padStart(2, "0");
 
-	const divisor_for_seconds = divisor_for_minutes % 60;
-	const seconds = Math.ceil(divisor_for_seconds);
-
-	return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+	return `${minutes}:${seconds}`;
 }
 
 export default defineComponent({
 	data(): {
 		//Because track is an object, we need a refreshKey for vue to detect changes
 		track?: CurrentlyPlaying;
+		pendingRequest: boolean;
 		refreshKey: boolean;
 		loaded: boolean;
 		spotifyAccesstoken?: string;
@@ -60,28 +68,28 @@ export default defineComponent({
 		return {
 			loaded: false,
 			refreshKey: false,
+			pendingRequest: false,
 		};
 	},
 	computed: {
 		current(): string {
 			this.refreshKey;
-			return this.track
-				? secondsToTimeString((this.track.progress_ms || 0) / 1000)
-				: "0:00";
+
+			return secondsToTimeString((this.track?.progress_ms || 0) / 1000);
 		},
 		end(): string {
 			this.refreshKey;
-			return this.track
-				? secondsToTimeString((this.track.item?.duration_ms || 0) / 1000)
-				: "0:00";
+			return secondsToTimeString((this.track?.item?.duration_ms || 0) / 1000);
 		},
 		percentage(): number {
 			this.refreshKey;
 
 			return this.track
-				? ((this.track.progress_ms || 0) /
-						(this.track.item?.duration_ms || 0)) *
-						100
+				? Math.round(
+						((this.track.progress_ms || 0) /
+							(this.track.item?.duration_ms || 0)) *
+							100
+				  )
 				: 0;
 		},
 		imageURL(): string {
@@ -101,44 +109,57 @@ export default defineComponent({
 	},
 	methods: {
 		async refreshTrack() {
-			if (!this.spotifyAccesstoken) return;
+			if (!this.spotifyAccesstoken || this.pendingRequest) return;
+			this.pendingRequest = true;
+			try {
+				const spotifyFetch = await fetch(
+					"https://api.spotify.com/v1/me/player",
+					{
+						headers: {
+							Authorization: "Bearer " + this.spotifyAccesstoken,
+							"Content-Type": "application/json",
+						},
+					}
+				);
+				const spotifyResult = await spotifyFetch.json();
+				if (spotifyResult.error) {
+					clearInterval(this.interval);
+					throw new Error(spotifyResult);
+				}
 
-			const spotifyFetch = await fetch("https://api.spotify.com/v1/me/player", {
-				headers: {
-					Authorization: "Bearer " + this.spotifyAccesstoken,
-					"Content-Type": "application/json",
-				},
-			});
-			const spotifyResult = await spotifyFetch.json();
-			if (spotifyResult.error) {
-				clearInterval(this.interval);
-				throw new Error(spotifyResult);
+				this.track = spotifyResult as CurrentlyPlaying;
+				this.refreshKey = !this.refreshKey;
+			} catch (e) {
+				console.error("spotify track request error ", e);
 			}
+			//TODO: Token probably expired, try to refresh it
+			// this.pendingRequest = false;
+		},
+		async getAccesstoken() {
+			const fetchRes = await fetch("/api/external/spotify");
+			const res = await fetchRes.json();
 
-			this.track = spotifyResult as CurrentlyPlaying;
-			this.refreshKey = !this.refreshKey;
+			if (!res?.data?.accesstoken) {
+				throw new Error("Coulnd't fetch spotify credentials");
+			}
+			this.spotifyAccesstoken = res.data.accesstoken;
 		},
 	},
-	async mounted() {
-		const fetchRes = await fetch("/api/external/spotify");
-		const res = await fetchRes.json();
-
-		if (!res?.data?.accesstoken) {
-			throw new Error("Coulnd't fetch spotify credentials");
-		}
-		this.spotifyAccesstoken = res.data.accesstoken;
+	async created() {
+		await this.getAccesstoken();
+		this.refreshTrack();
 
 		const self = this;
 		this.interval = setInterval(function () {
 			self.refreshTrack();
 		}, spotifyRefreshTimer);
+
 		this.interval2 = setInterval(function () {
-			//TODO: This is finnicky
 			if (self.track && self.track.progress_ms && self.track.is_playing) {
-				self.track.progress_ms += 100;
+				self.track.progress_ms += smoothProgressBar;
 				self.refreshKey = !self.refreshKey;
 			}
-		}, 100);
+		}, smoothProgressBar);
 
 		await this.refreshTrack();
 		this.loaded = true;
