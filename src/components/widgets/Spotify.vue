@@ -55,6 +55,7 @@ export default defineComponent({
 		loaded: boolean;
 		spotifyAccesstoken?: string;
 		interval?: number;
+		interval2?: number;
 	} {
 		return {
 			loaded: false,
@@ -91,7 +92,11 @@ export default defineComponent({
 		nameArtist(): string {
 			this.refreshKey;
 
-			return this.track ? `${this.track.item?.name}` : "Not currently playing";
+			return this.track
+				? `${this.track.item?.name} - ${(this.track.item as Track).artists
+						.map((x) => x.name)
+						.join(", ")}`
+				: "Not currently playing";
 		},
 	},
 	methods: {
@@ -127,11 +132,19 @@ export default defineComponent({
 		this.interval = setInterval(function () {
 			self.refreshTrack();
 		}, spotifyRefreshTimer);
+		this.interval2 = setInterval(function () {
+			//TODO: This is finnicky
+			if (self.track && self.track.progress_ms && self.track.is_playing) {
+				self.track.progress_ms += 100;
+				self.refreshKey = !self.refreshKey;
+			}
+		}, 100);
 
 		await this.refreshTrack();
 		this.loaded = true;
 	},
 	beforeDestroy() {
+		if (this.interval2) clearInterval(this.interval2);
 		if (this.interval) clearInterval(this.interval);
 	},
 	errorCaptured,
