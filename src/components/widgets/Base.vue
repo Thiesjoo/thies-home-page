@@ -14,8 +14,11 @@
 					<span class="inline-flex px-2" style="white-space: nowrap">
 						<slot name="content"></slot>
 					</span>
-					<span class="text-purple-400 text-xs text-center" v-if="showSubtitle">
-						<slot name="subtitle"></slot>
+					<span
+						class="text-purple-400 text-xs text-center"
+						v-if="showSubcontent"
+					>
+						<slot name="subcontent"></slot>
 					</span>
 				</div>
 			</div>
@@ -33,8 +36,8 @@ export default defineComponent({
 		link: String,
 	},
 	computed: {
-		showSubtitle() {
-			return !!this.$slots.$subval;
+		showSubcontent() {
+			return !!this.$slots.subcontent;
 		},
 	},
 	methods: {

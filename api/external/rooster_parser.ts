@@ -7,10 +7,12 @@ import { join } from "path";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	let rooster_data: string;
-	if (process.env.VERCEL) {
+	if (process.env.VERCEL && process.env.VERCEL_ENV === "production") {
+		console.log("Fetching rooster");
 		rooster_data = (await axios({ url: "https://datanose.nl/195750.ics" }))
 			?.data;
 	} else {
+		console.log("Caching rooster");
 		rooster_data = readFileSync(join(__dirname, "rooster.ics"), "utf8");
 	}
 
