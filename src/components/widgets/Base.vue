@@ -8,16 +8,15 @@
 					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center truncate"
 					:class="[color ? 'bg-' + color + '-600' : '']"
 				>
-					<!-- style="max-width: 50%" -->
-					<slot></slot>
+					<slot name="short"></slot>
 				</span>
 				<div class="flex flex-col items-center">
-					<span class="inline-flex px-2" style="white-space: nowrap">{{
-						getValue
-					}}</span>
-					<span class="text-purple-400 text-xs text-center" v-if="subval">{{
-						subval
-					}}</span>
+					<span class="inline-flex px-2" style="white-space: nowrap">
+						<slot name="content"></slot>
+					</span>
+					<span class="text-purple-400 text-xs text-center" v-if="showSubtitle">
+						<slot name="subtitle"></slot>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -30,22 +29,12 @@ import { defineComponent } from "vue";
 export default defineComponent({
 	props: {
 		color: String,
-		val: {
-			type: [Function, String],
-			default: "lol",
-		},
-		subval: String,
+		loaded: Boolean,
 		link: String,
 	},
-	data(): { loaded: boolean; precomputed: string } {
-		return {
-			loaded: false,
-			precomputed: "...",
-		};
-	},
 	computed: {
-		getValue() {
-			return typeof this.val === "function" ? this.precomputed : this.val;
+		showSubtitle() {
+			return !!this.$slots.$subval;
 		},
 	},
 	methods: {
@@ -53,20 +42,6 @@ export default defineComponent({
 			//@ts-ignore
 			if (this.link) window.top.location.href = this.link;
 		},
-	},
-	async mounted() {
-		try {
-			this.precomputed =
-				typeof this.val === "function" ? await this.val() : this.val;
-			this.loaded = true;
-		} catch (e) {
-			console.warn(
-				"Component with val: ",
-				(this.val as Function).name,
-				"failed to load with error: ",
-				e
-			);
-		}
 	},
 });
 </script>

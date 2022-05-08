@@ -2,11 +2,14 @@
 	<div class="relative" @mouseleave="open = false">
 		<Base
 			color="purple"
-			:val="getFollows"
+			:loaded="loaded"
 			@mouseover="open = true"
 			link="https://twitch.tv/"
 		>
-			<font-awesome-icon :icon="['fab', 'twitch']" />
+			<template #short>
+				<font-awesome-icon :icon="['fab', 'twitch']"
+			/></template>
+			<template #content>{{ text }}</template>
 		</Base>
 		<Transition
 			enter-active-class="transition ease-out duration-200"
@@ -65,8 +68,14 @@ export default defineComponent({
 			stream_image: string;
 			viewers: number;
 		}[];
+		text: string;
+		loaded: boolean;
 	} {
-		return { open: false, data: [] };
+		return { open: false, data: [], text: "", loaded: false };
+	},
+	async created() {
+		this.text = await this.getFollows();
+		this.loaded = true;
 	},
 	methods: {
 		async getFollows() {

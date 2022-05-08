@@ -42,7 +42,11 @@ export async function getProviderCredentials(
 			"PROVIDER (myapi): " + e + " msg: " + e?.response?.data?.message
 		);
 		res.statusCode = e?.message?.startsWith("401") ? 401 : 404;
-		res.json({ ok: false, error: e?.message });
+		res.json({
+			ok: false,
+			errorLocation: "getProviderCredentials",
+			error: e?.message,
+		});
 
 		return false;
 	}
