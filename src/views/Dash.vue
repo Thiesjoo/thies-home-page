@@ -20,7 +20,7 @@
 	</div>
 
 	<div v-if="authed" class="widget top-0 right-0">
-		<Spotify />
+		<!-- <Spotify /> -->
 		<POS />
 		<TwitchFollow />
 	</div>
@@ -34,6 +34,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
 import { windowEvent } from "@/helpers/constants";
+import errorCaptured from "@/components/widgets/errorCaptured";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -76,6 +77,7 @@ export default defineComponent({
 		if (this.interval) clearInterval(this.interval);
 		window.removeEventListener(windowEvent, listener.bind(this));
 	},
+	errorCaptured,
 	async created() {
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();

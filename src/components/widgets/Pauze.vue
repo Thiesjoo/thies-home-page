@@ -23,12 +23,13 @@
 </template>
 
 <script lang="ts">
-const baseTime = new Date("2022-04-21T07:00:00.000Z");
+const baseTime = new Date();
 
 import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 //@ts-ignore
 import { default as ms } from "ms";
+import errorCaptured from "./errorCaptured";
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -128,14 +129,14 @@ export default defineComponent({
 				return upcomingEvent.summary;
 			}
 
-			throw new Error("Not in lesson!");
+			throw new Error("SAFE - Not in lesson!");
 		},
 	},
 
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
 	},
-	async created() {
+	async mounted() {
 		const self = this;
 		self.interval = setInterval(() => {
 			const [announce, atTime] = pauseText();

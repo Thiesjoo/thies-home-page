@@ -54,4 +54,5 @@ app.use(VueReCaptcha, { siteKey: "6LcpnaEfAAAAABlZfJ_rRIBUTgCuJHPRKNmm9768" });
 clickOutsideDirective(app);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
+
 app.mount("#app");
