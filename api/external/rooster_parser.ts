@@ -7,7 +7,11 @@ import { join } from "path";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	let rooster_data: string;
-	if (process.env.VERCEL && process.env.VERCEL_ENV === "production") {
+	if (
+		process.env.VERCEL &&
+		(process.env.VERCEL_ENV === "production" ||
+			process.env.VERCEL_ENV === "preview")
+	) {
 		console.log("Fetching rooster");
 		rooster_data = (await axios({ url: "https://datanose.nl/195750.ics" }))
 			?.data;

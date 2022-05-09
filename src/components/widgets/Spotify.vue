@@ -1,7 +1,7 @@
 <template>
 	<Base :loaded="loaded">
 		<template #content>
-			<div class="flex flex-row w-[300px] text-center">
+			<div class="flex flex-row w-[300px] text-center" v-if="renderTrack">
 				<div class="items-center flex">
 					<img :src="imageURL" class="h-12 rounded-full" />
 				</div>
@@ -66,12 +66,18 @@ export default defineComponent({
 		interval2?: number;
 	} {
 		return {
+			track: undefined,
 			loaded: false,
 			refreshKey: false,
 			pendingRequest: false,
 		};
 	},
 	computed: {
+		renderTrack(): boolean {
+			this.refreshKey;
+
+			return !!this?.track;
+		},
 		current(): string {
 			this.refreshKey;
 
@@ -121,6 +127,10 @@ export default defineComponent({
 						},
 					}
 				);
+				if (spotifyFetch.status === 204) {
+					return;
+				}
+
 				const spotifyResult = await spotifyFetch.json();
 				if (spotifyResult.error) {
 					clearInterval(this.interval);
@@ -145,7 +155,7 @@ export default defineComponent({
 			this.spotifyAccesstoken = res.data.accesstoken;
 		},
 	},
-	async created() {
+	async mounted() {
 		await this.getAccesstoken();
 		this.refreshTrack();
 

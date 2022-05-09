@@ -4,9 +4,7 @@
 import { windowEvent } from "./constants";
 
 export const getBaseURL = () => {
-	return window.location.origin.includes("localhost")
-		? "http://localhost:6969"
-		: "https://auth.thies.dev";
+	return window.env.BASEURL;
 };
 
 const { fetch: originalFetch } = window;
