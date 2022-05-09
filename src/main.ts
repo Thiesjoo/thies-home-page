@@ -27,6 +27,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import {
 	faArrowRightFromBracket,
+	faBolt,
+	faChargingStation,
 	faLock,
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
@@ -44,7 +46,7 @@ window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA =
 	window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
-library.add(faTwitch, faXmark, faLock, faArrowRightFromBracket);
+library.add(faTwitch, faXmark, faLock, faArrowRightFromBracket, faBolt);
 
 const app = createApp(App, { router });
 app.use(router);

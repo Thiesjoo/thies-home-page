@@ -20,6 +20,7 @@
 	</div>
 
 	<div v-if="authed" class="widget top-0 left-0">
+		<Battery />
 		<Spotify />
 	</div>
 
