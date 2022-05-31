@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="current > 1"
+		v-if="currentNetworkRequests > 1"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background"></div>
@@ -29,6 +29,8 @@
 				'right-0': location.includes('right'),
 				'top-0': location.includes('top'),
 				'bottom-0': location.includes('bottom'),
+				// Small padding to move out of the way of version modal
+				'pb-3': location.includes('bottom') && location.includes('left'),
 			}"
 		>
 			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
@@ -61,7 +63,7 @@ function getGreeting() {
 
 function listener() {
 	//@ts-ignore
-	this.current = window.networking.currentlyLoadingRequests;
+	this.currentNetworkRequests = window.networking.currentlyLoadingRequests;
 }
 
 export default defineComponent({
@@ -71,7 +73,7 @@ export default defineComponent({
 			time: getCurrentTime(),
 			seconds: new Date().getSeconds(),
 			balance: "...",
-			current: 0,
+			currentNetworkRequests: 0,
 			greeting: getGreeting(),
 			locations: ["topleft", "topright", "bottomright", "bottomleft"],
 		};

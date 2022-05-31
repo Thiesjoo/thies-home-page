@@ -4,3 +4,5 @@ export { default as POS } from "./POS.vue";
 export { default as TwitchFollow } from "./TwitchFollow.vue";
 export { default as Spotify } from "./Spotify.vue";
 export { default as Battery } from "./BatteryWidget.vue";
+
+export type ValidComponentNames = "Pauze" | "POS" | "TwitchFollow" | "Spotify" | "Battery";

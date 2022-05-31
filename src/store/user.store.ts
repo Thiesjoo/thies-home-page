@@ -1,12 +1,13 @@
+import { ValidComponentNames } from "@/components/widgets";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
-import { acceptHMRUpdate, defineStore } from "pinia";
+import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
 export type Widget = {
-	type: "Spotify" | "Pauze" | "POS" | "TwitchFollow";
+	type: ValidComponentNames;
 	location: "topleft" | "bottomleft" | "topright" | "bottomright";
 };
 
@@ -50,10 +51,11 @@ export const useUserStore = defineStore("user", {
 				}
 				this.user.name = res.name;
 				this.user.settings.widgets = [
-					{ type: "Spotify", location: "topleft" },
+					// { type: "Spotify", location: "topleft" },
 					{ type: "TwitchFollow", location: "topright" },
 					{ type: "POS", location: "topright" },
 					{ type: "Pauze", location: "bottomright" },
+					{ type: "Battery", location: "bottomleft" },
 				];
 				// console.info(res);
 			} catch (e) {
