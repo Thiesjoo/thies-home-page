@@ -5,12 +5,17 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
+export type Widget = {
+	type: "Spotify" | "Pauze" | "POS" | "TwitchFollow";
+	location: "topleft" | "bottomleft" | "topright" | "bottomright";
+};
+
 export type User = {
 	name: string;
 	settings: {
 		showSeconds: boolean;
 		showVersion: boolean;
-		widgets: { type: "spotify"; location: "topleft" | "bottomleft" | "topright" | "bottomright" }[];
+		widgets: Widget[];
 	};
 };
 
@@ -44,7 +49,12 @@ export const useUserStore = defineStore("user", {
 					};
 				}
 				this.user.name = res.name;
-				this.user.settings.widgets = [{ type: "spotify", location: "topleft" }];
+				this.user.settings.widgets = [
+					{ type: "Spotify", location: "topleft" },
+					{ type: "TwitchFollow", location: "topright" },
+					{ type: "POS", location: "topright" },
+					{ type: "Pauze", location: "bottomright" },
+				];
 				// console.info(res);
 			} catch (e) {
 				toast.error("Something went wrong with getting user data");

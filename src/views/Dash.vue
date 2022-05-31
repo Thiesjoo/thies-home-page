@@ -20,18 +20,23 @@
 		</div>
 	</div>
 
-	<!-- <div v-if="user.loggedIn" class="widget top-0 left-0">
-		<Spotify />
+	<div v-if="user.loggedIn && !user.loading.userdata">
+		<div
+			v-for="location in locations"
+			class="widget"
+			:class="{
+				'left-0': location.includes('left'),
+				'right-0': location.includes('right'),
+				'top-0': location.includes('top'),
+				'bottom-0': location.includes('bottom'),
+			}"
+		>
+			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
+	Could also limit 1 instance per type
+		-->
+			<component v-for="widget in filtered(location)" :is="widget.type"></component>
+		</div>
 	</div>
-
-	<div v-if="user.loggedIn" class="widget top-0 right-0">
-		<POS />
-		<TwitchFollow />
-	</div>
-
-	<div v-if="user.loggedIn" class="widget bottom-0 right-0">
-		<Pauze />
-	</div> -->
 </template>
 
 <script lang="ts">
@@ -39,7 +44,7 @@ import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
 import { windowEvent } from "@/helpers/constants";
 import errorCaptured from "@/components/widgets/errorCaptured";
-import { useUserStore } from "@/store/user.store";
+import { useUserStore, Widget } from "@/store/user.store";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -68,6 +73,7 @@ export default defineComponent({
 			balance: "...",
 			current: 0,
 			greeting: getGreeting(),
+			locations: ["topleft", "topright", "bottomright", "bottomleft"],
 		};
 	},
 	beforeDestroy() {
@@ -81,6 +87,14 @@ export default defineComponent({
 	computed: {
 		name(): string {
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
+		},
+		widgets(): Widget[] {
+			return this.user.user?.settings.widgets || [];
+		},
+	},
+	methods: {
+		filtered(arg: string): Widget[] {
+			return this.widgets.filter((x) => x.location === arg);
 		},
 	},
 	async created() {
