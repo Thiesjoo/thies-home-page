@@ -93,7 +93,7 @@ export default defineComponent({
 	data() {
 		return { discordTag: "....", discordID: "...." };
 	},
-	async mounted() {
+	async created() {
 		try {
 			const fetchResp = await fetch("api/discord_tag");
 			const response = await fetchResp.json();

@@ -1,12 +1,22 @@
 <template>
-	<Base color="blue" :val="getBalance" link="https://pos.svia.nl/pos">POS</Base>
+	<Base color="blue" link="https://pos.svia.nl/pos" :loaded="loaded">
+		<template #short>POS</template>
+		<template #content>{{ text }}</template>
+	</Base>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import Base from "@/widgets/Base.vue";
+import { Base } from "./";
 
 export default defineComponent({
+	data() {
+		return { text: "", loaded: false };
+	},
+	async created() {
+		this.text = await this.getBalance();
+		this.loaded = true;
+	},
 	methods: {
 		async getBalance() {
 			const fetchRes = await fetch("/api/external/via");

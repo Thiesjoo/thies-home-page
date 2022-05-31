@@ -13,8 +13,9 @@
 		</header>
 		<div v-if="show" style="margin-top: 80px"></div>
 		<router-view></router-view>
-		<footer class="flex mx-2 fixed bottom-0 justify-center text-xs">
+		<footer class="flex mx-2 fixed bottom-0 justify-center text-xs space-x-5">
 			<VersionModalVue />
+			<LoginVue />
 		</footer>
 	</div>
 </template>
@@ -23,6 +24,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import { routes } from "./router/routes";
 import VersionModalVue from "./components/VersionModal.vue";
+import LoginVue from "./components/LoginModal.vue";
 
 export default defineComponent({
 	computed: {
@@ -40,7 +42,7 @@ export default defineComponent({
 			},
 		},
 	},
-	components: { VersionModalVue },
+	components: { VersionModalVue, LoginVue },
 });
 </script>
 

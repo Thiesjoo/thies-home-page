@@ -1,17 +1,23 @@
 <template>
-	<!-- This component executes the getCurrentLesson function, which also populates the state
-of this component-->
 	<Base
 		color="cyan"
-		:val="getCurrentLesson"
-		:subval="tooltip.location"
+		:loaded="loaded"
 		link="https://datanose.nl/#timetable[195750](0,0)"
 	>
-		<span :title="tooltip.location">{{ inTime }}</span>
+		<template #short>
+			<span :title="tooltip.location">{{ inTime }}</span>
+		</template>
+
+		<template #content>{{ text }}</template>
+		<template #subcontent>{{ tooltip.location }}</template>
 	</Base>
 	<div v-if="inTime && !withSlack">
-		<Base color="fuchsia" :val="text" link="https://ishetpauze.nl">
-			<span :title="tooltip.pauze">Pauze</span>
+		<Base color="fuchsia" :loaded="loaded" link="https://ishetpauze.nl">
+			<template #short>
+				<span :title="tooltip.pauze">Pauze</span>
+			</template>
+
+			<template #content>{{ pauzeText }}</template>
 		</Base>
 	</div>
 </template>
@@ -20,9 +26,10 @@ of this component-->
 const baseTime = new Date();
 
 import { defineComponent } from "@vue/runtime-core";
-import Base from "@/widgets/Base.vue";
+import { Base } from "./";
 //@ts-ignore
 import { default as ms } from "ms";
+import errorCaptured from "./errorCaptured";
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -68,7 +75,7 @@ function generateTooltip(event: EventDatanose) {
 
 export default defineComponent({
 	data(): {
-		text: string;
+		pauzeText: string;
 		interval: number | null;
 		inLesson: boolean;
 		inTime: string | null;
@@ -77,10 +84,12 @@ export default defineComponent({
 			pauze: string;
 			location: string;
 		};
+		text: string;
+		loaded: boolean;
 	} {
 		return {
 			interval: null,
-			text: pauseText()[0],
+			pauzeText: pauseText()[0],
 			inLesson: false,
 			inTime: null,
 			withSlack: false,
@@ -88,6 +97,8 @@ export default defineComponent({
 				location: "",
 				pauze: pauseText()[1],
 			},
+			text: "",
+			loaded: false,
 		};
 	},
 	methods: {
@@ -118,20 +129,22 @@ export default defineComponent({
 				return upcomingEvent.summary;
 			}
 
-			throw new Error("Not in lesson!");
+			throw new Error("SAFE - Not in lesson!");
 		},
 	},
-
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
 	},
-	created() {
+	async mounted() {
 		const self = this;
 		self.interval = setInterval(() => {
 			const [announce, atTime] = pauseText();
-			self.text = announce;
+			self.pauzeText = announce;
 			self.tooltip.pauze = atTime;
 		}, 1000);
+
+		this.text = await this.getCurrentLesson();
+		this.loaded = true;
 	},
 	components: { Base },
 });

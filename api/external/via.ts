@@ -26,6 +26,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			console.log("POS ERROR: ", e);
 			// Wipe the pos access token to prevent
 			try {
+				console.log("Deleting pos token");
 				await axios({
 					url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
 					headers: {
@@ -34,7 +35,9 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 					},
 					method: "PATCH",
 				});
-			} catch (e) {}
+			} catch (e) {
+				console.error("Something went wrong with deleting token");
+			}
 		}
 		res.statusCode = 403;
 		res.setHeader("Content-Type", "application/json");

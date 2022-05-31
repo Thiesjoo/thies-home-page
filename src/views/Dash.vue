@@ -1,32 +1,50 @@
 <template>
 	<span
-		v-if="current > 0"
+		v-if="current > 1"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background"></div>
 
 	<div class="centered">
 		<div class="info">
-			<h2 class="time">{{ time }}</h2>
+			<div>
+				<span
+					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
+					v-if="user.user?.settings?.showSeconds"
+					>{{ seconds }}
+				</span>
+				<!-- TODO: on 11:00 the seconds get off centered -->
+				<h2 class="time">{{ time }}</h2>
+			</div>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
 
-	<div v-if="authed" class="widget top-0 right-0">
-		<POS />
-		<TwitchFollow />
-	</div>
-
-	<div v-if="authed" class="widget bottom-0 right-0">
-		<Pauze />
+	<div v-if="user.loggedIn && !user.loading.userdata">
+		<div
+			v-for="location in locations"
+			class="widget"
+			:class="{
+				'left-0': location.includes('left'),
+				'right-0': location.includes('right'),
+				'top-0': location.includes('top'),
+				'bottom-0': location.includes('bottom'),
+			}"
+		>
+			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
+	Could also limit 1 instance per type
+		-->
+			<component v-for="widget in filtered(location)" :is="widget.type"></component>
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import TwitchFollow from "@/widgets/TwitchFollow.vue";
-import POS from "@/widgets/POS.vue";
-import Pauze from "@/widgets/Pauze.vue";
+import * as Widgets from "@/components/widgets";
+import { windowEvent } from "@/helpers/constants";
+import errorCaptured from "@/components/widgets/errorCaptured";
+import { useUserStore, Widget } from "@/store/user.store";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -38,11 +56,7 @@ function getCurrentTime() {
 function getGreeting() {
 	const date = new Date();
 	let hours = date.getHours();
-	return hours < 12
-		? "morning"
-		: hours <= 18 && hours >= 12
-		? "afternoon"
-		: "night";
+	return hours < 12 ? "morning" : hours <= 18 && hours >= 12 ? "afternoon" : "night";
 }
 
 function listener() {
@@ -55,43 +69,50 @@ export default defineComponent({
 		return {
 			interval: null as number | null,
 			time: getCurrentTime(),
+			seconds: new Date().getSeconds(),
 			balance: "...",
-			name: "",
 			current: 0,
 			greeting: getGreeting(),
-
-			//TODO: implement this in generic store
-			authed: true,
+			locations: ["topleft", "topright", "bottomright", "bottomleft"],
 		};
 	},
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
-		window.removeEventListener("currentlyLoadingRequests", listener.bind(this));
+		window.removeEventListener(windowEvent, listener.bind(this));
+	},
+	errorCaptured,
+	setup() {
+		return { user: useUserStore() };
+	},
+	computed: {
+		name(): string {
+			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
+		},
+		widgets(): Widget[] {
+			return this.user.user?.settings.widgets || [];
+		},
+	},
+	methods: {
+		filtered(arg: string): Widget[] {
+			return this.widgets.filter((x) => x.location === arg);
+		},
 	},
 	async created() {
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
 			this.greeting = getGreeting();
+			this.seconds = new Date().getSeconds();
 		}, 1000);
 
-		window.addEventListener("currentlyLoadingRequests", listener.bind(this));
-
-		try {
-			const res = await (await fetch("/api/whoami")).json();
-			if (res.name) {
-				this.name = `, ${res.name}`;
-			}
-
-			// this.authed = true;
-		} catch (_) {}
+		window.addEventListener(windowEvent, listener.bind(this));
 	},
-	components: { TwitchFollow, POS, Pauze },
+	components: { ...Widgets },
 });
 </script>
 <style>
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro",
-		"Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial,
+		sans-serif !important;
 	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
 	color: #fff;
 	overflow: hidden;
@@ -139,6 +160,12 @@ body {
 	font-size: 1050%;
 	font-weight: 500;
 	letter-spacing: -5px;
+	font-variant-numeric: tabular-nums lining-nums;
+}
+
+.seconds {
+	font-size: 120%;
+	margin-left: 4px;
 }
 
 .greeting {
@@ -159,9 +186,5 @@ body {
 	position: absolute;
 	margin: 1em;
 	max-width: 10%;
-}
-
-.widget > * {
-	float: right;
 }
 </style>
