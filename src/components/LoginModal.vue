@@ -12,9 +12,7 @@
 			>
 				<div class="relative p-4 w-full max-w-2xl h-full md:h-auto z-100">
 					<div class="relative rounded-lg shadow bg-gray-700">
-						<div
-							class="flex justify-between items-start p-5 rounded-t border-b border-gray-600"
-						>
+						<div class="flex justify-between items-start p-5 rounded-t border-b border-gray-600">
 							<h2 class="mt-6 text-center w-full text-3xl font-extrabold">
 								{{ title }}
 							</h2>
@@ -26,10 +24,8 @@
 								<font-awesome-icon :icon="['fas', 'xmark']" size="lg" />
 							</button>
 						</div>
-						<div
-							class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-400"
-						>
-							<ProfilePage v-if="login.loggedIn" />
+						<div class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-400">
+							<ProfilePage v-if="user.loggedIn" />
 							<LoginForm v-else />
 						</div>
 					</div>
@@ -39,7 +35,7 @@
 	</div>
 </template>
 <script lang="ts">
-import { useUserStore } from "@/store/login.store";
+import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import LoginForm from "./LoginForm.vue";
 import ProfilePage from "./ProfilePage.vue";
@@ -49,38 +45,54 @@ export default defineComponent({
 		open: boolean;
 	} {
 		return {
-			open: true,
+			open: false,
 		};
 	},
 	computed: {
 		title(): string {
-			return this.login.loggedIn ? "Your profile" : "Login to your account";
+			return this.user.loggedIn ? "Your profile" : "Login to your account";
 		},
 		popupTitle(): string {
-			return this.login.loggedIn ? "Your profile" : "Login";
+			return this.user.loggedIn ? "Your profile" : "Login";
 		},
 	},
 	methods: {
 		toggle() {
 			this.open = !this.open;
-			if (!this.login.loggedIn) {
-				//@ts-ignore
-				const recaptcha = this.$recaptchaInstance.value;
-				if (this.open) {
-					recaptcha.showBadge();
-				} else {
-					recaptcha.hideBadge();
-				}
+			//@ts-ignore
+			const recaptcha = this.$recaptchaInstance.value;
+
+			if (!this.open) {
+				recaptcha.hideBadge();
+			}
+
+			if (!this.user.loggedIn && this.open) {
+				recaptcha.showBadge();
 			}
 		},
 	},
 	setup() {
-		return { login: useUserStore() };
+		const userStore = useUserStore();
+
+		return { user: userStore };
 	},
 	async created() {
 		await this.$recaptchaLoaded();
 		//@ts-ignore
 		this.$recaptchaInstance.value.hideBadge();
+
+		const self = this;
+		this.user.$subscribe(function (mut, state) {
+			//@ts-ignore
+			const recaptcha = self.$recaptchaInstance.value;
+
+			if (state.loggedIn) {
+				recaptcha.hideBadge();
+			} else if (self.open) {
+				// Not logged in, but view is open
+				recaptcha.showBadge();
+			}
+		});
 	},
 	mounted() {
 		if (this.$route.query.open) {

@@ -10,6 +10,7 @@
 			<div>
 				<span
 					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
+					v-if="user.user?.settings?.showSeconds"
 					>{{ seconds }}
 				</span>
 				<!-- TODO: on 11:00 the seconds get off centered -->
@@ -19,18 +20,18 @@
 		</div>
 	</div>
 
-	<div v-if="authed" class="widget top-0 left-0">
+	<!-- <div v-if="user.loggedIn" class="widget top-0 left-0">
 		<Spotify />
 	</div>
 
-	<div v-if="authed" class="widget top-0 right-0">
+	<div v-if="user.loggedIn" class="widget top-0 right-0">
 		<POS />
 		<TwitchFollow />
 	</div>
 
-	<div v-if="authed" class="widget bottom-0 right-0">
+	<div v-if="user.loggedIn" class="widget bottom-0 right-0">
 		<Pauze />
-	</div>
+	</div> -->
 </template>
 
 <script lang="ts">
@@ -38,6 +39,7 @@ import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
 import { windowEvent } from "@/helpers/constants";
 import errorCaptured from "@/components/widgets/errorCaptured";
+import { useUserStore } from "@/store/user.store";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -49,11 +51,7 @@ function getCurrentTime() {
 function getGreeting() {
 	const date = new Date();
 	let hours = date.getHours();
-	return hours < 12
-		? "morning"
-		: hours <= 18 && hours >= 12
-		? "afternoon"
-		: "night";
+	return hours < 12 ? "morning" : hours <= 18 && hours >= 12 ? "afternoon" : "night";
 }
 
 function listener() {
@@ -68,12 +66,8 @@ export default defineComponent({
 			time: getCurrentTime(),
 			seconds: new Date().getSeconds(),
 			balance: "...",
-			name: "",
 			current: 0,
 			greeting: getGreeting(),
-
-			//TODO: implement this in generic store
-			authed: true,
 		};
 	},
 	beforeDestroy() {
@@ -81,6 +75,14 @@ export default defineComponent({
 		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	errorCaptured,
+	setup() {
+		return { user: useUserStore() };
+	},
+	computed: {
+		name(): string {
+			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
+		},
+	},
 	async created() {
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
@@ -89,23 +91,14 @@ export default defineComponent({
 		}, 1000);
 
 		window.addEventListener(windowEvent, listener.bind(this));
-
-		try {
-			const res = await (await fetch("/api/whoami")).json();
-			if (res.name) {
-				this.name = `, ${res.name}`;
-			}
-
-			// this.authed = true;
-		} catch (_) {}
 	},
 	components: { ...Widgets },
 });
 </script>
 <style>
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro",
-		"Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial,
+		sans-serif !important;
 	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
 	color: #fff;
 	overflow: hidden;

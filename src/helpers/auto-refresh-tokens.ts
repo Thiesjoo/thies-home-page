@@ -1,6 +1,7 @@
 // This file overwrites fetch, and watches for 401 errors.
 // IF there is an 401 error, we try to refresh the token.
 
+import { useUserStore } from "@/store/user.store";
 import { windowEvent } from "./constants";
 
 export const getBaseURL = () => {
@@ -16,31 +17,31 @@ window.networking = {
 	currentlyLoadingRequests: 0,
 	failedFetches: 0,
 	failedRequests: 0,
-	authenticated: true,
 };
 
-async function refreshTokens() {
+async function refreshTokens(store: ReturnType<typeof useUserStore>) {
 	if (!currentlyFetching) {
 		currentlyFetching = originalFetch(getBaseURL() + "/auth/refresh/access", {
 			credentials: "include",
 		});
 	}
+
 	try {
 		const newResponse = await currentlyFetching;
 		if (newResponse.ok) {
 			// We've acquired new tokens
+			const newTokens = await newResponse.json();
 			currentlyFetching = null;
-			window.networking.authenticated = true;
-			return true;
+
+			store.accessToken = newTokens.token;
+
+			return newTokens;
 		} else {
 			throw new Error(await newResponse.json());
 		}
 	} catch (e) {
-		window.networking.authenticated = false;
 		window.networking.failedFetches++;
-		throw new Error(
-			"Something went wrong with refreshing the tokens. Error: " + e
-		);
+		throw new Error("Something went wrong with refreshing the tokens. Error: " + e);
 	}
 }
 
@@ -49,36 +50,60 @@ const pendingRequest = (done: boolean) => {
 	window.dispatchEvent(new Event(windowEvent));
 };
 
-window.fetch = async (...args) => {
-	let [resource, config] = args;
+function constructConfig(config: RequestInit | undefined, token: string) {
+	if (!token) return config;
 
-	pendingRequest(false);
+	return {
+		...config,
+		headers: {
+			Authorization: "Bearer " + token,
+			...config?.headers,
+		},
+	};
+}
 
-	try {
-		const response = await originalFetch(resource, config);
+export function overwriteFetch() {
+	const userStore = useUserStore();
 
-		if (response.status === 401 && window.networking.authenticated) {
-			if (typeof resource == "string" && resource.includes("local/login")) {
-				console.log("Login request, not refreshing tokens");
-				return response;
+	window.fetch = async (...args) => {
+		let [resource, config] = args;
+
+		pendingRequest(false);
+
+		try {
+			const response = await originalFetch(resource, constructConfig(config, userStore.accessToken));
+
+			if (response.status === 401 && userStore.loggedIn) {
+				if (typeof resource == "string" && resource.includes("local/login")) {
+					console.log("Login request, not refreshing tokens");
+					return response;
+				}
+				console.warn("Refreshing tokens");
+
+				await refreshTokens(userStore);
+
+				// Retry original request when we've acquired new tokens
+				const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
+
+				pendingRequest(true);
+				if (!resp.ok) {
+					throw Error(response.statusText);
+				}
+				return resp;
 			}
-			console.warn("Refreshing tokens");
 
-			await refreshTokens();
-
-			// Retry original request when we've acquired new tokens
-			const resp = await originalFetch(resource, config);
 			pendingRequest(true);
-			return resp;
+
+			if (!response.ok) {
+				throw Error(response.statusText);
+			}
+
+			return response;
+		} catch (e) {
+			window.networking.failedFetches++;
+			pendingRequest(true);
+
+			throw e;
 		}
-
-		pendingRequest(true);
-
-		return response;
-	} catch (e) {
-		window.networking.failedFetches++;
-		pendingRequest(true);
-
-		throw e;
-	}
-};
+	};
+}

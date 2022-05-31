@@ -1,11 +1,17 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default function (req: VercelRequest, res: VercelResponse) {
-	if (!req.cookies.accesstoken) {
+	if (!(req.cookies.accesstoken || req.headers.authorization)) {
 		return res.status(401).json({ ok: false, error: "Not authed" });
 	}
 
-	const [_, data, __] = req.cookies.accesstoken.split(".");
+	let token = req.cookies.accesstoken;
+
+	if (!token) {
+		token = req.headers.authorization.split(" ")?.[1];
+	}
+
+	const [_, data, __] = token.split(".");
 	if (!data) {
 		return res.status(400).json({ ok: false });
 	}

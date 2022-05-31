@@ -11,23 +11,18 @@
 </template>
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 export default defineComponent({
 	data() {
 		return {};
 	},
+	setup() {
+		return { user: useUserStore() };
+	},
 	methods: {
 		async logout() {
-			try {
-				await fetch(getBaseURL() + "/auth/refresh/logout", {
-					method: "GET",
-					credentials: "include",
-				});
-				window.location.reload();
-			} catch (e: any) {
-				console.error(e);
-				alert(e);
-			}
+			this.user.logout();
 		},
 	},
 });

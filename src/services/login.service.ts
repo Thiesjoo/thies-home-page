@@ -16,7 +16,18 @@ function register(data: RegisterInformation) {
 	return genericNetworkRequest(data, { recaptcha: data.recaptchaToken }, "/auth/local/register");
 }
 
-async function genericNetworkRequest(body: { [key: string]: any }, headers: { [key: string]: any }, url: string) {
+async function logout() {
+	await fetch(getBaseURL() + "/auth/refresh/logout", {
+		method: "GET",
+		credentials: "include",
+	});
+}
+
+async function genericNetworkRequest(
+	body: { [key: string]: string },
+	headers: { [key: string]: string },
+	url: string
+): Promise<{ access: string; refresh: string; ok: boolean }> {
 	const fetchRes = await fetch(getBaseURL() + url, {
 		method: "POST",
 		body: JSON.stringify(body),
@@ -34,10 +45,11 @@ async function genericNetworkRequest(body: { [key: string]: any }, headers: { [k
 		throw new Error(json.message || json.error || "Something went wrong with getting the access token");
 	}
 
-	return true;
+	return json;
 }
 
 export const loginService = {
 	login,
 	register,
+	logout,
 };
