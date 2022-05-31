@@ -1,14 +1,8 @@
 <template>
-	<div
-		class="min-h-full flex items-center justify-center pb-8 px-4 sm:px-6 lg:px-8"
-	>
+	<div class="min-h-full flex items-center justify-center pb-8 px-4 sm:px-6 lg:px-8">
 		<div class="max-w-sm w-full">
 			<div class="w-full m-0 mb-3 items-center flex">
-				<span
-					class="text-rose-600 text-center font-semibold w-full text-xl"
-					v-if="error"
-					>{{ error }}</span
-				>
+				<span class="text-rose-600 text-center font-semibold w-full text-xl" v-if="error">{{ error }}</span>
 			</div>
 			<form class="space-y-6" @submit="onSubmit">
 				<div class="rounded-md shadow-sm -space-y-px">
@@ -55,9 +49,7 @@
 					</div>
 					<Transition>
 						<div v-if="!renderLogin">
-							<label for="password" class="sr-only"
-								>Password confirmation</label
-							>
+							<label for="password" class="sr-only">Password confirmation</label>
 							<input
 								v-model="passwordConfirm"
 								type="password"
@@ -73,15 +65,8 @@
 
 				<div class="flex items-center justify-between">
 					<div class="text-sm">
-						<a
-							@click="renderLogin = !renderLogin"
-							class="font-medium text-gray-100 hover:text-gray-400"
-						>
-							{{
-								renderLogin
-									? "Register new account"
-									: "Login to existing account"
-							}}
+						<a @click="renderLogin = !renderLogin" class="font-medium text-gray-100 hover:text-gray-400">
+							{{ renderLogin ? "Register new account" : "Login to existing account" }}
 						</a>
 					</div>
 					<div class="text-sm">
@@ -99,10 +84,28 @@
 				<div>
 					<button
 						type="submit"
-						class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+						:disabled="login.loading"
+						class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:hover:bg-indigo-600"
 					>
 						<span class="absolute left-0 inset-y-0 flex items-center pl-3">
-							<font-awesome-icon :icon="['fas', 'lock']" size="lg" />
+							<font-awesome-icon :icon="['fas', 'lock']" size="lg" v-if="!login.loading" />
+							<svg
+								v-if="login.loading"
+								role="status"
+								class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
+								viewBox="0 0 100 101"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+									fill="currentColor"
+								/>
+								<path
+									d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+									fill="currentFill"
+								/>
+							</svg>
 						</span>
 						Log in
 					</button>
@@ -112,7 +115,7 @@
 	</div>
 </template>
 <script lang="ts">
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import { useUserStore } from "@/store/login.store";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -132,6 +135,9 @@ export default defineComponent({
 			renderLogin: this.login,
 		};
 	},
+	setup() {
+		return { login: useUserStore() };
+	},
 	methods: {
 		async onSubmit(e: Event) {
 			e.preventDefault();
@@ -143,51 +149,44 @@ export default defineComponent({
 			) {
 				return;
 			}
-
 			if (!this.renderLogin && this.password !== this.passwordConfirm) {
 				this.error = "Password and password confirmation should be the same";
 				return;
 			}
 
-			await this.$recaptchaLoaded();
-			const body: { email: string; password: string; name?: string } = {
-				email: this.email,
-				password: this.password,
-			};
+			this.error = "";
 
-			if (!this.renderLogin) {
-				body.name = this.name;
-			}
+			await this.$recaptchaLoaded();
 
 			try {
-				const recaptchaToken = await this.$recaptcha(
-					!this.renderLogin ? "Register" : "Login"
-				);
+				const body = {
+					email: this.email,
+					password: this.password,
+					recaptchaToken: await this.$recaptcha(!this.renderLogin ? "Register" : "Login"),
+				};
 
-				const fetchRes = await fetch(
-					getBaseURL() +
-						"/auth/local/" +
-						(!this.renderLogin ? "register" : "login"),
-					{
-						method: "POST",
-						body: JSON.stringify(body),
-						headers: {
-							"Content-Type": "application/json",
-							recaptcha: recaptchaToken,
-						},
-						credentials: "include",
+				if (!this.renderLogin) {
+					//Signup form
+					try {
+						await this.login.register({
+							...body,
+							name: this.name,
+						});
+					} catch (e: any) {
+						this.error = e?.message;
 					}
-				);
-				const json = await fetchRes.json();
-				if (!json.access) {
-					//TODO: Parse the error array from here
-					this.error = json.message || json.error;
-				} else {
-					//TODO: Inform user of success
-					window.location.reload();
+
+					return;
 				}
-			} catch (e: any) {
-				this.error = e?.message || e?.error;
+
+				try {
+					await this.login.login(body);
+				} catch (e: any) {
+					this.error = e;
+				}
+			} catch (e) {
+				console.error("Recaptcha failed!");
+				this.error = "Something went wrong with the recaptcha";
 			}
 		},
 	},

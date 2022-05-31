@@ -1,6 +1,7 @@
 const EXTRA_KEYS = ["BASEURL"]
 
 module.exports = {
+  transpileDependencies: ['vuex-module-decorators'],
   chainWebpack: config => {
     config.plugin('define').tap(([options = {}]) => {
       return [{

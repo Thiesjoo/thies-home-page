@@ -39,6 +39,10 @@ import { VueReCaptcha } from "vue-recaptcha-v3";
 /** Tailwind shizz */
 import "./index.css";
 
+import { createPinia } from "pinia";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 //@ts-ignore
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA =
@@ -49,8 +53,13 @@ library.add(faTwitch, faXmark, faLock, faArrowRightFromBracket);
 const app = createApp(App, { router });
 app.use(router);
 
+app.use(createPinia());
+app.use(Toast, {});
+
 // For more options see below
-app.use(VueReCaptcha, { siteKey: "6LcpnaEfAAAAABlZfJ_rRIBUTgCuJHPRKNmm9768" });
+app.use(VueReCaptcha, {
+	siteKey: "6LcpnaEfAAAAABlZfJ_rRIBUTgCuJHPRKNmm9768",
+});
 
 clickOutsideDirective(app);
 

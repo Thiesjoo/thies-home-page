@@ -21,12 +21,13 @@
 		"core-js": "^3.20.1",
 		"date-fns": "^2.27.0",
 		"ms": "^3.0.0-beta.2",
+		"pinia": "^2.0.14",
 		"tmi.js": "^1.8.5",
 		"vue": "^3.2.25",
 		"vue-class-component": "^8.0.0-0",
 		"vue-recaptcha-v3": "^2.0.1",
 		"vue-router": "^4.0.12",
-		"vuex": "^4.0.2"
+		"vue-toastification": "^2.0.0-rc.5"
 	},
 	"devDependencies": {
 		"@types/tmi.js": "^1.8.1",

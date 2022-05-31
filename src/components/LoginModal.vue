@@ -29,7 +29,7 @@
 						<div
 							class="pt-1 p-6 space-y-6 text-base leading-relaxed text-gray-400"
 						>
-							<ProfilePage v-if="authed" />
+							<ProfilePage v-if="login.loggedIn" />
 							<LoginForm v-else />
 						</div>
 					</div>
@@ -39,40 +39,31 @@
 	</div>
 </template>
 <script lang="ts">
-import { windowEvent } from "@/helpers/constants";
+import { useUserStore } from "@/store/login.store";
 import { defineComponent } from "vue";
 import LoginForm from "./LoginForm.vue";
 import ProfilePage from "./ProfilePage.vue";
 
-function listener() {
-	//@ts-ignore
-	this.authed = window.networking.authenticated;
-}
-
 export default defineComponent({
 	data(): {
 		open: boolean;
-		authed: boolean;
 	} {
 		return {
-			open: false,
-			authed: window.networking.authenticated,
+			open: true,
 		};
 	},
 	computed: {
-		title() {
-			//@ts-ignore
-			return this.authed ? "Your profile" : "Login to your account";
+		title(): string {
+			return this.login.loggedIn ? "Your profile" : "Login to your account";
 		},
-		popupTitle() {
-			//@ts-ignore
-			return this.authed ? "Your profile" : "Login";
+		popupTitle(): string {
+			return this.login.loggedIn ? "Your profile" : "Login";
 		},
 	},
 	methods: {
 		toggle() {
 			this.open = !this.open;
-			if (!this.authed) {
+			if (!this.login.loggedIn) {
 				//@ts-ignore
 				const recaptcha = this.$recaptchaInstance.value;
 				if (this.open) {
@@ -83,19 +74,18 @@ export default defineComponent({
 			}
 		},
 	},
+	setup() {
+		return { login: useUserStore() };
+	},
 	async created() {
 		await this.$recaptchaLoaded();
 		//@ts-ignore
 		this.$recaptchaInstance.value.hideBadge();
-		window.addEventListener(windowEvent, listener.bind(this));
 	},
 	mounted() {
 		if (this.$route.query.open) {
 			this.open = true;
 		}
-	},
-	beforeDestroy() {
-		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	components: { LoginForm, ProfilePage },
 });
