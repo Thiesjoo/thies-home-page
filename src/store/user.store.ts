@@ -1,4 +1,5 @@
 import { ValidComponentNames } from "@/components/widgets";
+import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
@@ -17,6 +18,7 @@ export type User = {
 		showSeconds: boolean;
 		showVersion: boolean;
 		widgets: Widget[];
+		widgetsAvailable: { name: Lowercase<ValidComponentNames> | "via"; id: string }[];
 	};
 };
 
@@ -46,18 +48,23 @@ export const useUserStore = defineStore("user", {
 				if (!this.user) {
 					this.user = {
 						name: "",
-						settings: { showSeconds: false, showVersion: true, widgets: [] },
+						settings: { showSeconds: true, showVersion: false, widgets: [], widgetsAvailable: [] },
 					};
 				}
 				this.user.name = res.name;
+
+				const allWidgetsAvailable = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				this.user.settings.widgetsAvailable = allWidgetsAvailable;
+
+				const temp = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
+
 				this.user.settings.widgets = [
-					// { type: "Spotify", location: "topleft" },
-					{ type: "TwitchFollow", location: "topright" },
+					{ type: "Twitch", location: "topright" },
 					{ type: "POS", location: "topright" },
 					{ type: "Pauze", location: "bottomright" },
-					{ type: "Battery", location: "bottomleft" },
-				];
-				// console.info(res);
+				].filter((x) => temp.has(x.type.toLowerCase())) as Widget[];
+
+				this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
 			} catch (e) {
 				toast.error("Something went wrong with getting user data");
 				console.error(e);

@@ -1,8 +1,5 @@
 <template>
-	<div
-		class="flex items-center flex-col space-y-2 divide-y-4 border-2 border-indigo-500/75"
-		v-if="!user.loading.userdata"
-	>
+	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
 		<span>Username: {{ user.user?.name }}</span>
 
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
@@ -32,14 +29,47 @@
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show version modal in bottom right</span>
 		</label>
 
-		<button
-			@click="logout"
-			type="button"
-			class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-		>
-			<font-awesome-icon :icon="['fas', 'fa-arrow-right-from-bracket']" />
-			Logout
-		</button>
+		<div class="flex flex-col items-center justify-center w-9/12 text-sm">
+			<div class="flex flex-row items-stretch py-5">
+				<div class="flex flex-col items-center" v-for="item in oauthApps">
+					<a
+						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
+						:style="{ 'background-color': LightenDarkenColor(item.color, canUnlink(item.name) ? -35 : 0) }"
+						:class="{ disabled: canUnlink(item.name) }"
+						:href="getURL(item.name)"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<font-awesome-icon :icon="[`fab`, `${item.name.toLowerCase()}`]" class="mr-2" />
+						{{ item.name }}
+					</a>
+					<a
+						class="text-red-500 no-underline pt-2 flex flex-row justify-center items-center"
+						:href="getDeleteURL(item.name)"
+						target="_blank"
+						rel="noopener noreferrer"
+						v-if="canUnlink(item.name)"
+					>
+						<font-awesome-icon :icon="[`fas`, `link-slash`]" size="sm" class="mr-2" /> unlink</a
+					>
+				</div>
+			</div>
+			<div class="flex items-center w-full">
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+				<div class="flex-grow-0 mx-5 text dark:text-white">or</div>
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+			</div>
+			<button
+				@click="logout"
+				type="button"
+				class="mt-5 inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto sm:text-sm"
+			>
+				<div class="flex flex-row justify-center items-center">
+					<font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="mr-2" />
+					<span>Logout</span>
+				</div>
+			</button>
+		</div>
 	</div>
 
 	<span class="w-full flex items-center align-center" v-if="user.loading.userdata">
@@ -62,12 +92,32 @@
 	</span>
 </template>
 <script lang="ts">
+import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 
 export default defineComponent({
 	data() {
-		return {};
+		return {
+			oauthApps: [
+				{
+					name: "Discord",
+					color: "#7289DA",
+				},
+				{
+					name: "Twitch",
+					color: "#6441a5",
+				},
+				{
+					name: "Spotify",
+					color: "#1ed760",
+				},
+				{
+					name: "POS",
+					color: "#2c3e50",
+				},
+			],
+		};
 	},
 	setup() {
 		return { user: useUserStore() };
@@ -87,6 +137,46 @@ export default defineComponent({
 				//@ts-ignore
 				this.user.user.settings.showVersion = event.target.checked;
 			}
+		},
+		LightenDarkenColor(color: string, percent: number) {
+			var R = parseInt(color.substring(1, 3), 16);
+			var G = parseInt(color.substring(3, 5), 16);
+			var B = parseInt(color.substring(5, 7), 16);
+
+			//@ts-ignore
+			R = parseInt((R * (100 + percent)) / 100);
+			//@ts-ignore
+			G = parseInt((G * (100 + percent)) / 100);
+			//@ts-ignore
+			B = parseInt((B * (100 + percent)) / 100);
+
+			R = R < 255 ? R : 255;
+			G = G < 255 ? G : 255;
+			B = B < 255 ? B : 255;
+
+			var RR = R.toString(16).length == 1 ? "0" + R.toString(16) : R.toString(16);
+			var GG = G.toString(16).length == 1 ? "0" + G.toString(16) : G.toString(16);
+			var BB = B.toString(16).length == 1 ? "0" + B.toString(16) : B.toString(16);
+
+			return "#" + RR + GG + BB;
+		},
+		getURL(name: string) {
+			if (name == "POS") {
+				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
+			}
+			return `${getBaseURL()}/auth/${name.toLowerCase()}/login`;
+		},
+		getDeleteURL(name: string) {
+			if (name == "POS") {
+				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
+			}
+			return `${getBaseURL()}/auth/${name.toLowerCase()}/delete`;
+		},
+		canUnlink(name: string) {
+			name = name.toLowerCase();
+			return !!this.user.user?.settings.widgetsAvailable.find(
+				(x) => x.name === name || (name === "pos" && x.name === "via")
+			);
 		},
 	},
 });

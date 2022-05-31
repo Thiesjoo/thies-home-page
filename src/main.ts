@@ -23,14 +23,8 @@ import router from "./router";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
-import {
-	faArrowRightFromBracket,
-	faBolt,
-	faChargingStation,
-	faLock,
-	faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faTwitch, faDiscord, faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { faArrowRightFromBracket, faBolt, faLinkSlash, faLock, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
 import { overwriteFetch } from "./helpers/auto-refresh-tokens";
@@ -49,7 +43,8 @@ import { useUserStore } from "./store/user.store";
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
-library.add(faTwitch, faXmark, faLock, faArrowRightFromBracket, faBolt);
+library.add(faTwitch, faSpotify, faDiscord);
+library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash);
 
 const app = createApp(App, { router });
 app.use(router);
