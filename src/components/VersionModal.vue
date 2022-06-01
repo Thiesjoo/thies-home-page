@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="rounded p-1" @click="toggle">
+		<div class="rounded p-1" @click="toggle" v-if="user.user?.settings.showVersion">
 			<span :title="VUE_APP_VERCEL_GIT_COMMIT_SHA">{{ VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7) }}</span>
 		</div>
 		<div>

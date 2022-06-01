@@ -1,12 +1,14 @@
+import { ValidComponentNames } from "@/components/widgets";
+import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
-import { acceptHMRUpdate, defineStore } from "pinia";
+import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
 export type Widget = {
-	type: "Spotify" | "Pauze" | "POS" | "TwitchFollow";
+	type: ValidComponentNames;
 	location: "topleft" | "bottomleft" | "topright" | "bottomright";
 };
 
@@ -16,6 +18,7 @@ export type User = {
 		showSeconds: boolean;
 		showVersion: boolean;
 		widgets: Widget[];
+		widgetsAvailable: { name: Lowercase<ValidComponentNames> | "via"; id: string }[];
 	};
 };
 
@@ -43,19 +46,34 @@ export const useUserStore = defineStore("user", {
 			try {
 				const res = await (await fetch("/api/whoami")).json();
 				if (!this.user) {
+					// Default user data for testing
 					this.user = {
 						name: "",
-						settings: { showSeconds: false, showVersion: true, widgets: [] },
+						settings: {
+							showSeconds: true,
+							showVersion: false,
+							widgets: [
+								{ type: "Twitch", location: "topright" },
+								{ type: "POS", location: "topright" },
+								{ type: "Pauze", location: "bottomright" },
+							],
+							widgetsAvailable: [],
+						},
 					};
 				}
 				this.user.name = res.name;
-				this.user.settings.widgets = [
-					{ type: "Spotify", location: "topleft" },
-					{ type: "TwitchFollow", location: "topright" },
-					{ type: "POS", location: "topright" },
-					{ type: "Pauze", location: "bottomright" },
-				];
-				// console.info(res);
+
+				const allWidgetsAvailable = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				this.user.settings.widgetsAvailable = allWidgetsAvailable;
+
+				const temp = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
+
+				// Always filter to prevent invalidity
+				this.user.settings.widgets = this.user.settings.widgets.filter((x) =>
+					temp.has(x.type.toLowerCase())
+				) as Widget[];
+
+				// this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
 			} catch (e) {
 				toast.error("Something went wrong with getting user data");
 				console.error(e);

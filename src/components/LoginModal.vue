@@ -45,7 +45,7 @@ export default defineComponent({
 		open: boolean;
 	} {
 		return {
-			open: false,
+			open: true,
 		};
 	},
 	computed: {

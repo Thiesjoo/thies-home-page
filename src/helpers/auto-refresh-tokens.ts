@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/user.store";
 import { windowEvent } from "./constants";
 
 export const getBaseURL = () => {
-	return window.env.BASEURL;
+	return window.env.BASEURL || "https://auth.thies.dev";
 };
 
 const { fetch: originalFetch } = window;
