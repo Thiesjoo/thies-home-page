@@ -10,8 +10,7 @@ export const routes = [
 	{
 		path: "/users",
 		name: "Twitch Viewer list",
-		component: () =>
-			import(/* webpackChunkName: "users" */ "../views/Users.vue"),
+		component: () => import(/* webpackChunkName: "users" */ "../views/Users.vue"),
 		meta: {
 			header: true,
 		},
@@ -19,8 +18,7 @@ export const routes = [
 	{
 		path: "/rainbow",
 		name: "Twitch Chat Tricks",
-		component: () =>
-			import(/* webpackChunkName: "rainbow" */ "../views/RainbowTwitch.vue"),
+		component: () => import(/* webpackChunkName: "rainbow" */ "../views/RainbowTwitch.vue"),
 		exclude: true,
 		meta: {
 			header: true,
@@ -29,15 +27,13 @@ export const routes = [
 	{
 		path: "/gh*",
 		name: "Github Redirect",
-		component: () =>
-			import(/* webpackChunkName: "github" */ "../views/Github.vue"),
+		component: () => import(/* webpackChunkName: "github" */ "../views/Github.vue"),
 		exclude: true,
 	},
 	{
 		path: "/home",
 		name: "New tab",
-		component: () =>
-			import(/* webpackChunkName: "github" */ "../views/Dash.vue"),
+		component: () => import(/* webpackChunkName: "newtab" */ "../views/Dash.vue"),
 		exclude: true,
 	},
 ];

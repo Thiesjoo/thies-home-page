@@ -46,9 +46,19 @@ export const useUserStore = defineStore("user", {
 			try {
 				const res = await (await fetch("/api/whoami")).json();
 				if (!this.user) {
+					// Default user data for testing
 					this.user = {
 						name: "",
-						settings: { showSeconds: true, showVersion: false, widgets: [], widgetsAvailable: [] },
+						settings: {
+							showSeconds: true,
+							showVersion: false,
+							widgets: [
+								{ type: "Twitch", location: "topright" },
+								{ type: "POS", location: "topright" },
+								{ type: "Pauze", location: "bottomright" },
+							],
+							widgetsAvailable: [],
+						},
 					};
 				}
 				this.user.name = res.name;
@@ -58,13 +68,12 @@ export const useUserStore = defineStore("user", {
 
 				const temp = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
-				this.user.settings.widgets = [
-					{ type: "Twitch", location: "topright" },
-					{ type: "POS", location: "topright" },
-					{ type: "Pauze", location: "bottomright" },
-				].filter((x) => temp.has(x.type.toLowerCase())) as Widget[];
+				// Always filter to prevent invalidity
+				this.user.settings.widgets = this.user.settings.widgets.filter((x) =>
+					temp.has(x.type.toLowerCase())
+				) as Widget[];
 
-				this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
+				// this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
 			} catch (e) {
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
