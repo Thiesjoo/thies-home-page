@@ -66,7 +66,9 @@ export const useUserStore = defineStore("user", {
 				const allWidgetsAvailable = await (await fetch(getBaseURL() + "/api/providers/me")).json();
 				this.user.settings.widgetsAvailable = allWidgetsAvailable;
 
-				const temp = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
+				const temp = new Set<string>(
+					this.user.settings.widgetsAvailable.map((x) => (x.name == "via" ? "pos" : x.name))
+				);
 
 				// Always filter to prevent invalidity
 				this.user.settings.widgets = this.user.settings.widgets.filter((x) =>
