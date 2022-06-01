@@ -187,4 +187,12 @@ body {
 	margin: 1em;
 	max-width: 10%;
 }
+
+.widget.right-0 > * {
+	float: right;
+}
+
+.widget.left-0 > * {
+	float: left;
+}
 </style>
