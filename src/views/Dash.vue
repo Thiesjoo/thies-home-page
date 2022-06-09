@@ -24,7 +24,7 @@
 		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
 		-->
 
-		<!-- TODO: Remove transition on drop -->
+		<!-- TODO: Remove transition on drop. This transistion is because a new component is created when dragging to another group. Not really preventable -->
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{
@@ -37,9 +37,8 @@
 			}"
 			:id="location"
 			class="widget"
-			:list="user.user.settings.widgets[location]"
+			v-model="user.user.settings.widgets[location]"
 			group="widgets"
-			@sort="move"
 			:item-key="generateKey"
 		>
 			<template #item="{ element }">
@@ -101,13 +100,6 @@ export default defineComponent({
 	methods: {
 		generateKey(a: Widget) {
 			return a.type + a.id;
-		},
-		move(evt: any) {
-			const from = evt.from.id;
-			const to = evt.to.id;
-
-			console.log(from, to, evt.item);
-			// TODO: Update store
 		},
 	},
 	async created() {

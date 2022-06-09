@@ -12,10 +12,11 @@
 			leave-class="transform opacity-100 scale-100"
 			leave-to-class="transform opacity-0 scale-95"
 		>
+			<!-- TODO: Dropdown doesnt open to the top when space at the bottom is sparse -->
 			<div
 				v-if="open"
 				@mouseover="open = true"
-				class="absolute flex flex-col items-center right-0 w-64 py-2 mt-2 e bg-gray-100 rounded-md shadow-xl"
+				class="absolute flex flex-col items-center right-0 w-64 py-2 mt-2 bg-gray-100 rounded-md shadow-xl"
 			>
 				<a
 					:href="'https://twitch.tv/' + item.url"
