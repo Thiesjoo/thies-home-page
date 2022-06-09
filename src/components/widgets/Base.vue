@@ -1,5 +1,9 @@
 <template>
-	<Transition name="slide-fade">
+	<Transition
+		name="slide-fade"
+		:enter-from-class="`enter-from-${right ? 'right' : 'left'}`"
+		:leave-to-class="`enter-from-${right ? 'right' : 'left'}`"
+	>
 		<div class="p-2" v-if="loaded" @click="linkTo">
 			<div
 				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
@@ -15,10 +19,7 @@
 					<span class="inline-flex px-2" style="white-space: nowrap">
 						<slot name="content"></slot>
 					</span>
-					<span
-						class="text-purple-400 text-xs text-center w-full p-2 pb-0"
-						v-if="showSubcontent"
-					>
+					<span class="text-purple-400 text-xs text-center w-full p-2 pb-0" v-if="showSubcontent">
 						<slot name="subcontent"></slot>
 					</span>
 				</div>
@@ -36,12 +37,21 @@ export default defineComponent({
 		loaded: Boolean,
 		link: String,
 	},
+	mounted() {
+		console.log(this.left, this.right);
+	},
 	computed: {
 		showSubcontent() {
 			return !!this.$slots.subcontent;
 		},
 		showShort() {
 			return !!this.$slots.short;
+		},
+		left(): boolean {
+			return !!this.$attrs.left;
+		},
+		right(): boolean {
+			return !!this.$attrs.right;
 		},
 	},
 	methods: {
@@ -63,9 +73,13 @@ export default defineComponent({
 }
 
 /* TODO: This animation moves from the left, but some components are on the right */
-.slide-fade-enter-from,
-.slide-fade-leave-to {
+.enter-from-right {
 	transform: translateX(20px);
+	opacity: 0;
+}
+
+.enter-from-left {
+	transform: translateX(-20px);
 	opacity: 0;
 }
 </style>

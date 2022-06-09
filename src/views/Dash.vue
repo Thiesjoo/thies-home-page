@@ -36,7 +36,12 @@
 			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
 	Could also limit 1 instance per type
 		-->
-			<component v-for="widget in filtered(location)" :is="widget.type"></component>
+			<component
+				v-for="widget in filtered(location)"
+				:is="widget.type"
+				:left="location.includes('left')"
+				:right="location.includes('right')"
+			></component>
 		</div>
 	</div>
 </template>

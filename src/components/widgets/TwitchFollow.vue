@@ -1,14 +1,7 @@
 <template>
 	<div class="relative" @mouseleave="open = false">
-		<Base
-			color="purple"
-			:loaded="loaded"
-			@mouseover="open = true"
-			link="https://twitch.tv/"
-		>
-			<template #short>
-				<font-awesome-icon :icon="['fab', 'twitch']"
-			/></template>
+		<Base color="purple" :loaded="loaded" @mouseover="open = true" link="https://twitch.tv/" v-bind="$attrs">
+			<template #short> <font-awesome-icon :icon="['fab', 'twitch']" /></template>
 			<template #content>{{ text }}</template>
 		</Base>
 		<Transition
@@ -32,10 +25,7 @@
 					v-for="item in data"
 				>
 					<div class="px-4 w-36 items-center align-top">
-						<img
-							:src="item.avatar"
-							class="object-contain rounded-full w-full h-auto shadow-md"
-						/>
+						<img :src="item.avatar" class="object-contain rounded-full w-full h-auto shadow-md" />
 					</div>
 
 					<div class="flex flex-col w-full break-words" :title="item.title">
@@ -92,9 +82,7 @@ export default defineComponent({
 					title: x.title,
 					game_name: x.game_name,
 					avatar: x.profile_image_url,
-					stream_image: x.thumbnail_url
-						.replace("{width}", "1920")
-						.replace("{height}", "1080"),
+					stream_image: x.thumbnail_url.replace("{width}", "1920").replace("{height}", "1080"),
 					viewers: x.viewer_count,
 				};
 			});
