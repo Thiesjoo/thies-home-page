@@ -21,9 +21,12 @@
 	</div>
 
 	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
-		<div
+		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
+		-->
+
+		<!-- TODO: Remove transition on drop -->
+		<draggable
 			v-for="location in ALL_LOCATIONS"
-			class="widget"
 			:class="{
 				'left-0': location.includes('left'),
 				'right-0': location.includes('right'),
@@ -32,29 +35,23 @@
 				// Small padding to move out of the way of version modal
 				'pb-3': location.includes('bottom') && location.includes('left'),
 			}"
+			:id="location"
+			class="widget"
+			:list="user.user.settings.widgets[location]"
+			group="widgets"
+			@sort="move"
+			:item-key="generateKey"
 		>
-			<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
-		-->
-
-			<draggable
-				:id="location"
-				class="draggable"
-				:list="user.user.settings.widgets[location]"
-				group="widgets"
-				@sort="move"
-				:item-key="generateKey"
-			>
-				<template #item="{ element }">
-					<div>
-						<component
-							:is="element.type"
-							:left="location.includes('left')"
-							:right="location.includes('right')"
-						></component>
-					</div>
-				</template>
-			</draggable>
-		</div>
+			<template #item="{ element }">
+				<div>
+					<component
+						:is="element.type"
+						:left="location.includes('left')"
+						:right="location.includes('right')"
+					></component>
+				</div>
+			</template>
+		</draggable>
 	</div>
 </template>
 
@@ -200,15 +197,16 @@ body {
 	position: absolute;
 	margin: 1em;
 	width: 10%;
-}
-
-.draggable {
 	min-height: 400px;
-	width: 100%;
 }
 
-.widget.bottom-0 > * {
-	vertical-align: bottom;
+.widget.bottom-0 {
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.widget.right-0 {
+	align-items: flex-end;
 }
 
 .widget.right-0 > * {
