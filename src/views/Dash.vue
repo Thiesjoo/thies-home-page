@@ -20,9 +20,9 @@
 		</div>
 	</div>
 
-	<div v-if="user.loggedIn && !user.loading.userdata">
+	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
 		<div
-			v-for="location in locations"
+			v-for="location in ALL_LOCATIONS"
 			class="widget"
 			:class="{
 				'left-0': location.includes('left'),
@@ -33,15 +33,27 @@
 				'pb-3': location.includes('bottom') && location.includes('left'),
 			}"
 		>
-			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
-	Could also limit 1 instance per type
+			<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
 		-->
-			<component
-				v-for="widget in filtered(location)"
-				:is="widget.type"
-				:left="location.includes('left')"
-				:right="location.includes('right')"
-			></component>
+
+			<draggable
+				:id="location"
+				class="draggable"
+				:list="user.user.settings.widgets[location]"
+				group="widgets"
+				@sort="move"
+				:item-key="generateKey"
+			>
+				<template #item="{ element }">
+					<div>
+						<component
+							:is="element.type"
+							:left="location.includes('left')"
+							:right="location.includes('right')"
+						></component>
+					</div>
+				</template>
+			</draggable>
 		</div>
 	</div>
 </template>
@@ -50,7 +62,8 @@
 import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
 import errorCaptured from "@/components/widgets/errorCaptured";
-import { useUserStore, Widget } from "@/store/user.store";
+import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
+import draggable from "vuedraggable";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -73,7 +86,7 @@ export default defineComponent({
 			seconds: new Date().getSeconds(),
 			balance: "...",
 			greeting: getGreeting(),
-			locations: ["topleft", "topright", "bottomright", "bottomleft"],
+			ALL_LOCATIONS,
 		};
 	},
 	beforeDestroy() {
@@ -87,13 +100,17 @@ export default defineComponent({
 		name(): string {
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
-		widgets(): Widget[] {
-			return this.user.user?.settings.widgets || [];
-		},
 	},
 	methods: {
-		filtered(arg: string): Widget[] {
-			return this.widgets.filter((x) => x.location === arg);
+		generateKey(a: Widget) {
+			return a.type + a.id;
+		},
+		move(evt: any) {
+			const from = evt.from.id;
+			const to = evt.to.id;
+
+			console.log(from, to, evt.item);
+			// TODO: Update store
 		},
 	},
 	async created() {
@@ -103,7 +120,7 @@ export default defineComponent({
 			this.seconds = new Date().getSeconds();
 		}, 1000);
 	},
-	components: { ...Widgets },
+	components: { ...Widgets, draggable },
 });
 </script>
 <style>
@@ -182,7 +199,16 @@ body {
 .widget {
 	position: absolute;
 	margin: 1em;
-	max-width: 10%;
+	width: 10%;
+}
+
+.draggable {
+	min-height: 400px;
+	width: 100%;
+}
+
+.widget.bottom-0 > * {
+	vertical-align: bottom;
 }
 
 .widget.right-0 > * {
