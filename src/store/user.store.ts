@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
+const defaultWidgets = ["dummy", "battery"];
 
 export type Widget = {
 	type: ValidComponentNames;
@@ -18,7 +19,7 @@ export type User = {
 		showSeconds: boolean;
 		showVersion: boolean;
 		widgets: Widget[];
-		widgetsAvailable: { name: Lowercase<ValidComponentNames> | "via"; id: string }[];
+		widgetsAvailable: { name: Lowercase<ValidComponentNames> | "via" | "battery"; id: string }[];
 	};
 };
 
@@ -63,19 +64,21 @@ export const useUserStore = defineStore("user", {
 				}
 				this.user.name = res.name;
 
-				const allWidgetsAvailable = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				const allWidgetsAvailable: any[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
 				this.user.settings.widgetsAvailable = allWidgetsAvailable;
 
-				const temp = new Set<string>(
+				const validWidgets = new Set<string>(
 					this.user.settings.widgetsAvailable.map((x) => (x.name == "via" ? "pos" : x.name))
 				);
 
+				defaultWidgets.forEach((x) => validWidgets.add(x));
+
 				// Always filter to prevent invalidity
 				this.user.settings.widgets = this.user.settings.widgets.filter((x) =>
-					temp.has(x.type.toLowerCase())
+					validWidgets.has(x.type.toLowerCase())
 				) as Widget[];
 
-				// this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
+				//this.user.settings.widgets.push({ type: "Dummy", location: "bottomleft" });
 			} catch (e) {
 				if (e instanceof Interrupted) {
 					console.error("Request was interrupted, not modifying state");

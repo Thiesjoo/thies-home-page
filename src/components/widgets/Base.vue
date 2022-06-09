@@ -37,9 +37,6 @@ export default defineComponent({
 		loaded: Boolean,
 		link: String,
 	},
-	mounted() {
-		console.log(this.left, this.right);
-	},
 	computed: {
 		showSubcontent() {
 			return !!this.$slots.subcontent;
