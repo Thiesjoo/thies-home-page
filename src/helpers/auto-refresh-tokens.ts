@@ -2,22 +2,16 @@
 // IF there is an 401 error, we try to refresh the token.
 
 import { useUserStore } from "@/store/user.store";
-import { windowEvent } from "./constants";
 
 export const getBaseURL = () => {
 	return window.env.BASEURL || "https://auth.thies.dev";
 };
 
 const { fetch: originalFetch } = window;
+export class Interrupted extends Error {}
 
 /** Current refresh fetch */
 let currentlyFetching: Promise<Response> | null = null;
-
-window.networking = {
-	currentlyLoadingRequests: 0,
-	failedFetches: 0,
-	failedRequests: 0,
-};
 
 async function refreshTokens(store: ReturnType<typeof useUserStore>) {
 	if (!currentlyFetching) {
@@ -26,29 +20,31 @@ async function refreshTokens(store: ReturnType<typeof useUserStore>) {
 		});
 	}
 
-	try {
-		const newResponse = await currentlyFetching;
-		if (newResponse.ok) {
-			// We've acquired new tokens
-			const newTokens = await newResponse.json();
-			currentlyFetching = null;
+	return new Promise(async (resolve, reject) => {
+		try {
+			const newResponse = await currentlyFetching;
 
-			store.accessToken = newTokens.token;
+			if (!newResponse) {
+				throw Error("UNREACHABLE");
+			}
 
-			return newTokens;
-		} else {
-			throw new Error(await newResponse.json());
+			if (newResponse.ok) {
+				// We've acquired new tokens
+				const newTokens = await newResponse.json();
+				currentlyFetching = null;
+
+				store.accessToken = newTokens.token;
+
+				resolve(newTokens);
+			} else {
+				reject(await newResponse.json());
+			}
+		} catch (e: any) {
+			console.error("network error refresh: ", e);
+			throw new Interrupted(e?.message);
 		}
-	} catch (e) {
-		window.networking.failedFetches++;
-		throw new Error("Something went wrong with refreshing the tokens. Error: " + e);
-	}
+	});
 }
-
-const pendingRequest = (done: boolean) => {
-	window.networking.currentlyLoadingRequests += done ? -1 : 1;
-	window.dispatchEvent(new Event(windowEvent));
-};
 
 function constructConfig(config: RequestInit | undefined, token: string) {
 	if (!token) return config;
@@ -66,44 +62,40 @@ export function overwriteFetch() {
 	const userStore = useUserStore();
 
 	window.fetch = async (...args) => {
-		let [resource, config] = args;
+		return new Promise(async (resolve, reject) => {
+			try {
+				let [resource, config] = args;
 
-		pendingRequest(false);
+				const response = await originalFetch(resource, constructConfig(config, userStore.accessToken));
 
-		try {
-			const response = await originalFetch(resource, constructConfig(config, userStore.accessToken));
+				if (response.status === 401 && userStore.loggedIn) {
+					if (typeof resource == "string" && resource.includes("local/login")) {
+						console.log("Login request, not refreshing tokens");
+						resolve(response);
+					}
+					console.warn("Refreshing tokens");
 
-			if (response.status === 401 && userStore.loggedIn) {
-				if (typeof resource == "string" && resource.includes("local/login")) {
-					console.log("Login request, not refreshing tokens");
-					return response;
+					await refreshTokens(userStore);
+
+					// Retry original request when we've acquired new tokens
+					const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
+
+					if (!resp.ok) {
+						reject(new Error(response.statusText));
+					}
+
+					resolve(resp);
 				}
-				console.warn("Refreshing tokens");
 
-				await refreshTokens(userStore);
-
-				// Retry original request when we've acquired new tokens
-				const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
-
-				pendingRequest(true);
-				if (!resp.ok) {
-					throw Error(response.statusText);
+				if (!response.ok) {
+					reject(new Error(response.statusText));
 				}
-				return resp;
+
+				resolve(response);
+			} catch (e: any) {
+				console.error("Network error", e);
+				throw new Interrupted(e?.message);
 			}
-
-			pendingRequest(true);
-
-			if (!response.ok) {
-				throw Error(response.statusText);
-			}
-
-			return response;
-		} catch (e) {
-			window.networking.failedFetches++;
-			pendingRequest(true);
-
-			throw e;
-		}
+		});
 	};
 }

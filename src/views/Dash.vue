@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="currentNetworkRequests > 1"
+		v-if="user.loading.form || user.loading.userdata"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background"></div>
@@ -44,7 +44,6 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
-import { windowEvent } from "@/helpers/constants";
 import errorCaptured from "@/components/widgets/errorCaptured";
 import { useUserStore, Widget } from "@/store/user.store";
 
@@ -61,11 +60,6 @@ function getGreeting() {
 	return hours < 12 ? "morning" : hours <= 18 && hours >= 12 ? "afternoon" : "night";
 }
 
-function listener() {
-	//@ts-ignore
-	this.currentNetworkRequests = window.networking.currentlyLoadingRequests;
-}
-
 export default defineComponent({
 	data() {
 		return {
@@ -73,14 +67,12 @@ export default defineComponent({
 			time: getCurrentTime(),
 			seconds: new Date().getSeconds(),
 			balance: "...",
-			currentNetworkRequests: 0,
 			greeting: getGreeting(),
 			locations: ["topleft", "topright", "bottomright", "bottomleft"],
 		};
 	},
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
-		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	errorCaptured,
 	setup() {
@@ -105,8 +97,6 @@ export default defineComponent({
 			this.greeting = getGreeting();
 			this.seconds = new Date().getSeconds();
 		}, 1000);
-
-		window.addEventListener(windowEvent, listener.bind(this));
 	},
 	components: { ...Widgets },
 });

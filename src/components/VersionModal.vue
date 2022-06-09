@@ -71,14 +71,6 @@
 							<table>
 								<tbody>
 									<tr>
-										<td>Failed fetches</td>
-										<td>{{ failedFetches }}</td>
-									</tr>
-									<tr>
-										<td>Failed requests</td>
-										<td>{{ failedRequests }}</td>
-									</tr>
-									<tr>
 										<td>Authenticated</td>
 										<td
 											:class="{
@@ -99,22 +91,13 @@
 	</div>
 </template>
 <script lang="ts">
-import { windowEvent } from "@/helpers/constants";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
-
-function listener() {
-	//@ts-ignore
-	this.failedFetches = window.networking.failedFetches;
-	//@ts-ignore
-	this.failedRequests = window.networking.failedRequests;
-}
 
 export default defineComponent({
 	data() {
 		return {
 			...window.env,
-			...window.networking,
 			open: false,
 		};
 	},
@@ -125,12 +108,6 @@ export default defineComponent({
 	},
 	setup() {
 		return { user: useUserStore() };
-	},
-	beforeDestroy() {
-		window.removeEventListener(windowEvent, listener.bind(this));
-	},
-	created() {
-		window.addEventListener(windowEvent, listener.bind(this));
 	},
 });
 </script>

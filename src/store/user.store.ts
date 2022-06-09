@@ -1,5 +1,5 @@
 import { ValidComponentNames } from "@/components/widgets";
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import { getBaseURL, Interrupted } from "@/helpers/auto-refresh-tokens";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
@@ -30,7 +30,7 @@ export const useUserStore = defineStore("user", {
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
-			accessToken: "",
+			accessToken: useLocalStorage("accessToken", ""),
 		};
 	},
 
@@ -77,6 +77,11 @@ export const useUserStore = defineStore("user", {
 
 				// this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
 			} catch (e) {
+				if (e instanceof Interrupted) {
+					console.error("Request was interrupted, not modifying state");
+					this.loading.userdata = false;
+					return;
+				}
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
 				this.loggedIn = false;

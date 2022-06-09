@@ -1,10 +1,5 @@
 declare global {
 	interface Window {
-		networking: {
-			currentlyLoadingRequests: number;
-			failedFetches: number;
-			failedRequests: number;
-		};
 		env: {
 			VUE_APP_VERCEL_ENV: "production" | "preview" | "development";
 			VUE_APP_VERCEL_URL: string;
