@@ -51,6 +51,12 @@
 				</div>
 			</template>
 		</draggable>
+
+		<div class="absolute bottom-[-32px] justify-center flex w-full">
+			<div class="appear w-16 h-16 rounded-full backdrop-blur" @click="addWidget">
+				<font-awesome-icon :icon="['fas', 'plus']" class="w-full h-full" />
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -100,6 +106,10 @@ export default defineComponent({
 	methods: {
 		generateKey(a: Widget) {
 			return a.type + a.id;
+		},
+		addWidget() {
+			if (!this.user.user) return;
+			this.user.user.settings.widgets.bottomleft.push({ type: "Dummy", id: "" + Math.round(Math.random() * 1000) });
 		},
 	},
 	async created() {
@@ -207,5 +217,13 @@ body {
 
 .widget.left-0 > * {
 	float: left;
+}
+
+.appear {
+	transition: all 0.3s ease-in-out;
+}
+
+.appear:hover {
+	transform: scale(1.5) translateY(-32px);
 }
 </style>
