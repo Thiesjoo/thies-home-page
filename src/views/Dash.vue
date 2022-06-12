@@ -24,7 +24,7 @@
 		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
 		-->
 
-		<!-- TODO: Remove transition on drop. This transistion is because a new component is created when dragging to another group. Not really preventable -->
+		<!-- TODO: Remove transition on drop. This transition is because a new component is created when dragging to another draggable component. Not really preventable -->
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{
@@ -44,7 +44,7 @@
 			<template #item="{ element }">
 				<div>
 					<component
-						:is="element.type"
+						:is="element.name"
 						:left="location.includes('left')"
 						:right="location.includes('right')"
 					></component>
@@ -52,11 +52,7 @@
 			</template>
 		</draggable>
 
-		<div class="absolute bottom-[-32px] justify-center flex w-full">
-			<div class="appear w-16 h-16 rounded-full backdrop-blur" @click="addWidget">
-				<font-awesome-icon :icon="['fas', 'plus']" class="w-full h-full" />
-			</div>
-		</div>
+		<new-widget-modal></new-widget-modal>
 	</div>
 </template>
 
@@ -66,6 +62,7 @@ import * as Widgets from "@/components/widgets";
 import errorCaptured from "@/components/widgets/errorCaptured";
 import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
 import draggable from "vuedraggable";
+import NewWidgetModal from "@/components/NewWidgetModal.vue";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -105,11 +102,7 @@ export default defineComponent({
 	},
 	methods: {
 		generateKey(a: Widget) {
-			return a.type + a.id;
-		},
-		addWidget() {
-			if (!this.user.user) return;
-			this.user.user.settings.widgets.bottomleft.push({ type: "Dummy", id: "" + Math.round(Math.random() * 1000) });
+			return a.name + a.id;
 		},
 	},
 	async created() {
@@ -119,7 +112,7 @@ export default defineComponent({
 			this.seconds = new Date().getSeconds();
 		}, 1000);
 	},
-	components: { ...Widgets, draggable },
+	components: { ...Widgets, draggable, NewWidgetModal },
 });
 </script>
 <style>
@@ -217,13 +210,5 @@ body {
 
 .widget.left-0 > * {
 	float: left;
-}
-
-.appear {
-	transition: all 0.3s ease-in-out;
-}
-
-.appear:hover {
-	transform: scale(1.5) translateY(-32px);
 }
 </style>

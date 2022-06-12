@@ -36,6 +36,8 @@ async function genericNetworkRequest(
 			...headers,
 		},
 		credentials: "include",
+		//@ts-ignore
+		rethrowError: false,
 	}).catch((e) => {
 		throw new Error("Network connectivity to server is unstable");
 	});

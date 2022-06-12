@@ -7,13 +7,13 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-const DEFAULT_WIDGETS = ["dummy", "battery"];
+export const DEFAULT_WIDGETS = ["dummy", "battery", "pauze"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
 export type Widget = {
-	type: ValidComponentNames;
+	name: ValidComponentNames;
 	id: string;
 };
 
@@ -60,13 +60,10 @@ export const useUserStore = defineStore("user", {
 							showSeconds: true,
 							showVersion: false,
 							widgets: {
-								topleft: [],
-								topright: [
-									// { type: "Twitch", id: "GuanTheThird" },
-									{ type: "VIA", id: "POS" },
-								],
-								bottomleft: [],
-								bottomright: [{ type: "Pauze", id: "1" }],
+								topleft: [{ name: "Dummy", id: "2" }],
+								topright: [{ name: "VIA", id: "POS" }],
+								bottomleft: [{ name: "Dummy", id: "1" }],
+								bottomright: [{ name: "Pauze", id: "1" }],
 							},
 							widgetsAvailable: [],
 						},
@@ -84,8 +81,8 @@ export const useUserStore = defineStore("user", {
 				// Always filter to prevent invalidity
 				// TODO: CHeck for unique keys
 				for (const x of ALL_LOCATIONS) {
-					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) =>
-						validWidgets.has(x.type.toLowerCase())
+					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter(
+						(x) => x && validWidgets.has(x.name.toLowerCase())
 					) as Widget[];
 				}
 			} catch (e) {
@@ -98,6 +95,7 @@ export const useUserStore = defineStore("user", {
 				console.error(e);
 				this.loggedIn = false;
 				this.user = null;
+				this.accessToken = "";
 			}
 
 			this.loading.userdata = false;
@@ -111,6 +109,7 @@ export const useUserStore = defineStore("user", {
 			}
 			this.loggedIn = false;
 			this.user = null;
+			this.accessToken = "";
 			this.loading.form = false;
 			this.loading.userdata = false;
 		},
@@ -127,6 +126,7 @@ export const useUserStore = defineStore("user", {
 				this.getUserData();
 			} catch (e) {
 				toast.error("Something went wrong");
+				this.accessToken = "";
 				throw e;
 			} finally {
 				this.loading.form = false;

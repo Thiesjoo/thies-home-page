@@ -182,6 +182,7 @@ export default defineComponent({
 				try {
 					await this.login.login(body);
 				} catch (e: any) {
+					console.log(e);
 					this.error = e;
 				}
 			} catch (e) {

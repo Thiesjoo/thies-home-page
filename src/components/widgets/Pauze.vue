@@ -1,24 +1,22 @@
 <template>
-	<Base
-		color="cyan"
-		:loaded="loaded"
-		link="https://datanose.nl/#timetable[195750](0,0)"
-	>
-		<template #short>
-			<span :title="tooltip.location">{{ inTime }}</span>
-		</template>
-
-		<template #content>{{ text }}</template>
-		<template #subcontent>{{ tooltip.location }}</template>
-	</Base>
-	<div v-if="inTime && !withSlack">
-		<Base color="fuchsia" :loaded="loaded" link="https://ishetpauze.nl">
+	<div>
+		<Base color="cyan" :loaded="loaded" link="https://datanose.nl/#timetable[195750](0,0)">
 			<template #short>
-				<span :title="tooltip.pauze">Pauze</span>
+				<span :title="tooltip.location">{{ inTime }}</span>
 			</template>
 
-			<template #content>{{ pauzeText }}</template>
+			<template #content>{{ text }}</template>
+			<template #subcontent>{{ tooltip.location }}</template>
 		</Base>
+		<div v-if="inTime && !withSlack">
+			<Base color="fuchsia" :loaded="loaded" link="https://ishetpauze.nl">
+				<template #short>
+					<span :title="tooltip.pauze">Pauze</span>
+				</template>
+
+				<template #content>{{ pauzeText }}</template>
+			</Base>
+		</div>
 	</div>
 </template>
 
@@ -35,10 +33,7 @@ function pauseText() {
 	const t = new Date().getMinutes();
 
 	if (t < 45) {
-		return [
-			`in ${45 - t} minute${45 - t > 1 ? "s" : ""}`,
-			"Break at every last quarter of an hour",
-		];
+		return [`in ${45 - t} minute${45 - t > 1 ? "s" : ""}`, "Break at every last quarter of an hour"];
 	} else {
 		return [`JASSSSSSS!!!🎉🎊`, "HYPE 🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊🎉🎊"];
 	}
@@ -53,17 +48,11 @@ type EventDatanose = {
 	description: string;
 };
 
-function getEventWithSlack(
-	list: EventDatanose[],
-	slack: number
-): EventDatanose | undefined {
+function getEventWithSlack(list: EventDatanose[], slack: number): EventDatanose | undefined {
 	const findTime = baseTime.getTime();
 
 	return list.find(
-		(x) =>
-			x.type == "VEVENT" &&
-			new Date(x.start).getTime() - slack < findTime &&
-			new Date(x.end).getTime() > findTime
+		(x) => x.type == "VEVENT" && new Date(x.start).getTime() - slack < findTime && new Date(x.end).getTime() > findTime
 	);
 }
 
@@ -104,9 +93,7 @@ export default defineComponent({
 	methods: {
 		async getCurrentLesson() {
 			// TODO: Fix auto refresh on current lesson
-			const fetchRes = await (
-				await fetch("/api/external/rooster_parser")
-			).json();
+			const fetchRes = await (await fetch("/api/external/rooster_parser")).json();
 			const arr: EventDatanose[] = Object.values(fetchRes.data);
 
 			const currentEvent = getEventWithSlack(arr, ms("30s"));
@@ -120,9 +107,7 @@ export default defineComponent({
 
 			const upcomingEvent = getEventWithSlack(arr, ms("15m"));
 			if (upcomingEvent) {
-				this.inTime = ms(
-					new Date(upcomingEvent.start).getTime() - baseTime.getTime()
-				);
+				this.inTime = ms(new Date(upcomingEvent.start).getTime() - baseTime.getTime());
 				this.tooltip.location = generateTooltip(upcomingEvent);
 				this.withSlack = true;
 
