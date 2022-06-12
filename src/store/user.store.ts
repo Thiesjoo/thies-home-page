@@ -1,24 +1,31 @@
 import { ValidComponentNames } from "@/components/widgets";
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import { getBaseURL, Interrupted } from "@/helpers/auto-refresh-tokens";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
+// Default widgets are widgets that are available for everyone
+const DEFAULT_WIDGETS = ["dummy", "battery"];
+
+export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
+export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
 export type Widget = {
 	type: ValidComponentNames;
-	location: "topleft" | "bottomleft" | "topright" | "bottomright";
+	id: string;
 };
+
+type WidgetAvailable = { name: Lowercase<ValidComponentNames>; id: string };
 
 export type User = {
 	name: string;
 	settings: {
 		showSeconds: boolean;
 		showVersion: boolean;
-		widgets: Widget[];
-		widgetsAvailable: { name: Lowercase<ValidComponentNames> | "via"; id: string }[];
+		widgets: { [key in ValidLocation]: Widget[] };
+		widgetsAvailable: WidgetAvailable[];
 	};
 };
 
@@ -30,7 +37,7 @@ export const useUserStore = defineStore("user", {
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
-			accessToken: "",
+			accessToken: useLocalStorage("accessToken", ""),
 		};
 	},
 
@@ -52,31 +59,41 @@ export const useUserStore = defineStore("user", {
 						settings: {
 							showSeconds: true,
 							showVersion: false,
-							widgets: [
-								{ type: "Twitch", location: "topright" },
-								{ type: "POS", location: "topright" },
-								{ type: "Pauze", location: "bottomright" },
-							],
+							widgets: {
+								topleft: [],
+								topright: [
+									// { type: "Twitch", id: "GuanTheThird" },
+									{ type: "VIA", id: "POS" },
+								],
+								bottomleft: [],
+								bottomright: [{ type: "Pauze", id: "1" }],
+							},
 							widgetsAvailable: [],
 						},
 					};
 				}
 				this.user.name = res.name;
 
-				const allWidgetsAvailable = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				const allWidgetsAvailable: WidgetAvailable[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
 				this.user.settings.widgetsAvailable = allWidgetsAvailable;
 
-				const temp = new Set<string>(
-					this.user.settings.widgetsAvailable.map((x) => (x.name == "via" ? "pos" : x.name))
-				);
+				const validWidgets = new Set<string>(allWidgetsAvailable.map((x) => x.name));
+
+				DEFAULT_WIDGETS.forEach((x) => validWidgets.add(x));
 
 				// Always filter to prevent invalidity
-				this.user.settings.widgets = this.user.settings.widgets.filter((x) =>
-					temp.has(x.type.toLowerCase())
-				) as Widget[];
-
-				// this.user.settings.widgets.push({ type: "Battery", location: "bottomleft" });
+				// TODO: CHeck for unique keys
+				for (const x of ALL_LOCATIONS) {
+					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) =>
+						validWidgets.has(x.type.toLowerCase())
+					) as Widget[];
+				}
 			} catch (e) {
+				if (e instanceof Interrupted) {
+					console.error("Request was interrupted, not modifying state");
+					this.loading.userdata = false;
+					return;
+				}
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
 				this.loggedIn = false;

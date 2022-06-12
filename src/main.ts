@@ -1,10 +1,5 @@
 declare global {
 	interface Window {
-		networking: {
-			currentlyLoadingRequests: number;
-			failedFetches: number;
-			failedRequests: number;
-		};
 		env: {
 			VUE_APP_VERCEL_ENV: "production" | "preview" | "development";
 			VUE_APP_VERCEL_URL: string;
@@ -24,7 +19,14 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import { faTwitch, faDiscord, faSpotify } from "@fortawesome/free-brands-svg-icons";
-import { faArrowRightFromBracket, faBolt, faLinkSlash, faLock, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+	faArrowRightFromBracket,
+	faBolt,
+	faLinkSlash,
+	faLock,
+	faPlus,
+	faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
 import { overwriteFetch } from "./helpers/auto-refresh-tokens";
@@ -44,7 +46,7 @@ window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
 library.add(faTwitch, faSpotify, faDiscord);
-library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash);
+library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus);
 
 const app = createApp(App, { router });
 app.use(router);

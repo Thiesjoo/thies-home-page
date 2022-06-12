@@ -43,9 +43,10 @@
 						<font-awesome-icon :icon="[`fab`, `${item.name.toLowerCase()}`]" class="mr-2" />
 						{{ item.name }}
 					</a>
+					<!-- TODO: Implement listing of all providers here -->
+					<!-- :href="getDeleteURL(item.name)" -->
 					<a
 						class="text-red-500 no-underline pt-2 flex flex-row justify-center items-center"
-						:href="getDeleteURL(item.name)"
 						target="_blank"
 						rel="noopener noreferrer"
 						v-if="canUnlink(item.name)"
@@ -166,11 +167,11 @@ export default defineComponent({
 			}
 			return `${getBaseURL()}/auth/${name.toLowerCase()}/login`;
 		},
-		getDeleteURL(name: string) {
+		getDeleteURL(name: string, id: string) {
 			if (name == "POS") {
 				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
 			}
-			return `${getBaseURL()}/auth/${name.toLowerCase()}/delete`;
+			return `${getBaseURL()}/api/providers/me/${name.toLowerCase()}/${id}`;
 		},
 		canUnlink(name: string) {
 			name = name.toLowerCase();

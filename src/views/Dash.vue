@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="currentNetworkRequests > 1"
+		v-if="user.loading.form || user.loading.userdata"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background"></div>
@@ -20,10 +20,13 @@
 		</div>
 	</div>
 
-	<div v-if="user.loggedIn && !user.loading.userdata">
-		<div
-			v-for="location in locations"
-			class="widget"
+	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
+		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
+		-->
+
+		<!-- TODO: Remove transition on drop. This transistion is because a new component is created when dragging to another group. Not really preventable -->
+		<draggable
+			v-for="location in ALL_LOCATIONS"
 			:class="{
 				'left-0': location.includes('left'),
 				'right-0': location.includes('right'),
@@ -32,11 +35,27 @@
 				// Small padding to move out of the way of version modal
 				'pb-3': location.includes('bottom') && location.includes('left'),
 			}"
+			:id="location"
+			class="widget"
+			v-model="user.user.settings.widgets[location]"
+			group="widgets"
+			:item-key="generateKey"
 		>
-			<!-- TODO: Shared state for every component? Pinia state or something, because spotify would be fetching often
-	Could also limit 1 instance per type
-		-->
-			<component v-for="widget in filtered(location)" :is="widget.type"></component>
+			<template #item="{ element }">
+				<div>
+					<component
+						:is="element.type"
+						:left="location.includes('left')"
+						:right="location.includes('right')"
+					></component>
+				</div>
+			</template>
+		</draggable>
+
+		<div class="absolute bottom-[-32px] justify-center flex w-full">
+			<div class="appear w-16 h-16 rounded-full backdrop-blur" @click="addWidget">
+				<font-awesome-icon :icon="['fas', 'plus']" class="w-full h-full" />
+			</div>
 		</div>
 	</div>
 </template>
@@ -44,9 +63,9 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
-import { windowEvent } from "@/helpers/constants";
 import errorCaptured from "@/components/widgets/errorCaptured";
-import { useUserStore, Widget } from "@/store/user.store";
+import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
+import draggable from "vuedraggable";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -61,11 +80,6 @@ function getGreeting() {
 	return hours < 12 ? "morning" : hours <= 18 && hours >= 12 ? "afternoon" : "night";
 }
 
-function listener() {
-	//@ts-ignore
-	this.currentNetworkRequests = window.networking.currentlyLoadingRequests;
-}
-
 export default defineComponent({
 	data() {
 		return {
@@ -73,14 +87,12 @@ export default defineComponent({
 			time: getCurrentTime(),
 			seconds: new Date().getSeconds(),
 			balance: "...",
-			currentNetworkRequests: 0,
 			greeting: getGreeting(),
-			locations: ["topleft", "topright", "bottomright", "bottomleft"],
+			ALL_LOCATIONS,
 		};
 	},
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
-		window.removeEventListener(windowEvent, listener.bind(this));
 	},
 	errorCaptured,
 	setup() {
@@ -90,13 +102,14 @@ export default defineComponent({
 		name(): string {
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
-		widgets(): Widget[] {
-			return this.user.user?.settings.widgets || [];
-		},
 	},
 	methods: {
-		filtered(arg: string): Widget[] {
-			return this.widgets.filter((x) => x.location === arg);
+		generateKey(a: Widget) {
+			return a.type + a.id;
+		},
+		addWidget() {
+			if (!this.user.user) return;
+			this.user.user.settings.widgets.bottomleft.push({ type: "Dummy", id: "" + Math.round(Math.random() * 1000) });
 		},
 	},
 	async created() {
@@ -105,10 +118,8 @@ export default defineComponent({
 			this.greeting = getGreeting();
 			this.seconds = new Date().getSeconds();
 		}, 1000);
-
-		window.addEventListener(windowEvent, listener.bind(this));
 	},
-	components: { ...Widgets },
+	components: { ...Widgets, draggable },
 });
 </script>
 <style>
@@ -187,7 +198,17 @@ body {
 .widget {
 	position: absolute;
 	margin: 1em;
-	max-width: 10%;
+	width: 10%;
+	min-height: 400px;
+}
+
+.widget.bottom-0 {
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.widget.right-0 {
+	align-items: flex-end;
 }
 
 .widget.right-0 > * {
@@ -196,5 +217,13 @@ body {
 
 .widget.left-0 > * {
 	float: left;
+}
+
+.appear {
+	transition: all 0.3s ease-in-out;
+}
+
+.appear:hover {
+	transform: scale(1.5) translateY(-32px);
 }
 </style>
