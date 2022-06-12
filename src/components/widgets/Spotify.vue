@@ -6,19 +6,14 @@
 					<img :src="imageURL" class="h-12 rounded-full" />
 				</div>
 				<div class="w-full flex flex-col">
-					<span
-						class="font-bold m-1 w-75 text-center text-ellipsis"
-						style="overflow: hidden; white-space: pre-line"
-						>{{ nameArtist }}</span
-					>
+					<span class="font-bold m-1 w-75 text-center text-ellipsis" style="overflow: hidden; white-space: pre-line">{{
+						nameArtist
+					}}</span>
 					<!-- <div class="m-1">buttons</div> -->
 					<div class="w-[85%] m-auto flex flex-row items-center">
 						{{ current }}
 						<div class="w-full rounded-full h-2.5 bg-gray-600 mx-2">
-							<div
-								class="bg-green-200 h-2.5 rounded-full"
-								:style="{ width: `${percentage}%` }"
-							></div>
+							<div class="bg-green-200 h-2.5 rounded-full" :style="{ width: `${percentage}%` }"></div>
 						</div>
 						{{ end }}
 					</div>
@@ -90,13 +85,7 @@ export default defineComponent({
 		percentage(): number {
 			this.refreshKey;
 
-			return this.track
-				? Math.round(
-						((this.track.progress_ms || 0) /
-							(this.track.item?.duration_ms || 0)) *
-							100
-				  )
-				: 0;
+			return this.track ? Math.round(((this.track.progress_ms || 0) / (this.track.item?.duration_ms || 0)) * 100) : 0;
 		},
 		imageURL(): string {
 			this.refreshKey;
@@ -107,9 +96,7 @@ export default defineComponent({
 			this.refreshKey;
 
 			return this.track
-				? `${this.track.item?.name} - ${(this.track.item as Track).artists
-						.map((x) => x.name)
-						.join(", ")}`
+				? `${this.track.item?.name} - ${(this.track.item as Track).artists.map((x) => x.name).join(", ")}`
 				: "Not currently playing";
 		},
 	},
@@ -118,18 +105,17 @@ export default defineComponent({
 			if (!this.spotifyAccesstoken || this.pendingRequest) return;
 			this.pendingRequest = true;
 			try {
-				const spotifyFetch = await fetch(
-					"https://api.spotify.com/v1/me/player",
-					{
-						headers: {
-							Authorization: "Bearer " + this.spotifyAccesstoken,
-							"Content-Type": "application/json",
-						},
-					}
-				);
+				const spotifyFetch = await fetch("https://api.spotify.com/v1/me/player", {
+					headers: {
+						Authorization: "Bearer " + this.spotifyAccesstoken,
+						"Content-Type": "application/json",
+					},
+				});
 				if (spotifyFetch.status === 204) {
+					this.loaded = false;
 					return;
 				}
+				this.loaded = true;
 
 				const spotifyResult = await spotifyFetch.json();
 				if (spotifyResult.error) {

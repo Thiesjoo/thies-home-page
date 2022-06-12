@@ -4,7 +4,8 @@
 		"discord.js": "^12.5.3",
 		"irc-message": "^3.0.2",
 		"mongodb": "^3.6.9",
-		"node-ical": "^0.15.1"
+		"node-ical": "^0.15.1",
+		"ms": "^3.0.0-canary.1"
 	},
 	"devDependencies": {
 		"@types/mongodb": "^3.6.18",

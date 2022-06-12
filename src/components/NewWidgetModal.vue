@@ -12,7 +12,7 @@
 			<div
 				class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 w-full md:inset-0 h-modal md:h-full flex justify-center items-center"
 				v-if="open"
-				v-show="temp"
+				v-show="dragging"
 				v-click-outside="toggle"
 			>
 				<div class="relative p-4 w-full max-w-2xl h-full md:h-auto z-100">
@@ -60,8 +60,8 @@ import { generateKey, makeUnique } from "@/helpers/generateKeyFromWidget";
 export default defineComponent({
 	data() {
 		return {
-			open: true,
-			temp: true,
+			open: false,
+			dragging: true,
 		};
 	},
 	computed: {
@@ -83,10 +83,10 @@ export default defineComponent({
 		},
 		generateKey,
 		start() {
-			this.temp = false;
+			this.dragging = false;
 		},
 		end() {
-			this.temp = true;
+			this.dragging = true;
 		},
 	},
 	setup() {
