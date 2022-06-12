@@ -24,19 +24,19 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 		if (!e?.message?.startsWith("POS")) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
 			console.log("POS ERROR: ", e);
-			// Wipe the pos access token to prevent
 			try {
 				console.log("Deleting pos token");
 				await axios({
 					url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
 					headers: {
-						Authorization: `Bearer ${req.cookies.accesstoken}`,
+						Authorization: `Bearer ${req.cookies.accesstoken || req.headers.authorization?.split(" ")?.[1]}`,
 						"X-Secret": process.env.secret,
 					},
 					method: "PATCH",
 				});
 			} catch (e) {
-				console.error("Something went wrong with deleting token");
+				console.error("Something went wrong with deleting token", e);
+				res.setHeader("fail_location", "auth.thies.dev");
 			}
 		}
 		res.statusCode = 403;
