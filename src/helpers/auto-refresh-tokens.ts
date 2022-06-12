@@ -58,6 +58,8 @@ function constructConfig(config: RequestInit | undefined, token: string) {
 	};
 }
 
+// TODO: This requires a better rework to stay uncluttered
+
 export function overwriteFetch() {
 	const userStore = useUserStore();
 
@@ -75,7 +77,19 @@ export function overwriteFetch() {
 					}
 					console.warn("Refreshing tokens");
 
-					await refreshTokens(userStore);
+					try {
+						await refreshTokens(userStore);
+					} catch (e) {
+						if (e instanceof Interrupted) {
+							console.error("Request was interrupted, not modifying state");
+							throw e;
+						}
+
+						console.warn("Token refresh went wrong! Now logging you out!");
+						userStore.logout();
+						reject(new Error("No valid refresh token"));
+						return;
+					}
 
 					// Retry original request when we've acquired new tokens
 					const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
