@@ -23,7 +23,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 	} catch (e) {
 		if (!e?.message?.startsWith("POS")) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
-			console.log("POS ERROR: ", e);
+			console.log("EXTERNAL ERROR: ", e);
 			try {
 				console.log("Deleting pos token");
 				await axios({
@@ -31,6 +31,9 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 					headers: {
 						Authorization: `Bearer ${req.cookies.accesstoken || req.headers.authorization?.split(" ")?.[1]}`,
 						"X-Secret": process.env.secret,
+					},
+					data: {
+						accessToken: "",
 					},
 					method: "PATCH",
 				});
@@ -41,7 +44,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 		}
 		res.statusCode = 403;
 		res.setHeader("Content-Type", "application/json");
-		res.json({ error: "POS Creds expired" });
+		res.json({ error: "POS accesstoken is either expired, or non existent" });
 		return;
 	}
 
