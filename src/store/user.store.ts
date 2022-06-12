@@ -60,12 +60,12 @@ export const useUserStore = defineStore("user", {
 							showSeconds: true,
 							showVersion: false,
 							widgets: {
-								topleft: [{ type: "Dummy", id: "2" }],
+								topleft: [],
 								topright: [
-									{ type: "Twitch", id: "GuanTheThird" },
+									// { type: "Twitch", id: "GuanTheThird" },
 									{ type: "VIA", id: "POS" },
 								],
-								bottomleft: [{ type: "Dummy", id: "1" }],
+								bottomleft: [],
 								bottomright: [{ type: "Pauze", id: "1" }],
 							},
 							widgetsAvailable: [],
