@@ -51,10 +51,11 @@
 	</div>
 </template>
 <script lang="ts">
-import { DEFAULT_WIDGETS, useUserStore } from "@/store/user.store";
+import { DEFAULT_WIDGETS, useUserStore, Widget } from "@/store/user.store";
 import { defineComponent } from "vue";
 import * as Widgets from "@/components/widgets";
 import draggable from "vuedraggable";
+import { generateKey, makeUnique } from "@/helpers/generateKeyFromWidget";
 
 export default defineComponent({
 	data() {
@@ -64,23 +65,23 @@ export default defineComponent({
 		};
 	},
 	computed: {
-		allItems(): any[] {
-			return [
-				...this.user!.user!.settings!.widgetsAvailable,
-				...DEFAULT_WIDGETS.map((x, i) => {
-					return { name: x, id: i };
-				}),
-			];
+		allItems(): Widget[] {
+			return makeUnique(
+				[
+					...this.user!.user!.settings!.widgetsAvailable,
+					...DEFAULT_WIDGETS.map((x, i) => {
+						return { name: x, id: i + "" } as Widget;
+					}),
+				],
+				true
+			);
 		},
 	},
 	methods: {
 		toggle() {
 			this.open = !this.open;
 		},
-		generateKey(a: any) {
-			return a.name + a.id;
-		},
-
+		generateKey,
 		start() {
 			this.temp = false;
 		},

@@ -13,11 +13,9 @@ export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
 export type Widget = {
-	name: ValidComponentNames;
+	name: ValidComponentNames | Lowercase<ValidComponentNames>;
 	id: string;
 };
-
-type WidgetAvailable = { name: Lowercase<ValidComponentNames>; id: string };
 
 export type User = {
 	name: string;
@@ -25,7 +23,7 @@ export type User = {
 		showSeconds: boolean;
 		showVersion: boolean;
 		widgets: { [key in ValidLocation]: Widget[] };
-		widgetsAvailable: WidgetAvailable[];
+		widgetsAvailable: Widget[];
 	};
 };
 
@@ -71,7 +69,7 @@ export const useUserStore = defineStore("user", {
 				}
 				this.user.name = res.name;
 
-				const allWidgetsAvailable: WidgetAvailable[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				const allWidgetsAvailable: Widget[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
 				this.user.settings.widgetsAvailable = allWidgetsAvailable;
 
 				const validWidgets = new Set<string>(allWidgetsAvailable.map((x) => x.name));

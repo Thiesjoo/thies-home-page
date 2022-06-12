@@ -63,6 +63,7 @@ import errorCaptured from "@/components/widgets/errorCaptured";
 import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
 import draggable from "vuedraggable";
 import NewWidgetModal from "@/components/NewWidgetModal.vue";
+import { generateKey } from "@/helpers/generateKeyFromWidget";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -101,9 +102,7 @@ export default defineComponent({
 		},
 	},
 	methods: {
-		generateKey(a: Widget) {
-			return a.name + a.id;
-		},
+		generateKey,
 	},
 	async created() {
 		this.interval = setInterval(() => {
