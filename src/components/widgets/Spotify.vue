@@ -27,6 +27,7 @@
 import { isProduction } from "@/helpers/envParser";
 import { CurrentlyPlaying, Track } from "@/helpers/types/spotify.api";
 import { defineComponent } from "@vue/runtime-core";
+import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import ms from "ms";
 import { Base } from "./";
 import errorCaptured from "./errorCaptured";
@@ -54,16 +55,16 @@ function secondsToTimeString(secs: number | null): string {
 export default defineComponent({
 	data(): {
 		//Because track is an object, we need a refreshKey for vue to detect changes
-		track?: CurrentlyPlaying;
 		pendingRequest: boolean;
 		refreshKey: boolean;
 		loaded: boolean;
 		spotifyAccesstoken?: string;
-		interval?: number;
-		interval2?: number;
+		localProgress: number;
+		playerLoopInterval?: number;
+		progressInterval?: number;
 	} {
 		return {
-			track: undefined,
+			localProgress: 0,
 			loaded: false,
 			refreshKey: false,
 			pendingRequest: false,
@@ -78,7 +79,7 @@ export default defineComponent({
 		current(): string {
 			this.refreshKey;
 
-			return secondsToTimeString((this.track?.progress_ms || 0) / 1000);
+			return secondsToTimeString(this.localProgress / 1000);
 		},
 		end(): string {
 			this.refreshKey;
@@ -87,7 +88,7 @@ export default defineComponent({
 		percentage(): number {
 			this.refreshKey;
 
-			return this.track ? ((this.track.progress_ms || 0) / (this.track.item?.duration_ms || 0)) * 100 : 0;
+			return this.track ? (this.localProgress / (this.track.item?.duration_ms || 0)) * 100 : 0;
 		},
 		imageURL(): string {
 			this.refreshKey;
@@ -104,7 +105,16 @@ export default defineComponent({
 	},
 	methods: {
 		async refreshTrack() {
+			// TODO: Is pending request really needed
 			if (!this.spotifyAccesstoken || this.pendingRequest) return;
+
+			if (Date.now() - (this.track?.timestamp || 0) < ms("4.5s")) {
+				const offset = Date.now() - (this.track?.timestamp || 0);
+				this.localProgress = (this.track?.progress_ms || 0) + offset;
+				console.log("There was data fetched more recently. Probably other tab?");
+				return;
+			}
+
 			this.pendingRequest = true;
 			try {
 				const spotifyFetch = await fetch("https://api.spotify.com/v1/me/player", {
@@ -121,11 +131,16 @@ export default defineComponent({
 
 				const spotifyResult = await spotifyFetch.json();
 				if (spotifyResult.error) {
-					clearInterval(this.interval);
+					clearInterval(this.playerLoopInterval);
 					throw new Error(spotifyResult);
 				}
 
 				this.track = spotifyResult as CurrentlyPlaying;
+				this.localProgress = this.track.progress_ms || 0;
+				if (this.track) {
+					this.track.timestamp = Date.now();
+				}
+
 				this.refreshKey = !this.refreshKey;
 				this.pendingRequest = false;
 			} catch (e) {
@@ -144,18 +159,25 @@ export default defineComponent({
 			this.spotifyAccesstoken = res.data.accesstoken;
 		},
 	},
+	setup() {
+		return {
+			track: useLocalStorage("SPOTIFY-track", undefined, {
+				serializer: StorageSerializers.object,
+			}) as RemovableRef<CurrentlyPlaying | undefined>,
+		};
+	},
 	async mounted() {
 		await this.getAccesstoken();
 		this.refreshTrack();
 
 		const self = this;
-		this.interval = setInterval(function () {
+		this.playerLoopInterval = setInterval(function () {
 			self.refreshTrack();
 		}, spotifyRefreshTimer);
 
-		this.interval2 = setInterval(function () {
+		this.progressInterval = setInterval(function () {
 			if (self.track && self.track.progress_ms && self.track.is_playing) {
-				self.track.progress_ms += smoothProgressBar;
+				self.localProgress += smoothProgressBar;
 				self.refreshKey = !self.refreshKey;
 			}
 		}, smoothProgressBar);
@@ -164,8 +186,8 @@ export default defineComponent({
 		this.loaded = true;
 	},
 	beforeDestroy() {
-		if (this.interval2) clearInterval(this.interval2);
-		if (this.interval) clearInterval(this.interval);
+		if (this.progressInterval) clearInterval(this.progressInterval);
+		if (this.playerLoopInterval) clearInterval(this.playerLoopInterval);
 	},
 	errorCaptured,
 	components: { Base },
