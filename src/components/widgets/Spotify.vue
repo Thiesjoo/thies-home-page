@@ -138,7 +138,8 @@ export default defineComponent({
 					},
 				});
 				if (spotifyFetch.status === 204) {
-					this.track = undefined;
+					//@ts-ignore
+					this.track = { timestamp: Date.now() };
 					this.loaded = false;
 					return;
 				}

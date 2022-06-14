@@ -167,7 +167,7 @@ export default defineComponent({
 		canUnlink(name: string) {
 			name = name.toLowerCase();
 			return !!this.user.user?.settings.widgetsAvailable.find(
-				(x) => x.name === name || (name === "pos" && x.name === "via")
+				(x) => x.name === name || (name === "pos" && x.name === "VIA")
 			);
 		},
 	},

@@ -8,13 +8,13 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["battery", "pauze"];
+export const DEFAULT_WIDGETS = ["Battery", "Pauze"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
 export type Widget = {
-	name: ValidComponentNames | Lowercase<ValidComponentNames>;
+	name: ValidComponentNames;
 	id: string;
 };
 
@@ -60,7 +60,7 @@ export const useUserStore = defineStore("user", {
 							showVersion: false,
 							widgets: {
 								topleft: [],
-								topright: [{ name: "VIA", id: "POS" }],
+								topright: [{ name: "VIA", id: "pos" }],
 								bottomleft: [],
 								bottomright: [{ name: "Pauze", id: "1" }],
 							},
@@ -71,15 +71,23 @@ export const useUserStore = defineStore("user", {
 				this.user.name = res.name;
 
 				const allWidgetsAvailable: Widget[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
-				this.user.settings.widgetsAvailable = allWidgetsAvailable;
+				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
+					if (x.name.toLowerCase() === "via") {
+						return {
+							name: "VIA",
+							id: x.id,
+						};
+					}
 
-				const validWidgets = new Set<string>(allWidgetsAvailable.map((x) => x.name));
+					return x;
+				});
 
-				DEFAULT_WIDGETS.forEach((x) => validWidgets.add(x));
+				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
-				// Always filter to prevent invalidity
+				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
+
+				// Always filter to prevent invalidity when changing localstorage yourself
 				const uniqueCount = new Set<String>();
-				// TODO: CHeck for unique keys
 				for (const x of ALL_LOCATIONS) {
 					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) => {
 						if (!x || uniqueCount.has(generateKey(x))) {
@@ -88,7 +96,7 @@ export const useUserStore = defineStore("user", {
 
 						uniqueCount.add(generateKey(x));
 
-						return validWidgets.has(x.name.toLowerCase());
+						return validWidgetsNames.has(x.name);
 					}) as Widget[];
 				}
 			} catch (e) {
