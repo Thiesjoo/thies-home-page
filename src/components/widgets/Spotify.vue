@@ -9,7 +9,6 @@
 					<span class="font-bold m-1 w-75 text-center text-ellipsis" style="overflow: hidden; white-space: pre-line">{{
 						nameArtist
 					}}</span>
-					<!-- <div class="m-1">buttons</div> -->
 					<div class="w-[85%] m-auto flex flex-row items-center">
 						{{ current }}
 						<div class="w-full rounded-full h-2.5 bg-gray-600 mx-2">
@@ -26,8 +25,8 @@
 <script lang="ts">
 import { isProduction } from "@/helpers/envParser";
 import { CurrentlyPlaying, Track } from "@/helpers/types/spotify.api";
-import { defineComponent } from "@vue/runtime-core";
-import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
+import { defineComponent, ref } from "@vue/runtime-core";
+import { pausableFilter, RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import ms from "ms";
 import { Base } from "./";
 import errorCaptured from "./errorCaptured";
@@ -53,6 +52,9 @@ function secondsToTimeString(secs: number | null): string {
 }
 
 export default defineComponent({
+	props: {
+		sample: { type: Boolean },
+	},
 	data(): {
 		//Because track is an object, we need a refreshKey for vue to detect changes
 		pendingRequest: boolean;
@@ -80,7 +82,6 @@ export default defineComponent({
 			//@ts-ignore
 			toReturn.localProgress = (this.track?.progress_ms || 0) + offset;
 		}
-		// console.log(this?.track);
 		return toReturn;
 	},
 	computed: {
@@ -106,7 +107,7 @@ export default defineComponent({
 		imageURL(): string {
 			this.refreshKey;
 
-			return (this.track?.item as Track).album.images[0].url;
+			return (this.track?.item as Track)?.album?.images[0]?.url || "https://via.placeholder.com/150";
 		},
 		nameArtist(): string {
 			this.refreshKey;
@@ -174,13 +175,33 @@ export default defineComponent({
 		},
 	},
 	setup() {
+		const filter = pausableFilter();
 		return {
-			track: useLocalStorage("SPOTIFY-track", undefined, {
+			track: useLocalStorage<CurrentlyPlaying | null>("SPOTIFY-track", null, {
 				serializer: StorageSerializers.object,
-			}) as RemovableRef<CurrentlyPlaying | undefined>,
+				eventFilter: filter.eventFilter,
+			}),
+			pausable: filter.pause,
 		};
 	},
 	async mounted() {
+		if (this.sample) {
+			this.loaded = true;
+			this.pausable();
+			this.localProgress = ms("30sec");
+			this.track = {
+				item: {
+					duration_ms: ms("1m"),
+					name: "Sample image",
+					artists: ["Sample artist", "Sample artist 2"].map((x) => {
+						return { name: x };
+					}),
+				},
+				progress_ms: ms("30sec"),
+			} as unknown as CurrentlyPlaying;
+			return;
+		}
+
 		await this.getAccesstoken();
 		await this.refreshTrack();
 

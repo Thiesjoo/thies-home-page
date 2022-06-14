@@ -48,6 +48,9 @@ import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 
 export default defineComponent({
+	props: {
+		sample: { type: Boolean },
+	},
 	data(): {
 		open: boolean;
 		data: {
@@ -65,6 +68,24 @@ export default defineComponent({
 		return { open: false, data: [], text: "", loaded: false };
 	},
 	async created() {
+		if (this.sample) {
+			this.data = [
+				{
+					name: "GuanTheThird",
+					url: "guanthethird",
+					title: "Sample stream",
+					game_name: "Just Chatting",
+					avatar: "https://via.placeholder.com/150",
+					stream_image: "".replace("{width}", "1920").replace("{height}", "1080"),
+					viewers: 10000,
+				},
+			];
+			this.text = "1 stream";
+			this.loaded = true;
+
+			return;
+		}
+
 		this.text = await this.getFollows();
 		this.loaded = true;
 	},

@@ -22,13 +22,14 @@
 							<button
 								type="button"
 								@click="toggle"
-								class="text-gray-400 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center hover:bg-gray-600 hover:text-white"
+								class="absolute right-4 text-gray-400 bg-transparent rounded-lg text-sm p-1.5 ml-auto inline-flex items-center hover:bg-gray-600 hover:text-white"
 							>
 								<font-awesome-icon :icon="['fas', 'xmark']" size="lg" />
 							</button>
 						</div>
+						<h4 class="w-full text-center italic text-gray-300 p-0">These widgets are displayed with sample data</h4>
 
-						<div class="pt-1 p-6 space-y-6 items-center flex flex-col">
+						<div class="pt-3 p-6 space-y-6 items-center flex flex-col">
 							<draggable
 								id="newly_created"
 								:list="allItems"
@@ -39,7 +40,7 @@
 							>
 								<template #item="{ element }">
 									<div>
-										<component :is="element.name"></component>
+										<component :is="element.name" :sample="true"></component>
 									</div>
 								</template>
 							</draggable>

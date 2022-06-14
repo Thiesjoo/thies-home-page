@@ -10,10 +10,19 @@ import { defineComponent } from "@vue/runtime-core";
 import { Base } from ".";
 
 export default defineComponent({
+	props: {
+		sample: { type: Boolean },
+	},
 	data() {
 		return { text: "", loaded: false };
 	},
 	async created() {
+		if (this.sample) {
+			this.text = "€ 99,99";
+			this.loaded = true;
+			return;
+		}
+
 		this.text = await this.getBalance();
 		this.loaded = true;
 	},
