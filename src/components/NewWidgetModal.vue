@@ -32,7 +32,7 @@
 							<draggable
 								id="newly_created"
 								:list="allItems"
-								group="widgets"
+								:group="{ name: 'widgets', put: false }"
 								:item-key="generateKey"
 								@start="start"
 								@end="end"
@@ -84,9 +84,11 @@ export default defineComponent({
 		generateKey,
 		start() {
 			this.dragging = true;
+			this.$emit("dragging", true);
 		},
 		end() {
 			this.dragging = false;
+			this.$emit("dragging", false);
 		},
 	},
 	setup() {
@@ -99,7 +101,7 @@ export default defineComponent({
 	components: { ...Widgets, draggable },
 });
 </script>
-<style>
+<style scoped>
 .appear {
 	transition: all 0.3s ease-in-out;
 }

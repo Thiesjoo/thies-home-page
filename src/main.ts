@@ -13,6 +13,7 @@ import {
 	faLinkSlash,
 	faLock,
 	faPlus,
+	faTrash,
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -34,7 +35,7 @@ window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
 library.add(faTwitch, faSpotify, faDiscord);
-library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus);
+library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
 
 const app = createApp(App, { router });
 app.use(router);

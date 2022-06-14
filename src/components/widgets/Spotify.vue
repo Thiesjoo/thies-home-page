@@ -130,6 +130,7 @@ export default defineComponent({
 
 			this.pendingRequest = true;
 			try {
+				// TODO: Refresh interceptor for this
 				const spotifyFetch = await fetch("https://api.spotify.com/v1/me/player", {
 					headers: {
 						Authorization: "Bearer " + this.spotifyAccesstoken,
@@ -137,6 +138,7 @@ export default defineComponent({
 					},
 				});
 				if (spotifyFetch.status === 204) {
+					this.track = undefined;
 					this.loaded = false;
 					return;
 				}
@@ -159,8 +161,6 @@ export default defineComponent({
 			} catch (e) {
 				console.error("spotify track request error ", e);
 			}
-			//TODO: Token probably expired, try to refresh it
-			// this.pendingRequest = false;
 		},
 		async getAccesstoken() {
 			const fetchRes = await fetch("/api/external/spotify");

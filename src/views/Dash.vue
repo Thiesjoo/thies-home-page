@@ -34,7 +34,7 @@
 				'bottom-0': location.includes('bottom'),
 				// Small padding to move out of the way of version modal
 				'pb-3': location.includes('bottom') && location.includes('left'),
-				'border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1]': dragging,
+				'border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1]': dragging > 0,
 			}"
 			:id="location"
 			class="widget"
@@ -55,7 +55,20 @@
 			</template>
 		</draggable>
 
-		<new-widget-modal></new-widget-modal>
+		<div class="absolute top-[-16px] justify-center flex w-full" v-show="dragging == 1">
+			<draggable
+				class="p-[4rem] border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1] flex flex-col items-center"
+				:group="{ name: 'widgets', pull: false }"
+				:item-key="generateKey"
+			>
+				<template #header>
+					<font-awesome-icon :icon="['fas', 'trash']" class="w-16 h-16" />
+				</template>
+				<template #item="{}"></template>
+			</draggable>
+		</div>
+
+		<new-widget-modal @dragging="childDrag"></new-widget-modal>
 	</div>
 </template>
 
@@ -91,7 +104,7 @@ export default defineComponent({
 			balance: "...",
 			greeting: getGreeting(),
 			ALL_LOCATIONS,
-			dragging: false,
+			dragging: 0,
 		};
 	},
 	beforeDestroy() {
@@ -109,10 +122,14 @@ export default defineComponent({
 	methods: {
 		generateKey,
 		start() {
-			this.dragging = true;
+			this.dragging = 1;
 		},
 		end() {
-			this.dragging = false;
+			this.dragging = 0;
+		},
+		childDrag(dragging: boolean) {
+			// console.log("HMmm");
+			this.dragging = dragging ? 2 : 0;
 		},
 	},
 	async created() {
@@ -222,5 +239,13 @@ body {
 
 .widget.left-0 > * {
 	float: left;
+}
+
+.appear {
+	transition: all 0.3s ease-in-out;
+}
+
+.appear:hover {
+	transform: scale(2.5) translateY(24px);
 }
 </style>
