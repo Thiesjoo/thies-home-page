@@ -128,8 +128,7 @@ export default defineComponent({
 		if (this.interval) clearInterval(this.interval);
 	},
 	async mounted() {
-		if (this.sample || true) {
-			console.log(this.$attrs);
+		if (this.sample) {
 			this.inTime = "Nu";
 			this.tooltip.location = `SP G2.02 - Coole TA Bsc`;
 			this.withSlack = false;
