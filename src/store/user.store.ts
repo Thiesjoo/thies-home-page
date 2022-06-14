@@ -107,6 +107,7 @@ export const useUserStore = defineStore("user", {
 				}
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
+				window.localStorage.clear();
 				this.loggedIn = false;
 				this.user = null;
 				this.accessToken = "";
@@ -121,6 +122,8 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			window.localStorage.clear();
+
 			this.loggedIn = false;
 			this.user = null;
 			this.accessToken = "";

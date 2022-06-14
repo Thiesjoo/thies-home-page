@@ -32,6 +32,7 @@ const baseTime = new Date();
 import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 import { default as ms } from "ms";
+import { useLocalStorage } from "@vueuse/core";
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -98,11 +99,7 @@ export default defineComponent({
 		};
 	},
 	methods: {
-		async getCurrentLesson() {
-			// TODO: Fix auto refresh on current lesson
-			const fetchRes = await (await fetch("/api/external/rooster_parser")).json();
-			const arr: EventDatanose[] = Object.values(fetchRes.data);
-
+		getCurrentLesson(arr: EventDatanose[]) {
 			const currentEvent = getEventWithSlack(arr, ms("30s"));
 			if (currentEvent) {
 				this.inTime = "Nu";
@@ -120,12 +117,14 @@ export default defineComponent({
 
 				return upcomingEvent.summary;
 			}
-
-			throw new Error("SAFE - Not in lesson!");
+			return "";
 		},
 	},
 	beforeDestroy() {
 		if (this.interval) clearInterval(this.interval);
+	},
+	setup() {
+		return { rawData: useLocalStorage("datanose-rooster", [] as EventDatanose[]) };
 	},
 	async mounted() {
 		if (this.sample) {
@@ -145,10 +144,22 @@ export default defineComponent({
 			self.tooltip.pauze = atTime;
 		}, 1000);
 
+		if (this.rawData.length > 0) {
+			this.text = this.getCurrentLesson(this.rawData);
+			this.loaded = this.text !== "";
+		}
 		try {
-			this.text = await this.getCurrentLesson();
-			this.loaded = true;
-		} catch (e) {}
+			const fetchRes = await (await fetch("/api/external/rooster_parser")).json();
+			const unsorted = Object.values(fetchRes.data) as EventDatanose[];
+			unsorted.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+			this.rawData = unsorted.filter((x) => Date.now() < new Date(x.start).getTime()).slice(0, 20) as EventDatanose[];
+			this.text = this.getCurrentLesson(this.rawData);
+
+			this.loaded = this.text !== "";
+		} catch (e) {
+			console.error(e);
+		}
 	},
 	components: { Base },
 });

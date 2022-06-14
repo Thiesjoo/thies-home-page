@@ -21,10 +21,6 @@
 	</div>
 
 	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
-		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
-		-->
-
-		<!-- TODO: Remove transition on drop. This transition is because a new component is created when dragging to another draggable component. Not really preventable -->
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{

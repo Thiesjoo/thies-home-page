@@ -69,7 +69,7 @@ export default defineComponent({
 		text: string;
 		loaded: boolean;
 	} {
-		return { open: true, data: [], text: "", loaded: false };
+		return { open: false, data: [], text: "", loaded: true };
 	},
 	async created() {
 		if (this.sample) {
@@ -85,13 +85,12 @@ export default defineComponent({
 				},
 			];
 			this.text = "1 stream";
-			this.loaded = true;
 
 			return;
 		}
+		this.text = "... streams";
 
 		this.text = await this.getFollows();
-		this.loaded = true;
 	},
 	methods: {
 		async getFollows() {

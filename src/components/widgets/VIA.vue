@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
+import { useLocalStorage } from "@vueuse/core";
 import { Base } from ".";
 
 export default defineComponent({
@@ -14,13 +15,17 @@ export default defineComponent({
 		sample: { type: Boolean },
 	},
 	data() {
-		return { text: "", loaded: false };
+		return { text: useLocalStorage("POS-credits", ""), loaded: false };
 	},
 	async created() {
 		if (this.sample) {
 			this.text = "€ 99,99";
 			this.loaded = true;
 			return;
+		}
+
+		if (this.text) {
+			this.loaded = true;
 		}
 
 		this.text = await this.getBalance();
