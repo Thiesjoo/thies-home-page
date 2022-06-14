@@ -72,9 +72,8 @@ function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
 		minute: "numeric",
-	})
-		.format()
-		.replace(":", "∶");
+	}).format();
+	// .replace(":", "∶");
 }
 
 function getGreeting() {
@@ -183,7 +182,6 @@ body {
 .seconds {
 	font-size: 120%;
 	margin-left: 4px;
-	margin-bottom: 6px;
 }
 
 .greeting {
