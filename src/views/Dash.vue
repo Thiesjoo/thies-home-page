@@ -34,12 +34,15 @@
 				'bottom-0': location.includes('bottom'),
 				// Small padding to move out of the way of version modal
 				'pb-3': location.includes('bottom') && location.includes('left'),
+				'border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1]': dragging,
 			}"
 			:id="location"
 			class="widget"
 			v-model="user.user.settings.widgets[location]"
 			group="widgets"
 			:item-key="generateKey"
+			@start="start"
+			@end="end"
 		>
 			<template #item="{ element }">
 				<div>
@@ -87,6 +90,7 @@ export default defineComponent({
 			balance: "...",
 			greeting: getGreeting(),
 			ALL_LOCATIONS,
+			dragging: false,
 		};
 	},
 	beforeDestroy() {
@@ -103,6 +107,12 @@ export default defineComponent({
 	},
 	methods: {
 		generateKey,
+		start() {
+			this.dragging = true;
+		},
+		end() {
+			this.dragging = false;
+		},
 	},
 	async created() {
 		this.interval = setInterval(() => {
@@ -189,13 +199,15 @@ body {
 
 .widget {
 	position: absolute;
+	display: flex;
+	flex-direction: column;
 	margin: 1em;
 	width: 10%;
 	min-height: 400px;
+	min-width: 400px;
 }
 
 .widget.bottom-0 {
-	display: flex;
 	flex-direction: column-reverse;
 }
 

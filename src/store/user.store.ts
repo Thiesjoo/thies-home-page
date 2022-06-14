@@ -1,5 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { getBaseURL, Interrupted } from "@/helpers/auto-refresh-tokens";
+import { generateKey } from "@/helpers/generateKeyFromWidget";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
@@ -7,7 +8,7 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["dummy", "battery", "pauze"];
+export const DEFAULT_WIDGETS = ["battery", "pauze"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
@@ -58,9 +59,9 @@ export const useUserStore = defineStore("user", {
 							showSeconds: true,
 							showVersion: false,
 							widgets: {
-								topleft: [{ name: "Dummy", id: "2" }],
+								topleft: [],
 								topright: [{ name: "VIA", id: "POS" }],
-								bottomleft: [{ name: "Dummy", id: "1" }],
+								bottomleft: [],
 								bottomright: [{ name: "Pauze", id: "1" }],
 							},
 							widgetsAvailable: [],
@@ -77,11 +78,18 @@ export const useUserStore = defineStore("user", {
 				DEFAULT_WIDGETS.forEach((x) => validWidgets.add(x));
 
 				// Always filter to prevent invalidity
+				const uniqueCount = new Set<String>();
 				// TODO: CHeck for unique keys
 				for (const x of ALL_LOCATIONS) {
-					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter(
-						(x) => x && validWidgets.has(x.name.toLowerCase())
-					) as Widget[];
+					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) => {
+						if (!x || uniqueCount.has(generateKey(x))) {
+							return false;
+						}
+
+						uniqueCount.add(generateKey(x));
+
+						return validWidgets.has(x.name.toLowerCase());
+					}) as Widget[];
 				}
 			} catch (e) {
 				if (e instanceof Interrupted) {

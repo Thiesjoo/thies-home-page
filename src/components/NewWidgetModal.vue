@@ -105,7 +105,7 @@ export default defineComponent({
 }
 
 .appear:hover {
-	transform: scale(3) translateY(-32px);
+	transform: scale(2.5) translateY(-24px);
 }
 
 .v-enter-active,
