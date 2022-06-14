@@ -50,6 +50,7 @@
 						:is="element.name"
 						:left="location.includes('left')"
 						:right="location.includes('right')"
+						:bottom="location.includes('bottom')"
 					></component>
 				</div>
 			</template>

@@ -12,11 +12,15 @@
 			leave-class="transform opacity-100 scale-100"
 			leave-to-class="transform opacity-0 scale-95"
 		>
-			<!-- TODO: Dropdown doesnt open to the top when space at the bottom is sparse -->
 			<div
 				v-if="open"
 				@mouseover="open = true"
-				class="absolute flex flex-col items-center right-0 w-64 py-2 mt-2 bg-gray-100 rounded-md shadow-xl"
+				:class="{
+					'bottom-0': $attrs.bottom,
+					'mb-16': $attrs.bottom,
+					'right-0': $attrs.right,
+				}"
+				class="absolute flex flex-col items-center w-64 py-2 mt-2 bg-gray-100 rounded-md shadow-xl"
 			>
 				<a
 					:href="'https://twitch.tv/' + item.url"
@@ -45,7 +49,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { Base } from "./";
+import { Base } from ".";
 
 export default defineComponent({
 	props: {
@@ -65,7 +69,7 @@ export default defineComponent({
 		text: string;
 		loaded: boolean;
 	} {
-		return { open: false, data: [], text: "", loaded: false };
+		return { open: true, data: [], text: "", loaded: false };
 	},
 	async created() {
 		if (this.sample) {
