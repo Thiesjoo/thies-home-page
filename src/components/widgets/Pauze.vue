@@ -1,6 +1,12 @@
 <template>
 	<div>
-		<Base color="cyan" :loaded="loaded" link="https://datanose.nl/#timetable[195750](0,0)">
+		<Base
+			color="cyan"
+			:loaded="loaded"
+			link="https://datanose.nl/#timetable[195750](0,0)"
+			:left="$attrs.left"
+			:right="$attrs.right"
+		>
 			<template #short>
 				<span :title="tooltip.location">{{ inTime }}</span>
 			</template>
@@ -8,8 +14,8 @@
 			<template #content>{{ text }}</template>
 			<template #subcontent>{{ tooltip.location }}</template>
 		</Base>
-		<div v-if="inTime && !withSlack">
-			<Base color="fuchsia" :loaded="loaded" link="https://ishetpauze.nl">
+		<div v-if="inTime && !withSlack" :class="{ 'float-right': $attrs.right }">
+			<Base color="fuchsia" :loaded="loaded" link="https://ishetpauze.nl" :left="$attrs.left" :right="$attrs.right">
 				<template #short>
 					<span :title="tooltip.pauze">Pauze</span>
 				</template>
@@ -26,8 +32,6 @@ const baseTime = new Date();
 import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 import { default as ms } from "ms";
-
-// TODO: Pauze does not always float the right way
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -63,6 +67,9 @@ function generateTooltip(event: EventDatanose) {
 }
 
 export default defineComponent({
+	props: {
+		sample: { type: Boolean },
+	},
 	data(): {
 		pauzeText: string;
 		interval: number | null;
@@ -121,6 +128,17 @@ export default defineComponent({
 		if (this.interval) clearInterval(this.interval);
 	},
 	async mounted() {
+		if (this.sample || true) {
+			console.log(this.$attrs);
+			this.inTime = "Nu";
+			this.tooltip.location = `SP G2.02 - Coole TA Bsc`;
+			this.withSlack = false;
+
+			this.text = `Laptopcollege`;
+			this.loaded = true;
+			return;
+		}
+
 		const self = this;
 		self.interval = setInterval(() => {
 			const [announce, atTime] = pauseText();
@@ -128,8 +146,10 @@ export default defineComponent({
 			self.tooltip.pauze = atTime;
 		}, 1000);
 
-		this.text = await this.getCurrentLesson();
-		this.loaded = true;
+		try {
+			this.text = await this.getCurrentLesson();
+			this.loaded = true;
+		} catch (e) {}
 	},
 	components: { Base },
 });
