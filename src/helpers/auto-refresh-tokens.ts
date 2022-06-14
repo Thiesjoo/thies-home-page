@@ -59,6 +59,7 @@ function constructConfig(config: RequestInit | undefined, token: string) {
 }
 
 // TODO: This requires a better rework to stay uncluttered
+// https://www.npmjs.com/package/axios-auth-refresh
 
 export function overwriteFetch() {
 	const userStore = useUserStore();

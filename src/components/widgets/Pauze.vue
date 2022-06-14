@@ -25,9 +25,9 @@ const baseTime = new Date();
 
 import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
-//@ts-ignore
 import { default as ms } from "ms";
-import errorCaptured from "./errorCaptured";
+
+// TODO: Pauze does not always float the right way
 
 function pauseText() {
 	const t = new Date().getMinutes();

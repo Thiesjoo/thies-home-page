@@ -118,6 +118,9 @@
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 
+// TODO: Implement social logins right here and link with accounts
+// Backend should have a pending user list?
+
 export default defineComponent({
 	props: {
 		login: {

@@ -24,15 +24,17 @@
 </template>
 
 <script lang="ts">
+import { isProduction } from "@/helpers/envParser";
 import { CurrentlyPlaying, Track } from "@/helpers/types/spotify.api";
 import { defineComponent } from "@vue/runtime-core";
+import ms from "ms";
 import { Base } from "./";
 import errorCaptured from "./errorCaptured";
 
 /** How often to ping spotify for music change */
-const spotifyRefreshTimer = 5000;
+const spotifyRefreshTimer = isProduction() ? ms("20s") : ms("5s");
 /** How often to increase our own timer of the progress bar */
-const smoothProgressBar = 100;
+const smoothProgressBar = 500;
 
 /**
  * Make a M:ss string from the amount of seconds
@@ -85,7 +87,7 @@ export default defineComponent({
 		percentage(): number {
 			this.refreshKey;
 
-			return this.track ? Math.round(((this.track.progress_ms || 0) / (this.track.item?.duration_ms || 0)) * 100) : 0;
+			return this.track ? ((this.track.progress_ms || 0) / (this.track.item?.duration_ms || 0)) * 100 : 0;
 		},
 		imageURL(): string {
 			this.refreshKey;
