@@ -33,7 +33,7 @@ import { Base } from "./";
 import errorCaptured from "./errorCaptured";
 
 /** How often to ping spotify for music change */
-const spotifyRefreshTimer = isProduction() ? ms("20s") : ms("5s");
+const spotifyRefreshTimer = isProduction() ? ms("5s") : ms("20s");
 /** How often to increase our own timer of the progress bar */
 const smoothProgressBar = 500;
 
@@ -63,12 +63,25 @@ export default defineComponent({
 		playerLoopInterval?: number;
 		progressInterval?: number;
 	} {
-		return {
+		const toReturn = {
 			localProgress: 0,
 			loaded: false,
 			refreshKey: false,
 			pendingRequest: false,
 		};
+		// If we have fetched data in the last 5 seconds, there must be another tab open.
+		// We can just copy that data and stay loaded without waiting
+
+		//@ts-ignore Somewhat illegal stuff because track is already loaded in setup.
+		const offset = Date.now() - (this?.track?.timestamp || 0);
+
+		if (offset < spotifyRefreshTimer - 500) {
+			toReturn.loaded = true;
+			//@ts-ignore
+			toReturn.localProgress = (this.track?.progress_ms || 0) + offset;
+		}
+		// console.log(this?.track);
+		return toReturn;
 	},
 	computed: {
 		renderTrack(): boolean {
@@ -107,9 +120,9 @@ export default defineComponent({
 		async refreshTrack() {
 			// TODO: Is pending request really needed
 			if (!this.spotifyAccesstoken || this.pendingRequest) return;
+			const offset = Date.now() - (this.track?.timestamp || 0);
 
-			if (Date.now() - (this.track?.timestamp || 0) < ms("4.5s")) {
-				const offset = Date.now() - (this.track?.timestamp || 0);
+			if (offset < spotifyRefreshTimer - 500) {
 				this.localProgress = (this.track?.progress_ms || 0) + offset;
 				console.log("There was data fetched more recently. Probably other tab?");
 				return;
@@ -168,7 +181,7 @@ export default defineComponent({
 	},
 	async mounted() {
 		await this.getAccesstoken();
-		this.refreshTrack();
+		await this.refreshTrack();
 
 		const self = this;
 		this.playerLoopInterval = setInterval(function () {
@@ -181,8 +194,6 @@ export default defineComponent({
 				self.refreshKey = !self.refreshKey;
 			}
 		}, smoothProgressBar);
-
-		await this.refreshTrack();
 		this.loaded = true;
 	},
 	beforeDestroy() {
