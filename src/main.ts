@@ -1,15 +1,3 @@
-declare global {
-	interface Window {
-		env: {
-			VUE_APP_VERCEL_ENV: "production" | "preview" | "development";
-			VUE_APP_VERCEL_URL: string;
-			VUE_APP_VERCEL_GIT_COMMIT_SHA: string;
-			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
-			BASEURL: string;
-		};
-	}
-}
-
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
@@ -25,6 +13,7 @@ import {
 	faLinkSlash,
 	faLock,
 	faPlus,
+	faTrash,
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -41,12 +30,12 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { useUserStore } from "./store/user.store";
 
-//@ts-ignore
+//@ts-ignore This constant is inserted by webpack in vue.config.js
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
 library.add(faTwitch, faSpotify, faDiscord);
-library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus);
+library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
 
 const app = createApp(App, { router });
 app.use(router);

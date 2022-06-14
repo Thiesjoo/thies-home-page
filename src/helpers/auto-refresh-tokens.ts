@@ -59,6 +59,7 @@ function constructConfig(config: RequestInit | undefined, token: string) {
 }
 
 // TODO: This requires a better rework to stay uncluttered
+// https://www.npmjs.com/package/axios-auth-refresh
 
 export function overwriteFetch() {
 	const userStore = useUserStore();
@@ -94,14 +95,17 @@ export function overwriteFetch() {
 					// Retry original request when we've acquired new tokens
 					const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
 
-					if (!resp.ok) {
+					//@ts-ignore
+					if (!resp.ok && config?.rethrowError) {
 						reject(new Error(response.statusText));
 					}
 
 					resolve(resp);
 				}
 
-				if (!response.ok) {
+				//@ts-ignore
+				if (!response.ok && config?.rethrowError) {
+					console.log(response);
 					reject(new Error(response.statusText));
 				}
 

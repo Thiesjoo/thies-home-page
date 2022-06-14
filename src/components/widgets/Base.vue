@@ -69,7 +69,6 @@ export default defineComponent({
 	transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
-/* TODO: This animation moves from the left, but some components are on the right */
 .enter-from-right {
 	transform: translateX(20px);
 	opacity: 0;

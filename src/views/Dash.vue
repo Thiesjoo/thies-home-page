@@ -21,10 +21,6 @@
 	</div>
 
 	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
-		<!-- TODO: Shared state across browser tabs? Spotify would be fetching very often, and pos doesn't need updating every 5 seconds
-		-->
-
-		<!-- TODO: Remove transition on drop. This transistion is because a new component is created when dragging to another group. Not really preventable -->
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{
@@ -34,29 +30,42 @@
 				'bottom-0': location.includes('bottom'),
 				// Small padding to move out of the way of version modal
 				'pb-3': location.includes('bottom') && location.includes('left'),
+				'border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1]': dragging > 0,
 			}"
 			:id="location"
 			class="widget"
 			v-model="user.user.settings.widgets[location]"
 			group="widgets"
 			:item-key="generateKey"
+			@start="start"
+			@end="end"
 		>
 			<template #item="{ element }">
 				<div>
 					<component
-						:is="element.type"
+						:is="element.name"
 						:left="location.includes('left')"
 						:right="location.includes('right')"
+						:bottom="location.includes('bottom')"
 					></component>
 				</div>
 			</template>
 		</draggable>
 
-		<div class="absolute bottom-[-32px] justify-center flex w-full">
-			<div class="appear w-16 h-16 rounded-full backdrop-blur" @click="addWidget">
-				<font-awesome-icon :icon="['fas', 'plus']" class="w-full h-full" />
-			</div>
+		<div class="absolute top-[-16px] justify-center flex w-full" v-show="dragging == 1">
+			<draggable
+				class="p-[4rem] border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1] flex flex-col items-center"
+				:group="{ name: 'widgets', pull: false }"
+				:item-key="generateKey"
+			>
+				<template #header>
+					<font-awesome-icon :icon="['fas', 'trash']" class="w-16 h-16" />
+				</template>
+				<template #item="{}"></template>
+			</draggable>
 		</div>
+
+		<new-widget-modal @dragging="childDrag"></new-widget-modal>
 	</div>
 </template>
 
@@ -66,12 +75,15 @@ import * as Widgets from "@/components/widgets";
 import errorCaptured from "@/components/widgets/errorCaptured";
 import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
 import draggable from "vuedraggable";
+import NewWidgetModal from "@/components/NewWidgetModal.vue";
+import { generateKey } from "@/helpers/generateKeyFromWidget";
 
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
 		minute: "numeric",
 	}).format();
+	// .replace(":", "∶");
 }
 
 function getGreeting() {
@@ -89,6 +101,7 @@ export default defineComponent({
 			balance: "...",
 			greeting: getGreeting(),
 			ALL_LOCATIONS,
+			dragging: 0,
 		};
 	},
 	beforeDestroy() {
@@ -104,12 +117,16 @@ export default defineComponent({
 		},
 	},
 	methods: {
-		generateKey(a: Widget) {
-			return a.type + a.id;
+		generateKey,
+		start() {
+			this.dragging = 1;
 		},
-		addWidget() {
-			if (!this.user.user) return;
-			this.user.user.settings.widgets.bottomleft.push({ type: "Dummy", id: "" + Math.round(Math.random() * 1000) });
+		end() {
+			this.dragging = 0;
+		},
+		childDrag(dragging: boolean) {
+			// console.log("HMmm");
+			this.dragging = dragging ? 2 : 0;
 		},
 	},
 	async created() {
@@ -119,7 +136,7 @@ export default defineComponent({
 			this.seconds = new Date().getSeconds();
 		}, 1000);
 	},
-	components: { ...Widgets, draggable },
+	components: { ...Widgets, draggable, NewWidgetModal },
 });
 </script>
 <style>
@@ -197,13 +214,15 @@ body {
 
 .widget {
 	position: absolute;
+	display: flex;
+	flex-direction: column;
 	margin: 1em;
 	width: 10%;
 	min-height: 400px;
+	min-width: 400px;
 }
 
 .widget.bottom-0 {
-	display: flex;
 	flex-direction: column-reverse;
 }
 
@@ -224,6 +243,6 @@ body {
 }
 
 .appear:hover {
-	transform: scale(1.5) translateY(-32px);
+	transform: scale(2.5) translateY(24px);
 }
 </style>

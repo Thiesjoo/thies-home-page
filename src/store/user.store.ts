@@ -1,5 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { getBaseURL, Interrupted } from "@/helpers/auto-refresh-tokens";
+import { generateKey } from "@/helpers/generateKeyFromWidget";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
@@ -7,17 +8,15 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-const DEFAULT_WIDGETS = ["dummy", "battery"];
+export const DEFAULT_WIDGETS = ["Battery", "Pauze"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
 export type Widget = {
-	type: ValidComponentNames;
+	name: ValidComponentNames;
 	id: string;
 };
-
-type WidgetAvailable = { name: Lowercase<ValidComponentNames>; id: string };
 
 export type User = {
 	name: string;
@@ -25,7 +24,7 @@ export type User = {
 		showSeconds: boolean;
 		showVersion: boolean;
 		widgets: { [key in ValidLocation]: Widget[] };
-		widgetsAvailable: WidgetAvailable[];
+		widgetsAvailable: Widget[];
 	};
 };
 
@@ -61,12 +60,9 @@ export const useUserStore = defineStore("user", {
 							showVersion: false,
 							widgets: {
 								topleft: [],
-								topright: [
-									// { type: "Twitch", id: "GuanTheThird" },
-									{ type: "VIA", id: "POS" },
-								],
+								topright: [{ name: "VIA", id: "pos" }],
 								bottomleft: [],
-								bottomright: [{ type: "Pauze", id: "1" }],
+								bottomright: [{ name: "Pauze", id: "1" }],
 							},
 							widgetsAvailable: [],
 						},
@@ -74,19 +70,34 @@ export const useUserStore = defineStore("user", {
 				}
 				this.user.name = res.name;
 
-				const allWidgetsAvailable: WidgetAvailable[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
-				this.user.settings.widgetsAvailable = allWidgetsAvailable;
+				const allWidgetsAvailable: Widget[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
+					if (x.name.toLowerCase() === "via") {
+						return {
+							name: "VIA",
+							id: x.id,
+						};
+					}
 
-				const validWidgets = new Set<string>(allWidgetsAvailable.map((x) => x.name));
+					return x;
+				});
 
-				DEFAULT_WIDGETS.forEach((x) => validWidgets.add(x));
+				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
-				// Always filter to prevent invalidity
-				// TODO: CHeck for unique keys
+				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
+
+				// Always filter to prevent invalidity when changing localstorage yourself
+				const uniqueCount = new Set<String>();
 				for (const x of ALL_LOCATIONS) {
-					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) =>
-						validWidgets.has(x.type.toLowerCase())
-					) as Widget[];
+					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) => {
+						if (!x || uniqueCount.has(generateKey(x))) {
+							return false;
+						}
+
+						uniqueCount.add(generateKey(x));
+
+						return validWidgetsNames.has(x.name);
+					}) as Widget[];
 				}
 			} catch (e) {
 				if (e instanceof Interrupted) {
@@ -96,8 +107,10 @@ export const useUserStore = defineStore("user", {
 				}
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
+				window.localStorage.clear();
 				this.loggedIn = false;
 				this.user = null;
+				this.accessToken = "";
 			}
 
 			this.loading.userdata = false;
@@ -109,8 +122,11 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			window.localStorage.clear();
+
 			this.loggedIn = false;
 			this.user = null;
+			this.accessToken = "";
 			this.loading.form = false;
 			this.loading.userdata = false;
 		},
@@ -127,6 +143,7 @@ export const useUserStore = defineStore("user", {
 				this.getUserData();
 			} catch (e) {
 				toast.error("Something went wrong");
+				this.accessToken = "";
 				throw e;
 			} finally {
 				this.loading.form = false;
