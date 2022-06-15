@@ -109,10 +109,10 @@ function getUsersFromIRC(irc: { messages: string[] }, maxDate = +ms("1h")): User
 				} else if (typeof parsed.tags.badges === "string" && (parsed.tags.badges as string).startsWith("vip")) {
 					type = "vip";
 				}
-				acc.push({ name: parsed.tags["display-name"].toLowerCase(), type });
+				acc.push({ name: parsed.tags["display-name"].toLowerCase(), type: type as "user" | "mod" | "vip" });
 			}
 			return acc;
-		}, [])
+		}, [] as { name: string; type: "user" | "mod" | "vip" }[])
 		.filter((x) => x);
 }
 

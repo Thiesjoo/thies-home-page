@@ -8,7 +8,7 @@ export default function (req: VercelRequest, res: VercelResponse) {
 	let token: string | undefined = req.cookies.accesstoken;
 
 	if (!token) {
-		token = req.headers.authorization.split(" ")?.[1];
+		token = req.headers.authorization?.split(" ")?.[1];
 	}
 
 	if (!token) {
