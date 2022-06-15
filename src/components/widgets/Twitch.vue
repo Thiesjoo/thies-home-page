@@ -113,10 +113,6 @@ export default defineComponent({
 			});
 			this.data.sort((a, b) => b.viewers - a.viewers);
 
-			if (res.data.length == 0) {
-				throw new Error("No twitch streams available");
-			}
-
 			return `${res.data.length} stream${res.data.length == 1 ? "" : "s"}`;
 		},
 	},
