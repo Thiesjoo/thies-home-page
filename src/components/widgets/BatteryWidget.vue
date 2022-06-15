@@ -22,7 +22,7 @@ export default defineComponent({
 		//@ts-ignore
 		const battery = await navigator.getBattery();
 		this.charging = battery.charging;
-		this.percentage = battery.level * 100;
+		this.percentage = Math.round(battery.level * 100);
 
 		const self = this;
 		battery.addEventListener("chargingchange", function () {
