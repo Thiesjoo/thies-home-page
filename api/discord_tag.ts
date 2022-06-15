@@ -6,7 +6,7 @@ let user: User | null = null;
 
 export default function (req: VercelRequest, res: VercelResponse) {
 	client.on("ready", async () => {
-		console.log(`Bot has logged in as ${client.user.tag}!`);
+		console.log(`Bot has logged in as ${client?.user?.tag}!`);
 		user = await client.users.fetch("299983320815763456");
 		if (!user) {
 			return res.status(404).json({ ok: false, error: "User not found ):" });
@@ -24,7 +24,7 @@ export default function (req: VercelRequest, res: VercelResponse) {
 }
 
 function generateResponse(res: VercelResponse) {
-	res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
+	res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
 	res.json({
 		ok: true,
 		tag: user?.discriminator,

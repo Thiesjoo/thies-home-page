@@ -5,10 +5,14 @@ export default function (req: VercelRequest, res: VercelResponse) {
 		return res.status(401).json({ ok: false, error: "Not authed" });
 	}
 
-	let token = req.cookies.accesstoken;
+	let token: string | undefined = req.cookies.accesstoken;
 
 	if (!token) {
 		token = req.headers.authorization.split(" ")?.[1];
+	}
+
+	if (!token) {
+		return res.status(400).json({ ok: false, error: "Authed, but token is invalid" });
 	}
 
 	const [_, data, __] = token.split(".");

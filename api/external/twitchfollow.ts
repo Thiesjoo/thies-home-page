@@ -31,14 +31,13 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 				Authorization: "Bearer " + result.accessToken,
 			},
 		});
-		const profileImages = profileImageRequest.data.data;
+		const profileImages = profileImageRequest.data.data as { id: string; profile_image_url: string }[];
 
 		// Joining the profile images with correct users
 		const joined = users.map((x: any) => {
 			return {
 				...x,
-				profile_image_url: profileImages.find((y) => y.id === x.user_id)
-					?.profile_image_url,
+				profile_image_url: profileImages.find((y) => y.id === x.user_id)?.profile_image_url,
 			};
 		});
 

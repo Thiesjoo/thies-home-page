@@ -7,9 +7,10 @@
 		"serve": "vue-cli-service serve",
 		"build": "vue-cli-service build",
 		"inst": "npm ci && cd api/ && npm ci",
-		"start": "vercel dev"
+		"start": "vercel dev",
+		"build-report": "vue-cli-service build --report"
 	},
-	"main": "index.js",
+	"main": "src/main.ts",
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.1.1",
 		"@fortawesome/free-brands-svg-icons": "^6.1.1",
