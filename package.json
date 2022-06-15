@@ -44,9 +44,7 @@
 		"vite": "^2.7.7"
 	},
 	"browserslist": [
-		"> 1%",
-		"last 2 versions",
-		"not dead"
+		"> 1% and last 2 versions and not dead"
 	],
 	"homepage": "https://thies.dev",
 	"license": "ISC",
