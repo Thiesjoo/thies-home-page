@@ -29,7 +29,7 @@ export default defineComponent({
 			self.charging = battery.charging;
 		});
 		battery.addEventListener("onlevelchange", function () {
-			self.percentage = battery.level * 100;
+			self.percentage = Math.round(battery.level * 100);
 		});
 	},
 	components: { Battery, Base },
