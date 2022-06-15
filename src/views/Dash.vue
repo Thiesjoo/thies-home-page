@@ -86,6 +86,10 @@ function getCurrentTime() {
 	// .replace(":", "∶");
 }
 
+function getSeconds() {
+	return (new Date().getSeconds() + "").padStart(2, "0");
+}
+
 function getGreeting() {
 	const date = new Date();
 	let hours = date.getHours();
@@ -97,7 +101,7 @@ export default defineComponent({
 		return {
 			interval: null as number | null,
 			time: getCurrentTime(),
-			seconds: new Date().getSeconds(),
+			seconds: getSeconds(),
 			balance: "...",
 			greeting: getGreeting(),
 			ALL_LOCATIONS,
@@ -133,7 +137,7 @@ export default defineComponent({
 		this.interval = setInterval(() => {
 			this.time = getCurrentTime();
 			this.greeting = getGreeting();
-			this.seconds = new Date().getSeconds();
+			this.seconds = getSeconds();
 		}, 1000);
 	},
 	components: { ...Widgets, draggable, NewWidgetModal },
