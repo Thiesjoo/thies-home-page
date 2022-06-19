@@ -4,15 +4,13 @@
 			<h1>GuanTheThird | Thies</h1>
 			<div class="buttons">
 				<div class="btn" style="order: 0" id="discord_id" :title="discordID">
-					<a href="#"
-						><i class="fab fa-discord"></i>GuanTheThird#<span>{{
-							discordTag
-						}}</span></a
+					<a href="#">
+						<font-awesome-icon :icon="['fab', 'discord']" />GuanTheThird#<span>{{ discordTag }}</span></a
 					>
 				</div>
 				<div class="btn" style="order: 1">
-					<a href="https://github.com/thiesjoo" rel="noreferrer" target="_blank"
-						><i class="fas fa-terminal"></i>My Github</a
+					<a href="https://github.com/thiesjoo" rel="noreferrer" target="_blank">
+						<font-awesome-icon :icon="['fab', 'github']" />My Github</a
 					>
 				</div>
 			</div>
@@ -30,9 +28,8 @@
 						alt="Waving frog"
 						src="https://cdn.betterttv.net/emote/5c0e1a3c6c146e7be4ff5c0c/2x"
 					/>
-					Welcome on the website of Thies. This website hosts school stuff
-					(PWS), linux stuff (Linuxinstall) and some random other projects
-					(ElectroAPI)
+					Welcome on the website of Thies. This website hosts school stuff (PWS), linux stuff (Linuxinstall) and some
+					random other projects (ElectroAPI)
 				</p>
 			</div>
 		</section>
@@ -42,43 +39,28 @@
 			</div>
 			<div class="buttons">
 				<div class="btn">
-					<a
-						href="https://github.com/thiesjoo/guanthebot"
-						rel="noreferrer"
-						target="_blank"
-						><i class="fas fa-robot"></i>GuanTheBot</a
+					<a href="https://github.com/thiesjoo/guanthebot" rel="noreferrer" target="_blank">
+						<font-awesome-icon :icon="['fas', 'robot']" /> GuanTheBot</a
 					>
-					is a Twitch/Discord text bot. It detects typo's in certain emotes and
-					uses a real time database to respond with a mocking comment. It was my
-					first project which was completely tested using Jest
+					is a Twitch/Discord text bot. It detects typo's in certain emotes and uses a real time database to respond
+					with a mocking comment. It was my first project which was completely tested using Jest
 				</div>
 
 				<div class="btn">
-					<a
-						href="https://github.com/thiesjoo/PWS"
-						rel="noreferrer"
-						target="_blank"
-						><i class="fas fa-scroll"></i>PWS</a
+					<a href="https://github.com/thiesjoo/PWS" rel="noreferrer" target="_blank">
+						<font-awesome-icon :icon="['fas', 'scroll']" /> PWS</a
 					>
 					is a boid simulation I did for my swarm intelligence profile paper.
-					<a href="https://pws.thies.dev" rel="noreferrer" target="_blank">
-						Code for the simulation
-					</a>
+					<a href="https://pws.thies.dev" rel="noreferrer" target="_blank"> Code for the simulation </a>
 					can be found on github and my site
 				</div>
 
 				<div class="btn">
-					<a
-						href="https://github.com/thiesjoo/linuxinstall"
-						rel="noreferrer"
-						target="_blank"
-						><i class="fas fa-server"></i>linuxinstall</a
+					<a href="https://github.com/thiesjoo/linuxinstall" rel="noreferrer" target="_blank">
+						<font-awesome-icon :icon="['fas', 'server']" />linuxinstall</a
 					>
-					is a bash script that customizes and install a new ubuntu installation
-					to my liking.
-					<a href="https://install.thies.dev" rel="noreferrer" target="_blank">
-						The raw file
-					</a>
+					is a bash script that customizes and install a new ubuntu installation to my liking.
+					<a href="https://install.thies.dev" rel="noreferrer" target="_blank"> The raw file </a>
 					is hosted on my website
 				</div>
 			</div>
@@ -224,5 +206,9 @@ a i {
 	font-size: 14px;
 	text-align: center;
 	padding: 30px 0px 0px 0px;
+}
+
+svg {
+	margin-right: 0.3em;
 }
 </style>
