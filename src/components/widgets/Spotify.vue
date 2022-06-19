@@ -134,6 +134,7 @@ export default defineComponent({
 			try {
 				// TODO: Refresh interceptor for this
 				const spotifyFetch = await axios.get("https://api.spotify.com/v1/me/player", {
+					withCredentials: false,
 					headers: {
 						Authorization: "Bearer " + this.spotifyAccesstoken,
 						"Content-Type": "application/json",
