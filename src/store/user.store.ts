@@ -1,8 +1,9 @@
 import { ValidComponentNames } from "@/components/widgets";
-import { getBaseURL, Interrupted } from "@/helpers/auto-refresh-tokens";
+import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
+import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 
@@ -51,7 +52,7 @@ export const useUserStore = defineStore("user", {
 			this.loading.userdata = true;
 
 			try {
-				const res = await (await fetch("/api/whoami")).json();
+				const res = (await axios.get("/api/whoami", { baseURL: "/" })).data;
 				if (!this.user) {
 					// Default user data for testing
 					this.user = {
@@ -72,7 +73,7 @@ export const useUserStore = defineStore("user", {
 				}
 				this.user.name = res.name;
 
-				const allWidgetsAvailable: Widget[] = await (await fetch(getBaseURL() + "/api/providers/me")).json();
+				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
 					if (x.name.toLowerCase() === "via") {
 						return {
@@ -102,11 +103,11 @@ export const useUserStore = defineStore("user", {
 					}) as Widget[];
 				}
 			} catch (e) {
-				if (e instanceof Interrupted) {
-					console.error("Request was interrupted, not modifying state");
-					this.loading.userdata = false;
-					return;
-				}
+				// if (e instanceof Interrupted) {
+				// 	console.error("Request was interrupted, not modifying state");
+				// 	this.loading.userdata = false;
+				// 	return;
+				// }
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
 				window.localStorage.clear();

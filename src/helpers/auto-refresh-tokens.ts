@@ -1,119 +1,66 @@
-// This file overwrites fetch, and watches for 401 errors.
-// IF there is an 401 error, we try to refresh the token.
-
 import { useUserStore } from "@/store/user.store";
+import axios from "axios";
+import { AxiosAuthRefreshRequestConfig, default as createAuthRefreshInterceptor } from "axios-auth-refresh";
 
 export const getBaseURL = () => {
-	return window.env.BASEURL || "https://auth.thies.dev";
+	return window?.env?.BASEURL || "https://auth.thies.dev";
 };
 
-const { fetch: originalFetch } = window;
-export class Interrupted extends Error {}
+// Function that will be called to refresh authorization
+const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => {
+	console.log("Going to refresh");
+	try {
+		const tokenRefreshResponse = await axios.get(getBaseURL() + "/auth/refresh/access", {
+			skipAuthRefresh: true,
+		} as AxiosAuthRefreshRequestConfig);
+		if (!tokenRefreshResponse.data.token) {
+			throw new Error("Refresh went wrong!");
+		}
+		const userStore = useUserStore();
+		userStore.accessToken = tokenRefreshResponse.data.token;
+		failedRequest.response.config.headers["Authorization"] = "Bearer " + tokenRefreshResponse.data.token;
+		return await Promise.resolve();
+	} catch (e) {
+		console.error(e);
+		throw e;
+	}
+};
 
-/** Current refresh fetch */
-let currentlyFetching: Promise<Response> | null = null;
+// Instantiate the interceptor
+createAuthRefreshInterceptor(axios, refreshAuthLogic, {
+	shouldRefresh: (error) => {
+		// 401, but not on "local/login"
+		return (
+			error.response?.status === 401 &&
+			!(!!error.config.url?.includes("local/login") || !!error.config.url?.includes("local/register"))
+		);
+	},
+});
 
-async function refreshTokens(store: ReturnType<typeof useUserStore>) {
-	if (!currentlyFetching) {
-		currentlyFetching = originalFetch(getBaseURL() + "/auth/refresh/access", {
-			credentials: "include",
-		});
+axios.interceptors.request.use((request) => {
+	const userStore = useUserStore();
+	if (!request.headers) {
+		request.headers = {};
 	}
 
-	return new Promise(async (resolve, reject) => {
-		try {
-			const newResponse = await currentlyFetching;
+	if (!request.headers["Authorization"] && userStore.accessToken) {
+		request.headers["Authorization"] = `Bearer ${userStore.accessToken}`;
+	}
 
-			if (!newResponse) {
-				throw Error("UNREACHABLE");
-			}
+	return request;
+});
 
-			if (newResponse.ok) {
-				// We've acquired new tokens
-				const newTokens = await newResponse.json();
-				currentlyFetching = null;
+axios.interceptors.response.use(
+	function (response) {
+		return response;
+	},
+	function (error) {
+		return Promise.reject(error?.response?.data?.message || error);
+	}
+);
 
-				store.accessToken = newTokens.token;
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = getBaseURL();
 
-				resolve(newTokens);
-			} else {
-				reject(await newResponse.json());
-			}
-		} catch (e: any) {
-			console.error("network error refresh: ", e);
-			throw new Interrupted(e?.message);
-		}
-	});
-}
-
-function constructConfig(config: RequestInit | undefined, token: string) {
-	if (!token) return config;
-
-	return {
-		...config,
-		headers: {
-			Authorization: "Bearer " + token,
-			...config?.headers,
-		},
-	};
-}
-
-// TODO: This requires a better rework to stay uncluttered
-// https://www.npmjs.com/package/axios-auth-refresh
-
-export function overwriteFetch() {
-	const userStore = useUserStore();
-
-	window.fetch = async (...args) => {
-		return new Promise(async (resolve, reject) => {
-			try {
-				let [resource, config] = args;
-
-				const response = await originalFetch(resource, constructConfig(config, userStore.accessToken));
-
-				if (response.status === 401 && userStore.loggedIn) {
-					if (typeof resource == "string" && resource.includes("local/login")) {
-						console.log("Login request, not refreshing tokens");
-						resolve(response);
-					}
-					console.warn("Refreshing tokens");
-
-					try {
-						await refreshTokens(userStore);
-					} catch (e) {
-						if (e instanceof Interrupted) {
-							console.error("Request was interrupted, not modifying state");
-							throw e;
-						}
-
-						console.warn("Token refresh went wrong! Now logging you out!");
-						userStore.logout();
-						reject(new Error("No valid refresh token"));
-						return;
-					}
-
-					// Retry original request when we've acquired new tokens
-					const resp = await originalFetch(resource, constructConfig(config, userStore.accessToken));
-
-					//@ts-ignore
-					if (!resp.ok && config?.rethrowError) {
-						reject(new Error(response.statusText));
-					}
-
-					resolve(resp);
-				}
-
-				//@ts-ignore
-				if (!response.ok && config?.rethrowError) {
-					console.log(response);
-					reject(new Error(response.statusText));
-				}
-
-				resolve(response);
-			} catch (e: any) {
-				console.error("Network error", e);
-				throw new Interrupted(e?.message);
-			}
-		});
-	};
-}
+//TODO: network error interceptor
+//TODO: Spotify accesstoken expiry error

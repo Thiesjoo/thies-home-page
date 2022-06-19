@@ -49,6 +49,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
+import axios from "axios";
 import { Base } from ".";
 
 export default defineComponent({
@@ -94,12 +95,11 @@ export default defineComponent({
 	},
 	methods: {
 		async getFollows() {
-			const fetchRes = await fetch("/api/external/twitchfollow", {
-				credentials: "include",
+			const fetchRes = await axios.get("/api/external/twitchfollow", {
+				baseURL: "/",
 			});
-			if (!fetchRes.ok) throw new Error(fetchRes.statusText);
 
-			const res = await fetchRes.json();
+			const res = fetchRes.data;
 			this.data = res.data.map((x: any) => {
 				return {
 					name: x.user_name,

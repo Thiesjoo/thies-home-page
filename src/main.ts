@@ -18,7 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
-import { overwriteFetch } from "./helpers/auto-refresh-tokens";
+import "./helpers/auto-refresh-tokens";
 
 import { VueReCaptcha } from "vue-recaptcha-v3";
 
@@ -42,9 +42,6 @@ app.use(router);
 
 app.use(createPinia());
 app.use(Toast, {});
-
-// Pinia is now loaded, so we can use overwrite fetch
-overwriteFetch();
 
 // For more options see below
 app.use(VueReCaptcha, {

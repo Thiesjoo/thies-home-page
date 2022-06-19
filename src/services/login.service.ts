@@ -1,4 +1,4 @@
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import axios from "axios";
 
 export type LoginInformation = {
 	email: string;
@@ -17,10 +17,7 @@ function register(data: RegisterInformation) {
 }
 
 async function logout() {
-	await fetch(getBaseURL() + "/auth/refresh/logout", {
-		method: "GET",
-		credentials: "include",
-	});
+	await axios.get("/auth/refresh/logout");
 }
 
 async function genericNetworkRequest(
@@ -28,21 +25,15 @@ async function genericNetworkRequest(
 	headers: { [key: string]: string },
 	url: string
 ): Promise<{ access: string; refresh: string; ok: boolean }> {
-	const fetchRes = await fetch(getBaseURL() + url, {
+	const fetchRes = await axios(url, {
 		method: "POST",
-		body: JSON.stringify(body),
+		data: body,
 		headers: {
-			"Content-Type": "application/json",
 			...headers,
 		},
-		credentials: "include",
-		//@ts-ignore
-		rethrowError: false,
-	}).catch((e) => {
-		throw new Error("Network connectivity to server is unstable");
 	});
 
-	const json = await fetchRes.json();
+	const json = fetchRes.data;
 	if (!json.access) {
 		throw new Error(json.message || json.error || "Something went wrong with getting the access token");
 	}
