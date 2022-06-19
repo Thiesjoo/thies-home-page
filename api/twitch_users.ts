@@ -29,14 +29,12 @@ type User = { name: string; type: "mod" | "vip" | "user" };
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
 import ms from "ms";
+//@ts-ignore
 import { parse } from "irc-message";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	if (typeof req.query.user === "object") return;
-	if (!req.query.user)
-		return res
-			.status(400)
-			.json({ ok: false, error: "Please add a user in the query parameter" });
+	if (!req.query.user) return res.status(400).json({ ok: false, error: "Please add a user in the query parameter" });
 	const { user } = req.query;
 
 	const recentReq = async () => {
@@ -67,9 +65,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 }
 
 /** Combine all viewers from the TMI api with correct type */
-function combineViewers(data: {
-	chatters: { [key: string]: string[] };
-}): User[] {
+function combineViewers(data: { chatters: { [key: string]: string[] } }): User[] {
 	return sort(
 		Object.entries(data.chatters)
 			.map((chatCategory) => {
@@ -96,10 +92,7 @@ function combineViewers(data: {
  * @param maxDate From what date to filter
  * @returns
  */
-function getUsersFromIRC(
-	irc: { messages: string[] },
-	maxDate = +ms("1h")
-): User[] {
+function getUsersFromIRC(irc: { messages: string[] }, maxDate = +ms("1h")): User[] {
 	const current = Date.now() - maxDate;
 	return irc.messages
 		.reduce((acc, val) => {
@@ -113,16 +106,13 @@ function getUsersFromIRC(
 
 				if (parsed.tags.mod === "1") {
 					type = "mod";
-				} else if (
-					typeof parsed.tags.badges === "string" &&
-					(parsed.tags.badges as string).startsWith("vip")
-				) {
+				} else if (typeof parsed.tags.badges === "string" && (parsed.tags.badges as string).startsWith("vip")) {
 					type = "vip";
 				}
-				acc.push({ name: parsed.tags["display-name"].toLowerCase(), type });
+				acc.push({ name: parsed.tags["display-name"].toLowerCase(), type: type as "user" | "mod" | "vip" });
 			}
 			return acc;
-		}, [])
+		}, [] as { name: string; type: "user" | "mod" | "vip" }[])
 		.filter((x) => x);
 }
 
@@ -133,11 +123,7 @@ function filterBotsAndDuplicates(users: User[], broadcaster?: string): User[] {
 	const already = new Set();
 	if (broadcaster) already.add(broadcaster);
 	return users.filter((x) => {
-		if (
-			already.has(x.name) ||
-			BOTLIST.includes(x.name) ||
-			x.name.endsWith("bot")
-		) {
+		if (already.has(x.name) || BOTLIST.includes(x.name) || x.name.endsWith("bot")) {
 			return false;
 		}
 		already.add(x.name);

@@ -22,6 +22,7 @@ export type User = {
 	name: string;
 	settings: {
 		showSeconds: boolean;
+		showDate: boolean;
 		showVersion: boolean;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
@@ -56,6 +57,7 @@ export const useUserStore = defineStore("user", {
 					this.user = {
 						name: "",
 						settings: {
+							showDate: true,
 							showSeconds: true,
 							showVersion: false,
 							widgets: {

@@ -7,15 +7,12 @@
 
 	<div class="centered">
 		<div class="info">
-			<div>
-				<span
-					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
-					v-if="user.user?.settings?.showSeconds"
-					>{{ seconds }}
-				</span>
+			<div class="flex items-center justify-center">
+				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds">{{ seconds }} </span>
 				<!-- TODO: on 11:00 the seconds get off centered -->
 				<h2 class="time">{{ time }}</h2>
 			</div>
+			<span class="date text-neutral-200" v-if="user.user?.settings?.showDate">{{ date }}</span>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
@@ -78,12 +75,24 @@ import draggable from "vuedraggable";
 import NewWidgetModal from "@/components/NewWidgetModal.vue";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
 
+function getCurrentDate() {
+	return Intl.DateTimeFormat("nl-NL", {
+		month: "long",
+		day: "numeric",
+	}).format();
+}
+
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
 		minute: "numeric",
-	}).format();
-	// .replace(":", "∶");
+	})
+		.format()
+		.replace(":", "∶");
+}
+
+function getSeconds() {
+	return (new Date().getSeconds() + "").padStart(2, "0");
 }
 
 function getGreeting() {
@@ -96,10 +105,11 @@ export default defineComponent({
 	data() {
 		return {
 			interval: null as number | null,
+			date: getCurrentDate(),
 			time: getCurrentTime(),
-			seconds: new Date().getSeconds(),
-			balance: "...",
+			seconds: getSeconds(),
 			greeting: getGreeting(),
+			balance: "...",
 			ALL_LOCATIONS,
 			dragging: 0,
 		};
@@ -131,9 +141,10 @@ export default defineComponent({
 	},
 	async created() {
 		this.interval = setInterval(() => {
+			this.date = getCurrentDate();
 			this.time = getCurrentTime();
 			this.greeting = getGreeting();
-			this.seconds = new Date().getSeconds();
+			this.seconds = getSeconds();
 		}, 1000);
 	},
 	components: { ...Widgets, draggable, NewWidgetModal },
@@ -186,6 +197,16 @@ body {
 	justify-content: center;
 }
 
+.date {
+	font-size: 150%;
+	font-weight: 100;
+
+	position: absolute;
+	top: 0px;
+	left: 50%;
+	transform: translate(-50%);
+}
+
 .time {
 	font-size: 1050%;
 	font-weight: 500;
@@ -194,8 +215,9 @@ body {
 }
 
 .seconds {
-	font-size: 120%;
-	margin-left: 4px;
+	font-size: 100%;
+	/* margin-left: 5px; */
+	transform: translate(15%, 50%);
 }
 
 .greeting {
