@@ -7,15 +7,12 @@
 
 	<div class="centered">
 		<div class="info">
-			<div>
-				<span
-					class="seconds w-full absolute left-0 bottom-1/2 text-center text-neutral-200"
-					v-if="user.user?.settings?.showSeconds"
-					>{{ seconds }}
-				</span>
+			<div class="flex items-center justify-center">
+				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds">{{ seconds }} </span>
 				<!-- TODO: on 11:00 the seconds get off centered -->
 				<h2 class="time">{{ time }}</h2>
 			</div>
+			<span class="text-neutral-200 mb-2" v-if="user.user?.settings?.showDate">HAHA HOI </span>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
@@ -82,8 +79,9 @@ function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
 		minute: "numeric",
-	}).format();
-	// .replace(":", "∶");
+	})
+		.format()
+		.replace(":", "∶");
 }
 
 function getSeconds() {
@@ -198,8 +196,9 @@ body {
 }
 
 .seconds {
-	font-size: 120%;
-	margin-left: 4px;
+	font-size: 100%;
+	/* margin-left: 5px; */
+	transform: translate(15%, 50%);
 }
 
 .greeting {
