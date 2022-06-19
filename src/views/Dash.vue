@@ -12,7 +12,7 @@
 				<!-- TODO: on 11:00 the seconds get off centered -->
 				<h2 class="time">{{ time }}</h2>
 			</div>
-			<span class="text-neutral-200 mb-2" v-if="user.user?.settings?.showDate">HAHA HOI </span>
+			<span class="date text-neutral-200" v-if="user.user?.settings?.showDate">{{ date }}</span>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
@@ -75,6 +75,13 @@ import draggable from "vuedraggable";
 import NewWidgetModal from "@/components/NewWidgetModal.vue";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
 
+function getCurrentDate() {
+	return Intl.DateTimeFormat("nl-NL", {
+		month: "long",
+		day: "numeric",
+	}).format();
+}
+
 function getCurrentTime() {
 	return Intl.DateTimeFormat("nl-NL", {
 		hour: "numeric",
@@ -98,10 +105,11 @@ export default defineComponent({
 	data() {
 		return {
 			interval: null as number | null,
+			date: getCurrentDate(),
 			time: getCurrentTime(),
 			seconds: getSeconds(),
-			balance: "...",
 			greeting: getGreeting(),
+			balance: "...",
 			ALL_LOCATIONS,
 			dragging: 0,
 		};
@@ -133,6 +141,7 @@ export default defineComponent({
 	},
 	async created() {
 		this.interval = setInterval(() => {
+			this.date = getCurrentDate();
 			this.time = getCurrentTime();
 			this.greeting = getGreeting();
 			this.seconds = getSeconds();
@@ -186,6 +195,16 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.date {
+	font-size: 150%;
+	font-weight: 100;
+
+	position: absolute;
+	top: 0px;
+	left: 50%;
+	transform: translate(-50%);
 }
 
 .time {
