@@ -1,5 +1,5 @@
 <template>
-	<Base :loaded="true">
+	<Base :loaded="Math.abs(1 - level) > 0.01">
 		<template #content>
 			<Battery :percentage="percentage" :charging="charging"></Battery>
 		</template>
@@ -10,27 +10,17 @@
 import { defineComponent } from "@vue/runtime-core";
 import Battery from "@/components/Battery.vue";
 import { Base } from ".";
+import { useBattery } from "@vueuse/core";
 
 export default defineComponent({
-	data() {
-		return {
-			charging: false,
-			percentage: 100,
-		};
+	setup() {
+		const { charging, level } = useBattery();
+		return { charging, level };
 	},
-	async mounted() {
-		//@ts-ignore
-		const battery = await navigator.getBattery();
-		this.charging = battery.charging;
-		this.percentage = Math.round(battery.level * 100);
-
-		const self = this;
-		battery.addEventListener("chargingchange", function () {
-			self.charging = battery.charging;
-		});
-		battery.addEventListener("onlevelchange", function () {
-			self.percentage = Math.round(battery.level * 100);
-		});
+	computed: {
+		percentage(): number {
+			return Math.round(this.level * 100);
+		},
 	},
 	components: { Battery, Base },
 });

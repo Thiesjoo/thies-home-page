@@ -27,9 +27,13 @@ export default defineComponent({
 		if (this.text) {
 			this.loaded = true;
 		}
-
-		this.text = await this.getBalance();
-		this.loaded = true;
+		try {
+			this.text = await this.getBalance();
+			this.loaded = true;
+		} catch (e) {
+			this.loaded = false;
+			this.text = "";
+		}
 	},
 	methods: {
 		async getBalance() {
