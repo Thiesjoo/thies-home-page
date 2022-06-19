@@ -6,19 +6,22 @@ import router from "./router";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { faTwitch, faDiscord, faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { faTwitch, faDiscord, faSpotify, faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
 	faArrowRightFromBracket,
 	faBolt,
 	faLinkSlash,
 	faLock,
 	faPlus,
+	faRobot,
+	faScroll,
+	faServer,
 	faTrash,
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
-import { overwriteFetch } from "./helpers/auto-refresh-tokens";
+import "./helpers/auto-refresh-tokens";
 
 import { VueReCaptcha } from "vue-recaptcha-v3";
 
@@ -34,17 +37,16 @@ import { useUserStore } from "./store/user.store";
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 
-library.add(faTwitch, faSpotify, faDiscord);
+library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
+//Home page
+library.add(faRobot, faScroll, faServer);
 
 const app = createApp(App, { router });
 app.use(router);
 
 app.use(createPinia());
 app.use(Toast, {});
-
-// Pinia is now loaded, so we can use overwrite fetch
-overwriteFetch();
 
 // For more options see below
 app.use(VueReCaptcha, {

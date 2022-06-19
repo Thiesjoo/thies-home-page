@@ -8,6 +8,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { useLocalStorage } from "@vueuse/core";
+import axios from "axios";
 import { Base } from ".";
 
 export default defineComponent({
@@ -37,8 +38,8 @@ export default defineComponent({
 	},
 	methods: {
 		async getBalance() {
-			const fetchRes = await fetch("/api/external/via");
-			const res = await fetchRes.json();
+			const res = (await axios.get("/api/external/via", { baseURL: "/" })).data;
+
 			if (!res.balance) {
 				throw new Error("POS balance is non existent");
 			}

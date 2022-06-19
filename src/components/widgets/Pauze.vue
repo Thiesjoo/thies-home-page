@@ -33,6 +33,7 @@ import { defineComponent } from "@vue/runtime-core";
 import { Base } from "./";
 import { default as ms } from "ms";
 import { useLocalStorage } from "@vueuse/core";
+import axios from "axios";
 
 function pauseText() {
 	const t = new Date().getMinutes();
@@ -149,7 +150,7 @@ export default defineComponent({
 			this.loaded = this.text !== "";
 		}
 		try {
-			const fetchRes = await (await fetch("/api/external/rooster_parser")).json();
+			const fetchRes = (await axios.get("/api/external/rooster_parser", { baseURL: "/" })).data;
 			const unsorted = Object.values(fetchRes.data) as EventDatanose[];
 			unsorted.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 

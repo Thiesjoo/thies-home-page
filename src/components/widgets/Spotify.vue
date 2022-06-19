@@ -27,6 +27,7 @@ import { isProduction } from "@/helpers/envParser";
 import { CurrentlyPlaying, Track } from "@/helpers/types/spotify.api";
 import { defineComponent, ref } from "@vue/runtime-core";
 import { pausableFilter, RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
+import axios from "axios";
 import ms from "ms";
 import { Base } from "./";
 import errorCaptured from "./errorCaptured";
@@ -132,7 +133,7 @@ export default defineComponent({
 			this.pendingRequest = true;
 			try {
 				// TODO: Refresh interceptor for this
-				const spotifyFetch = await fetch("https://api.spotify.com/v1/me/player", {
+				const spotifyFetch = await axios.get("https://api.spotify.com/v1/me/player", {
 					headers: {
 						Authorization: "Bearer " + this.spotifyAccesstoken,
 						"Content-Type": "application/json",
@@ -146,7 +147,7 @@ export default defineComponent({
 				}
 				this.loaded = true;
 
-				const spotifyResult = await spotifyFetch.json();
+				const spotifyResult = spotifyFetch.data;
 				if (spotifyResult.error) {
 					clearInterval(this.playerLoopInterval);
 					throw new Error(spotifyResult);
@@ -165,8 +166,8 @@ export default defineComponent({
 			}
 		},
 		async getAccesstoken() {
-			const fetchRes = await fetch("/api/external/spotify");
-			const res = await fetchRes.json();
+			const fetchRes = await axios.get("/api/external/spotify", { baseURL: "/" });
+			const res = fetchRes.data;
 
 			if (!res?.data?.accesstoken) {
 				throw new Error("Coulnd't fetch spotify credentials");
