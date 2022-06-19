@@ -152,8 +152,7 @@ export default defineComponent({
 </script>
 <style>
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial,
-		sans-serif !important;
+	font-family: sans-serif;
 	text-shadow: 0 1px 5px rgb(0 0 0 / 10%);
 	color: #fff;
 	overflow: hidden;
