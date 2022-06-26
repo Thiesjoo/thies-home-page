@@ -39,6 +39,7 @@ export const useUserStore = defineStore("user", {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
 			accessToken: useLocalStorage("accessToken", ""),
+			refreshToken: useLocalStorage("refreshToken", ""),
 		};
 	},
 
@@ -103,17 +104,10 @@ export const useUserStore = defineStore("user", {
 					}) as Widget[];
 				}
 			} catch (e) {
-				// if (e instanceof Interrupted) {
-				// 	console.error("Request was interrupted, not modifying state");
-				// 	this.loading.userdata = false;
-				// 	return;
-				// }
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
+				this.$reset();
 				window.localStorage.clear();
-				this.loggedIn = false;
-				this.user = null;
-				this.accessToken = "";
 			}
 
 			this.loading.userdata = false;
@@ -125,13 +119,8 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			this.$reset();
 			window.localStorage.clear();
-
-			this.loggedIn = false;
-			this.user = null;
-			this.accessToken = "";
-			this.loading.form = false;
-			this.loading.userdata = false;
 		},
 
 		async login(data: LoginInformation) {
@@ -140,6 +129,7 @@ export const useUserStore = defineStore("user", {
 			try {
 				const tokens = await loginService.login(data);
 				this.accessToken = tokens.access;
+				this.refreshToken = tokens.refresh;
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");

@@ -43,7 +43,8 @@ axios.interceptors.request.use((request) => {
 		request.headers = {};
 	}
 
-	if (!request.headers["Authorization"] && userStore.accessToken) {
+	// Do not include auth headers when refreshing tokens
+	if (!request.url?.includes("access") && !request.headers["Authorization"] && userStore.accessToken) {
 		request.headers["Authorization"] = `Bearer ${userStore.accessToken}`;
 	}
 
