@@ -1,6 +1,7 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
 		<span>Username: {{ user.user?.name }}</span>
+		<span>Email: {{ user.user?.email }}</span>
 
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
@@ -42,13 +43,14 @@
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show version modal in bottom right</span>
 		</label>
 
-		<div class="flex flex-col items-center justify-center w-9/12 text-sm">
+		<div class="flex flex-col items-center justify-center w-9/12 text-sm pt-5">
+			<h3>Link a new account</h3>
 			<div class="flex flex-row items-stretch py-5">
 				<div class="flex flex-col items-center" v-for="item in oauthApps">
 					<a
 						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
-						:style="{ 'background-color': LightenDarkenColor(item.color, canUnlink(item.name) ? -35 : 0) }"
-						:class="{ disabled: canUnlink(item.name) }"
+						:style="{ 'background-color': LightenDarkenColor(item.color, canAddExtraAccount(item.name) ? -35 : 0) }"
+						:class="{ disabled: canAddExtraAccount(item.name), 'text-red-500': canAddExtraAccount(item.name) }"
 						:href="getURL(item.name)"
 						target="_blank"
 						rel="noopener noreferrer"
@@ -56,16 +58,6 @@
 						<font-awesome-icon :icon="[`fab`, `${item.name.toLowerCase()}`]" class="mr-2" />
 						{{ item.name }}
 					</a>
-					<!-- TODO: Implement listing of all providers here -->
-					<!-- :href="getDeleteURL(item.name)" -->
-					<a
-						class="text-red-500 no-underline pt-2 flex flex-row justify-center items-center"
-						target="_blank"
-						rel="noopener noreferrer"
-						v-if="canUnlink(item.name)"
-					>
-						<font-awesome-icon :icon="[`fas`, `link-slash`]" size="sm" class="mr-2" /> unlink</a
-					>
 				</div>
 			</div>
 			<div class="flex items-center w-full">
@@ -168,17 +160,12 @@ export default defineComponent({
 			}
 			return `${getBaseURL()}/auth/${name.toLowerCase()}/login`;
 		},
-		getDeleteURL(name: string, id: string) {
-			if (name == "POS") {
-				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
-			}
-			return `${getBaseURL()}/api/providers/me/${name.toLowerCase()}/${id}`;
-		},
-		canUnlink(name: string) {
+		canAddExtraAccount(name: string) {
 			name = name.toLowerCase();
-			return !!this.user.user?.settings.widgetsAvailable.find(
-				(x) => x.name === name || (name === "pos" && x.name === "VIA")
-			);
+			if (name === "pos") {
+				return !!this.user.user?.settings.widgetsAvailable.find((x) => x.name === "VIA");
+			}
+			return !true;
 		},
 	},
 });

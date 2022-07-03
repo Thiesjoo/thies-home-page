@@ -1,5 +1,4 @@
 import { ValidComponentNames } from "@/components/widgets";
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
@@ -21,6 +20,7 @@ export type Widget = {
 
 export type User = {
 	name: string;
+	email: string;
 	settings: {
 		showSeconds: boolean;
 		showDate: boolean;
@@ -53,13 +53,14 @@ export const useUserStore = defineStore("user", {
 			this.loading.userdata = true;
 
 			try {
-				const res = (await axios.get("/api/whoami", { baseURL: "/" })).data;
+				const res = (await axios.get("/api/users/me")).data;
 				if (!this.user) {
 					// Default user data for testing
 					this.user = {
 						name: "",
+						email: "",
 						settings: {
-							showDate: true,
+							showDate: false,
 							showSeconds: true,
 							showVersion: false,
 							widgets: {
@@ -73,6 +74,7 @@ export const useUserStore = defineStore("user", {
 					};
 				}
 				this.user.name = res.name;
+				this.user.email = res.email;
 
 				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
