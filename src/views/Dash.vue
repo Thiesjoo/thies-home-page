@@ -3,7 +3,7 @@
 		v-if="user.loading.form || user.loading.userdata"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
-	<div class="background"></div>
+	<div class="background" :style="{ backgroundImage: background }"></div>
 
 	<div class="centered">
 		<div class="info">
@@ -125,6 +125,11 @@ export default defineComponent({
 		name(): string {
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
+		background(): string {
+			const url = this.user.user?.settings.background || "https://source.unsplash.com/random/1920x1080/?landscape";
+
+			return `url("${url}")`;
+		},
 	},
 	methods: {
 		generateKey,
@@ -159,8 +164,7 @@ body {
 }
 
 .background {
-	background: url("https://source.unsplash.com/random/1920x1080/?landscape"),
-		linear-gradient(to right, #74ebd5 0%, #9face6 100%);
+	background: linear-gradient(to right, #74ebd5 0%, #9face6 100%);
 	position: absolute;
 
 	-webkit-backface-visibility: hidden;

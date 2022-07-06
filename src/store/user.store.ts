@@ -25,6 +25,7 @@ export type User = {
 		showSeconds: boolean;
 		showDate: boolean;
 		showVersion: boolean;
+		background: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
 	};
@@ -53,7 +54,9 @@ export const useUserStore = defineStore("user", {
 			this.loading.userdata = true;
 
 			try {
-				const res = (await axios.get("/api/users/me")).data;
+				const userInformation = (await axios.get("/api/users/me")).data;
+				const userSettings = (await axios.get("/api/settings/me")).data;
+				console.log("Got user data: ", userInformation, "and settings: ", userSettings);
 				if (!this.user) {
 					// Default user data for testing
 					this.user = {
@@ -63,6 +66,7 @@ export const useUserStore = defineStore("user", {
 							showDate: false,
 							showSeconds: true,
 							showVersion: false,
+							background: "",
 							widgets: {
 								topleft: [],
 								topright: [{ name: "VIA", id: "pos" }],
@@ -73,8 +77,9 @@ export const useUserStore = defineStore("user", {
 						},
 					};
 				}
-				this.user.name = res.name;
-				this.user.email = res.email;
+				this.user.name = userInformation.name;
+				this.user.email = userInformation.email;
+				this.user.settings.background = userSettings.backgroundURL || "";
 
 				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {

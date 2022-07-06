@@ -21,7 +21,11 @@ const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => 
 		failedRequest.response.config.headers["Authorization"] = "Bearer " + tokenRefreshResponse.data.token;
 		return await Promise.resolve();
 	} catch (e) {
-		console.error(e);
+		console.error("WIPING USER STATE BECAUSE REFRESH WENT WRONG: ", e);
+		const userStore = useUserStore();
+		window.localStorage.clear();
+		userStore.$reset();
+		console.log(userStore.user);
 		throw e;
 	}
 };
@@ -32,7 +36,11 @@ createAuthRefreshInterceptor(axios, refreshAuthLogic, {
 		// 401, but not on "local/login"
 		return (
 			error.response?.status === 401 &&
-			!(!!error.config.url?.includes("local/login") || !!error.config.url?.includes("local/register"))
+			!(
+				!!error.config.url?.includes("local/login") ||
+				!!error.config.url?.includes("local/register") ||
+				!!error.config.url?.includes("via")
+			)
 		);
 	},
 });
@@ -48,6 +56,9 @@ axios.interceptors.request.use((request) => {
 		request.headers["Authorization"] = `Bearer ${userStore.accessToken}`;
 	}
 
+	request.headers["pragma"] = "no-cache";
+	request.headers["cache-control"] = "no-cache";
+
 	return request;
 });
 
@@ -61,7 +72,8 @@ axios.interceptors.response.use(
 );
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = getBaseURL();
+// THis is done in main.ts
+// axios.defaults.baseURL = getBaseURL();
 
 //TODO: network error interceptor
 //TODO: Spotify accesstoken expiry error
