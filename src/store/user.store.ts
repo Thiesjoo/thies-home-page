@@ -1,5 +1,4 @@
 import { ValidComponentNames } from "@/components/widgets";
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
@@ -21,10 +20,12 @@ export type Widget = {
 
 export type User = {
 	name: string;
+	email: string;
 	settings: {
 		showSeconds: boolean;
 		showDate: boolean;
 		showVersion: boolean;
+		background: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
 	};
@@ -53,15 +54,19 @@ export const useUserStore = defineStore("user", {
 			this.loading.userdata = true;
 
 			try {
-				const res = (await axios.get("/api/whoami", { baseURL: "/" })).data;
+				const userInformation = (await axios.get("/api/users/me")).data;
+				const userSettings = (await axios.get("/api/settings/me")).data;
+				console.log("Got user data: ", userInformation, "and settings: ", userSettings);
 				if (!this.user) {
 					// Default user data for testing
 					this.user = {
 						name: "",
+						email: "",
 						settings: {
-							showDate: true,
+							showDate: false,
 							showSeconds: true,
 							showVersion: false,
+							background: "",
 							widgets: {
 								topleft: [],
 								topright: [{ name: "VIA", id: "pos" }],
@@ -72,7 +77,9 @@ export const useUserStore = defineStore("user", {
 						},
 					};
 				}
-				this.user.name = res.name;
+				this.user.name = userInformation.name;
+				this.user.email = userInformation.email;
+				this.user.settings.background = userSettings.backgroundURL || "";
 
 				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
