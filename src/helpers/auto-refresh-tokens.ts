@@ -56,8 +56,11 @@ axios.interceptors.request.use((request) => {
 		request.headers["Authorization"] = `Bearer ${userStore.accessToken}`;
 	}
 
-	request.headers["pragma"] = "no-cache";
-	request.headers["cache-control"] = "no-cache";
+	// Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
+	if (request.url?.includes("thies.dev")) {
+		request.headers["pragma"] = "no-cache";
+		request.headers["cache-control"] = "no-cache";
+	}
 
 	return request;
 });
