@@ -4,8 +4,8 @@
 			v-if="preview"
 			class="absolute w-[300px] top-[10px] ml-[-100px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[100]"
 		>
-			<span class="font-extrabold"> PREVIEW </span>
-			<span class="text-xs">{{ version }}</span>
+			<span class="font-extrabold text-sm"> {{ version }} </span>
+			<span class="text-xs">{{ gitSHA }}</span>
 		</div>
 		<header class="header" v-if="show">
 			<div class="container">
@@ -42,7 +42,8 @@ export default defineComponent({
 			return header === undefined ? false : header;
 		},
 		preview: () => !isProduction(),
-		version: () => window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7),
+		gitSHA: () => window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7),
+		version: () => window.env.VUE_APP_VERCEL_ENV.toUpperCase(),
 	},
 	watch: {
 		$route: {
