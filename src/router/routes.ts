@@ -36,4 +36,10 @@ export const routes = [
 		component: () => import(/* webpackChunkName: "newtab" */ "../views/Dash.vue"),
 		exclude: true,
 	},
+	// {
+	// 	path: "/external",
+	// 	name: "External Login",
+	// 	component: () => import(/* webpackChunkName: "external" */ "../views/External.vue"),
+	// 	exclude: true,
+	// },
 ];
