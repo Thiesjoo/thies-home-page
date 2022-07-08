@@ -57,7 +57,8 @@ axios.interceptors.request.use((request) => {
 	}
 
 	// Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
-	if (request.url?.includes("thies.dev")) {
+	if (request.url?.includes("thies.dev") || request.baseURL?.includes("thies.dev")) {
+		console.info("Including anti-caching header because CORS and Vercel and multiple domains do not work together");
 		request.headers["pragma"] = "no-cache";
 		request.headers["cache-control"] = "no-cache";
 	}
@@ -75,8 +76,6 @@ axios.interceptors.response.use(
 );
 
 axios.defaults.withCredentials = true;
-// THis is done in main.ts
-// axios.defaults.baseURL = getBaseURL();
 
 //TODO: network error interceptor
 //TODO: Spotify accesstoken expiry error
