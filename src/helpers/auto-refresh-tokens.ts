@@ -57,7 +57,10 @@ axios.interceptors.request.use((request) => {
 	}
 
 	// Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
-	if (request.url?.includes("thies.dev") || request.baseURL?.includes("thies.dev")) {
+	if (
+		request.url?.includes("thies.dev") ||
+		(request.baseURL?.includes("thies.dev") && !request.url?.includes("http"))
+	) {
 		console.info("Including anti-caching header because CORS and Vercel and multiple domains do not work together");
 		request.headers["pragma"] = "no-cache";
 		request.headers["cache-control"] = "no-cache";
