@@ -103,7 +103,7 @@ export default defineComponent({
 		percentage(): number {
 			this.refreshKey;
 
-			return this.track ? (this.localProgress / (this.track.item?.duration_ms || 0)) * 100 : 0;
+			return this.track ? Math.min((this.localProgress / (this.track.item?.duration_ms || 0)) * 100, 100) : 0;
 		},
 		imageURL(): string {
 			this.refreshKey;
