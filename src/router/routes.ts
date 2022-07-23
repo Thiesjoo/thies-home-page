@@ -1,4 +1,15 @@
-export const routes = [
+import { RouteRecordRaw } from "vue-router";
+
+export type Route = RouteRecordRaw & {
+	meta?: {
+		/** Should the header be shown on this page. Default: false */
+		header?: boolean;
+	};
+	/** Should this route be shown in the header */
+	exclude?: boolean;
+};
+
+export const routes: Route[] = [
 	{
 		path: "/",
 		name: "About me!",
@@ -34,6 +45,12 @@ export const routes = [
 		path: "/home",
 		name: "New tab",
 		component: () => import(/* webpackChunkName: "newtab" */ "../views/Dash.vue"),
+		exclude: true,
+	},
+	{
+		path: "/login",
+		name: "Login",
+		component: () => import(/* webpackChunkName: "login" */ "../views/Login.vue"),
 		exclude: true,
 	},
 ];
