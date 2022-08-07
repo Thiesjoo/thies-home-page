@@ -40,7 +40,7 @@ export default defineComponent({
 		async getBalance() {
 			const res = (await axios.get("/api/external/via", { baseURL: "/" })).data;
 
-			if (!res.balance) {
+			if (!res.hasOwnProperty("balance")) {
 				throw new Error("POS balance is non existent");
 			}
 

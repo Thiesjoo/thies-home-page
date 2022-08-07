@@ -126,9 +126,9 @@ export default defineComponent({
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
 		background(): string {
-			const url = this.user.user?.settings.background || "https://source.unsplash.com/random/1920x1080/?landscape";
+			const url = this.user.user?.settings.background;
 
-			return `url("${url}")`;
+			return (url ? `url("${url}"),` : "") + `url("https://source.unsplash.com/random/1920x1080/?landscape")`;
 		},
 	},
 	methods: {
