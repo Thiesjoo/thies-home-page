@@ -74,7 +74,7 @@ export default defineComponent({
 	},
 	data(): {
 		pauzeText: string;
-		interval: number | null;
+		interval: ReturnType<typeof setInterval> | null;
 		inLesson: boolean;
 		inTime: string | null;
 		withSlack: boolean;

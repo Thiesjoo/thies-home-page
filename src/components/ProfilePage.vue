@@ -1,6 +1,10 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
 		<button class="p-10" @click="registerNewToken">WEBAUTHN TRIGGER</button>
+		<input type="text" autocomplete="webauthn" placeholder="Webauth autofill?" />
+
+		<button class="p-10" @click="() => loginWithWebAuth(false)">login trigger TRIGGER</button>
+
 		<span>Username: {{ user.user?.name }}</span>
 		<span>Email: {{ user.user?.email }}</span>
 
@@ -100,7 +104,7 @@
 </template>
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
-import { registerNewToken } from "@/helpers/webauthn";
+import { loginWithWebAuth, registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 
@@ -132,6 +136,7 @@ export default defineComponent({
 	},
 	methods: {
 		registerNewToken,
+		loginWithWebAuth,
 		async logout() {
 			this.user.logout();
 		},
@@ -170,6 +175,9 @@ export default defineComponent({
 			}
 			return !true;
 		},
+	},
+	mounted() {
+		// loginWithWebAuth(true);
 	},
 });
 </script>

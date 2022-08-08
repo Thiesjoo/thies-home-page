@@ -1,34 +1,23 @@
-import { startRegistration } from "@simplewebauthn/browser";
+import { startAuthentication, startRegistration } from "@simplewebauthn/browser";
+import axios from "axios";
+import { decode } from "base64-arraybuffer";
 
 export async function registerNewToken() {
-	console.log("hmmm");
-	const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-		challenge: Uint8Array.from("hmmmmmmm", (c) => c.charCodeAt(0)),
-		rp: {
-			name: "Authorium",
-			// id: "thies.dev",
-		},
-		user: {
-			id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
-			name: "lee@webauthn.guide",
-			displayName: "Lee",
-		},
-		pubKeyCredParams: [
-			//https://chromium.googlesource.com/chromium/src/+/master/content/browser/webauth/pub_key_cred_params.md
-			{ alg: -7, type: "public-key" },
-			{ alg: -257, type: "public-key" },
-		],
-		authenticatorSelection: {
-			authenticatorAttachment: "cross-platform",
-			userVerification: "required", //TODO: This is auth so maybe required:https://developers.yubico.com/WebAuthn/WebAuthn_Developer_Guide/User_Presence_vs_User_Verification.html
-		},
-		timeout: 60000,
-		attestation: "direct",
-	};
+	// GET registration options from the endpoint that calls
+	// @simplewebauthn/server -> generateRegistrationOptions()
+	const resp = await axios.get("/auth/webauthn/generate-registration-options");
+	let attResp;
+	try {
+		// Pass the options to the authenticator and wait for a response
+		attResp = await startRegistration(resp.data);
+	} catch (error) {
+		throw error;
+	}
 
-	const credential = await navigator.credentials.create({
-		publicKey: publicKeyCredentialCreationOptions,
-	});
+	// POST the response to the endpoint that calls
+	// @simplewebauthn/server -> verifyRegistrationResponse()
+	const verificationResp = await axios.post("/auth/webauthn/verify-registration", attResp);
 
-	console.log(credential);
+	// Wait for the results of verification
+	console.log(verificationResp);
 }

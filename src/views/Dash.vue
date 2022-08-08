@@ -104,7 +104,7 @@ function getGreeting() {
 export default defineComponent({
 	data() {
 		return {
-			interval: null as number | null,
+			interval: null as ReturnType<typeof setInterval> | null,
 			date: getCurrentDate(),
 			time: getCurrentTime(),
 			seconds: getSeconds(),

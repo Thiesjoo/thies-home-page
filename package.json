@@ -21,6 +21,7 @@
 		"@vueuse/core": "^8.6.0",
 		"axios": "^0.27.2",
 		"axios-auth-refresh": "^3.3.1",
+		"base64-arraybuffer": "^1.0.2",
 		"chokidar": "^3.5.2",
 		"core-js": "^3.20.1",
 		"date-fns": "^2.27.0",
@@ -35,6 +36,7 @@
 		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
+		"@simplewebauthn/typescript-types": "^5.4.0",
 		"@types/tmi.js": "^1.8.1",
 		"@vitejs/plugin-vue": "^2.0.1",
 		"@vue/cli-plugin-typescript": "^5.0.4",
