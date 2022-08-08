@@ -39,6 +39,7 @@ createAuthRefreshInterceptor(axios, refreshAuthLogic, {
 			!(
 				!!error.config.url?.includes("local/login") ||
 				!!error.config.url?.includes("local/register") ||
+				!!error.config.url?.includes("authentication") ||
 				!!error.config.url?.includes("via")
 			)
 		);

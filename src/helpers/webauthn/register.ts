@@ -19,5 +19,5 @@ export async function registerNewToken() {
 	const verificationResp = await axios.post("/auth/webauthn/verify-registration", attResp);
 
 	// Wait for the results of verification
-	console.log(verificationResp);
+	console.log("Verified token: ", verificationResp);
 }

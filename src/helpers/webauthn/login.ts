@@ -1,17 +1,28 @@
 import { startAuthentication } from "@simplewebauthn/browser";
 import axios from "axios";
+import { toastInjectionKey, useToast } from "vue-toastification";
 
 export async function loginWithWebAuth(autofill = false) {
-	const resp = await axios.get("/auth/webauthn/generate-authentication-options");
+	const toast = useToast();
+	try {
+		const resp = await axios.get("/auth/webauthn/generate-authentication-options");
+		const authResult = await startAuthentication(resp.data, autofill);
 
-	// resp.data.allowCredentials = resp.data.allowCredentials.map((x: any) => {
-	// 	return {
-	// 		...x,
-	// 		id: decode(x.id),
-	// 	};
-	// });
+		console.log("Auth result: ", authResult);
 
-	const authResult = await startAuthentication(resp.data, autofill);
+		const authResp = await axios.post("/auth/webauthn/verify-authentication", {
+			// We send the challenge we signed back: https://antony.cloud/posts/en/webauthn/`
+			challenge: resp.data.challenge,
+			...authResult,
+		});
 
-	console.log(authResult);
+		if (authResp.data) {
+			toast.success("Got data from authenticator");
+		} else {
+			throw new Error(authResp.data);
+		}
+	} catch (e) {
+		console.error(e);
+		toast.error("Something went wrong!");
+	}
 }
