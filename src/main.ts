@@ -61,6 +61,10 @@ clickOutsideDirective(app);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
 
+if (/\blinux\b/i.test(navigator.userAgent)) {
+	document.body.className += " linux";
+}
+
 app.mount("#app");
 
 // Update userdata!
