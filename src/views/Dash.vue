@@ -8,7 +8,7 @@
 	<div class="centered">
 		<div class="info">
 			<div class="flex items-center justify-center">
-				<span class="seconds absolute text-neutral-200" v-if="true || user.user?.settings?.showSeconds"
+				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds"
 					>{{ seconds }}
 				</span>
 				<!-- TODO: on 11:00 the seconds get off centered -->
