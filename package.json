@@ -4,7 +4,7 @@
 	"description": "This is the main page for [thies.dev](https://thies.dev)",
 	"author": "Thies Nieborg",
 	"scripts": {
-		"serve": "vue-cli-service serve",
+		"serve": "vue-cli-service serve --public https://laptop.thies.dev",
 		"build": "vue-cli-service build",
 		"inst": "npm ci && cd api/ && npm ci",
 		"start": "vercel dev",

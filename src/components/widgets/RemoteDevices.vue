@@ -1,7 +1,7 @@
 <template>
 	<Base :loaded="true">
 		<template #content>
-			<div v-for="device in devices">{{ device.id }}</div>
+			<div v-for="device in devices">{{ device.name }} - {{ device.battery }}</div>
 		</template>
 	</Base>
 </template>
@@ -13,19 +13,19 @@ import { Base } from ".";
 
 export default defineComponent({
 	data() {
-		return { devices: [] as { id: string }[] };
+		return { devices: [] as { [key: string]: any }[] };
 	},
 	methods: {
 		async getUpdatedDevices() {
 			const res = (
-				await axios.get("https://windows.thies.dev/output/devices/summary", {
+				await axios.get("https://customdash.thies.dev/output/summary", {
 					headers: {
 						Authorization: "Bearer",
 					},
 				})
 			).data;
 			console.log(res);
-			return [{ id: "test" }];
+			return res.summary;
 		},
 	},
 	async mounted() {
