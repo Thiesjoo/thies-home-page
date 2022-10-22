@@ -1,3 +1,8 @@
+//@ts-ignore This constant is inserted by webpack in vue.config.js
+window.env = ENV;
+window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
+window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development	";
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
@@ -10,13 +15,22 @@ import { faTwitch, faDiscord, faSpotify, faGithub } from "@fortawesome/free-bran
 import {
 	faArrowRightFromBracket,
 	faBolt,
+	faDesktop,
+	faEthernet,
+	faHourglass,
+	faLaptop,
 	faLinkSlash,
 	faLock,
+	faMobile,
+	faPhone,
+	faPlaneUp,
 	faPlus,
 	faRobot,
 	faScroll,
 	faServer,
+	faSignal,
 	faTrash,
+	faWifi,
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -34,18 +48,15 @@ import "vue-toastification/dist/index.css";
 import { useUserStore } from "./store/user.store";
 import { getBaseURL } from "./helpers/auto-refresh-tokens";
 
-//@ts-ignore This constant is inserted by webpack in vue.config.js
-window.env = ENV;
-window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
-window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development	";
-
 import axios from "axios";
 axios.defaults.baseURL = getBaseURL();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
 //Home page
-library.add(faRobot, faScroll, faServer);
+library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
+
+library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass);
 
 const app = createApp(App, { router });
 app.use(router);
