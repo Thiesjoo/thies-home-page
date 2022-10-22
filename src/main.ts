@@ -37,6 +37,7 @@ import { getBaseURL } from "./helpers/auto-refresh-tokens";
 //@ts-ignore This constant is inserted by webpack in vue.config.js
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
+window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development	";
 
 import axios from "axios";
 axios.defaults.baseURL = getBaseURL();
