@@ -137,7 +137,7 @@ export default defineComponent({
 			return device.battery !== undefined;
 		},
 		async getUpdatedDevices() {
-			if (true) {
+			if (window.env.VUE_APP_VERCEL_ENV === "development") {
 				return {
 					summary: [
 						{
