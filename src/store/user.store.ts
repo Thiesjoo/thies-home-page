@@ -10,10 +10,10 @@ const toast = useToast();
 // Default widgets are widgets that are available for everyone
 export const DEFAULT_WIDGETS = ["Battery", "Pauze"];
 
-if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
-	DEFAULT_WIDGETS.push("Dummy");
-	DEFAULT_WIDGETS.push("RemoteDevices");
-}
+// if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
+// 	DEFAULT_WIDGETS.push("Dummy");
+// 	DEFAULT_WIDGETS.push("RemoteDevices");
+// }
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
