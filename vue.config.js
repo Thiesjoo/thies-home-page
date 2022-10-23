@@ -5,8 +5,8 @@ const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 module.exports = {
   configureWebpack: {
     plugins: [new CspHtmlWebpackPlugin({
-      'script-src': ["'self'", "'https://static.cloudflareinsights.com/'"],
-      'style-src': ["'self'"],
+      'script-src': ["'self'", "https://static.cloudflareinsights.com", "https://challenges.cloudflare.com", "https://www.google.com/"],
+      'style-src': ["'self'", "'unsafe-inline'", "ttps://fonts.googleapis.com"],
     }, {
       enabled: process.env.NODE_ENV === 'production',
     })],
