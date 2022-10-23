@@ -7,6 +7,7 @@ module.exports = {
     plugins: [new CspHtmlWebpackPlugin({
       'script-src': ["'self'", "https://static.cloudflareinsights.com", "https://challenges.cloudflare.com", "https://www.google.com/"],
       'style-src': ["'self'", "'unsafe-inline'", "ttps://fonts.googleapis.com"],
+      'frame-ancestors': ["'self'"],
     }, {
       enabled: process.env.NODE_ENV === 'production',
     })],
