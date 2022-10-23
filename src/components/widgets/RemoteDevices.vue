@@ -143,7 +143,7 @@ export default defineComponent({
 						{
 							type: "laptop",
 							name: "thies-zenbook",
-							id: "ce4edc9f-616b-3d4e-80eb-f87abb1b00c0",
+							id: "test",
 							uptime: 2390.19,
 							upsince: 1665662516,
 							battery: 37,
@@ -152,8 +152,8 @@ export default defineComponent({
 								interval: 5116,
 								up: 2450.76892350709,
 								down: 1773.7167964849211,
-								ip4: "145.109.21.248",
-								ip6: "fe80::e9fc:de49:ef92:58e2",
+								ip4: "-",
+								ip6: "-",
 								type: "wifi",
 								extraInfo: "eduroam [e185fa14] (null)",
 								dateReceived: 1665666851741,
@@ -161,11 +161,11 @@ export default defineComponent({
 							connected: false,
 							lastConnected: {
 								time: 1665666570337,
-								ip: "145.109.21.248",
+								ip: "-",
 								location: {
 									age: 1665666570337,
-									lat: "52.38240",
-									lon: "4.89950",
+									lat: "-",
+									lon: "-",
 								},
 							},
 							dateReceived: 1665666857141,
@@ -184,22 +184,22 @@ export default defineComponent({
 								up: 0,
 								down: 0,
 								type: "wifi",
-								extraInfo: "Circustent_5GHz -70",
+								extraInfo: "- -70",
 							},
 							connected: false,
 							lastConnected: {
 								time: 1666443462711,
 								ip: "fe80::1b32:cb0e:5db4:a611",
 								location: {
-									lat: "52.3419651",
-									lon: "4.9725862",
+									lat: "-",
+									lon: "-",
 									age: 1666446326000,
 								},
 							},
 						},
 					],
 					livedata: {
-						"ce4edc9f-616b-3d4e-80eb-f87abb1b00c0": {
+						"-": {
 							battery: {
 								interval: 5029,
 								currentCapacity: 28472,
@@ -213,8 +213,8 @@ export default defineComponent({
 								interval: 5116,
 								up: 2450.76892350709,
 								down: 1773.7167964849211,
-								ip4: "145.109.21.248",
-								ip6: "fe80::e9fc:de49:ef92:58e2",
+								ip4: "-",
+								ip6: "-",
 								type: "wifi",
 								extraInfo: "eduroam [e185fa14] (null)",
 								dateReceived: 1665666851741,
@@ -227,7 +227,7 @@ export default defineComponent({
 								up: 0,
 								down: 0,
 								type: "wifi",
-								extraInfo: "Circustent_5GHz -70",
+								extraInfo: "- -70",
 							},
 							bluetooth: {
 								scanning: true,
@@ -246,8 +246,8 @@ export default defineComponent({
 									time: 1666443462711,
 									ip: "fe80::1b32:cb0e:5db4:a611",
 									location: {
-										lat: "52.3419651",
-										lon: "4.9725862",
+										lat: "-",
+										lon: "-",
 										age: 1666446326000,
 									},
 								},
@@ -256,10 +256,10 @@ export default defineComponent({
 						},
 					},
 					names: {
-						"ce4edc9f-616b-3d4e-80eb-f87abb1b00c0": {
+						"-": {
 							type: "laptop",
 							os: {
-								guid: "ce4edc9f-616b-3d4e-80eb-f87abb1b00c0",
+								guid: "-",
 								hostname: "thies-zenbook",
 								arch: "x64",
 								distro: "Ubuntu",
