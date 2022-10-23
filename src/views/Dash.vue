@@ -8,10 +8,7 @@
 	<div class="centered">
 		<div class="info">
 			<div class="flex items-center justify-center">
-				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds"
-					>{{ seconds }}
-				</span>
-				<!-- TODO: on 11:00 the seconds get off centered -->
+				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds">{{ seconds }} </span>
 				<h2 class="time">{{ time }}</h2>
 			</div>
 			<span class="date text-neutral-200" v-if="user.user?.settings?.showDate">{{ date }}</span>
