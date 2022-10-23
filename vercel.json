@@ -12,16 +12,8 @@
 					"value": "frame-ancestors https://*.thies.dev chrome-extension://ghjlkdhcijpomopkolgnoejjkdbmhdci;"
 				},
 				{
-					"key": "X-XSS-Protection",
-					"value": "1; mode=block"
-				},
-				{
 					"key": "Referrer-Policy",
 					"value": "strict-origin"
-				},
-				{
-					"key": "Permissions-Policy",
-					"value": "geolocation=(self), microphone=()"
 				}
 			]
 		}
