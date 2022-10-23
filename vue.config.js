@@ -9,38 +9,17 @@ module.exports = {
       'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
     }, {
       enabled: process.env.NODE_ENV === 'production',
+      hashEnabled: {
+        'style-src': false,
+        'script-src': true,
+      },
+      nonceEnabled: {
+        'style-src': false,
+        'script-src': true,
+      },
     })],
   },
   chainWebpack: config => {
-    // config.plugin("html").tap(([options]) => {
-    //   console.log('test', options)
-
-    //   return [{
-    //     ...options,
-    //     cspPlugin: {
-    //       enabled: true,
-    //       // enabled: modeArgument === 'production',
-    //       hashEnabled: {
-    //         'script-src': true,
-    //         'style-src': false,
-    //       },
-    //       nonceEnabled: {
-    //         'script-src': true,
-    //         'style-src': false,
-    //       },
-    //       policy: {
-    //         'base-uri': "'self'",
-    //         'default-src': "'self'",
-    //         'frame-src': "'none'",
-    //         'img-src': ["'self'", 'data:'],
-    //         'media-src': "'none'",
-    //         'object-src': "'none'",
-    //         'script-src': ["'self'"],
-    //         'style-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-    //       },
-    //     },
-    //   }]
-    // })
     config.plugin('define').tap(([options = {}]) => {
       return [{
         ...options, // these are the env variables from your .env file, if any arr defined
