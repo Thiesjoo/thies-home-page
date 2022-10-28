@@ -131,6 +131,7 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			// TODO: This doesn't work
 			this.$reset();
 			window.localStorage.clear();
 		},
