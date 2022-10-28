@@ -47,6 +47,10 @@ createAuthRefreshInterceptor(axios, refreshAuthLogic, {
 });
 
 axios.interceptors.request.use((request) => {
+	// If you make changes to window api, you can also change every request after that
+	if (!request.baseURL) {
+		request.baseURL = getBaseURL();
+	}
 	const userStore = useUserStore();
 	if (!request.headers) {
 		request.headers = {};
