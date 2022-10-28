@@ -6,11 +6,24 @@ export async function registerNewToken() {
 	// GET registration options from the endpoint that calls
 	// @simplewebauthn/server -> generateRegistrationOptions()
 	const resp = await axios.get("/auth/webauthn/generate-registration-options");
+
+	let opts = resp.data;
+
+	opts.authenticatorSelection.residentKey = "required";
+	opts.authenticatorSelection.requireResidentKey = true;
+	opts.extensions = {
+		credProps: true,
+	};
+
+	console.log("Data from server combined with options: ", opts);
+
 	let attResp;
 	try {
 		// Pass the options to the authenticator and wait for a response
-		attResp = await startRegistration(resp.data);
+		attResp = await startRegistration(opts);
+		console.log("Got attresp: ", attResp);
 	} catch (error) {
+		console.error("Error inside registerNewToken", error);
 		throw error;
 	}
 

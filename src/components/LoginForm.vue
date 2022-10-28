@@ -21,6 +21,9 @@
 							/></div
 					></Transition>
 					<div>
+						<button class="p-10" @click="() => loginWithWebAuth(false)">Login with WebAuthN</button>
+					</div>
+					<div>
 						<label for="email-address" class="sr-only">Email address</label>
 						<input
 							v-model="email"
@@ -115,6 +118,7 @@
 	</div>
 </template>
 <script lang="ts">
+import { loginWithWebAuth } from "@/helpers/webauthn/login";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 
@@ -142,6 +146,7 @@ export default defineComponent({
 		return { login: useUserStore() };
 	},
 	methods: {
+		loginWithWebAuth,
 		async onSubmit(e: Event) {
 			e.preventDefault();
 			if (

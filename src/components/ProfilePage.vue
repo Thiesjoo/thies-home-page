@@ -1,9 +1,6 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
 		<button class="p-10" @click="registerNewToken">WEBAUTHN TRIGGER</button>
-		<input type="text" autocomplete="webauthn" placeholder="Webauth autofill?" />
-
-		<button class="p-10" @click="() => loginWithWebAuth(false)">login trigger TRIGGER</button>
 
 		<span>Username: {{ user.user?.name }}</span>
 		<span>Email: {{ user.user?.email }}</span>
