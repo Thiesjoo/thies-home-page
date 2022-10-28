@@ -1,11 +1,11 @@
-import { startAuthentication, startRegistration } from "@simplewebauthn/browser";
+import { startRegistration } from "@simplewebauthn/browser";
 import axios from "axios";
-import { decode } from "base64-arraybuffer";
+import { getBaseURL } from "../auto-refresh-tokens";
 
 export async function registerNewToken() {
 	// GET registration options from the endpoint that calls
 	// @simplewebauthn/server -> generateRegistrationOptions()
-	const resp = await axios.get("/auth/webauthn/generate-registration-options");
+	const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-registration-options");
 
 	let opts = resp.data;
 
@@ -29,7 +29,7 @@ export async function registerNewToken() {
 
 	// POST the response to the endpoint that calls
 	// @simplewebauthn/server -> verifyRegistrationResponse()
-	const verificationResp = await axios.post("/auth/webauthn/verify-registration", attResp);
+	const verificationResp = await axios.post(getBaseURL() + "/auth/webauthn/verify-registration", attResp);
 
 	// Wait for the results of verification
 	console.log("Verified token: ", verificationResp);
