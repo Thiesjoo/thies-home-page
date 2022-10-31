@@ -117,8 +117,10 @@ export const useUserStore = defineStore("user", {
 					}) as Widget[];
 				}
 			} catch (e) {
-				toast.error("Something went wrong with getting user data");
+				toast.warning("Please login again");
 				console.error(e);
+
+				window.localStorage.clear();
 				this.$reset();
 				window.localStorage.clear();
 			}
