@@ -1,7 +1,11 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
-		<button class="p-3" @click="() => registerNewToken(true, 'test')">Register new passkey</button>
-		<button class="p-3" @click="() => registerNewToken(true, 'test')">Register new passwordless key</button>
+		<button class="p-3" @click="() => registerNewToken(true, 'passkey')">
+			Register new passkey (Username on token)
+		</button>
+		<button class="p-3" @click="() => registerNewToken(false, 'passwordless')">
+			Register new passwordless key (Enter username on each login)
+		</button>
 
 		<span>Username: {{ user.user?.name }}</span>
 		<span>Email: {{ user.user?.email }}</span>
