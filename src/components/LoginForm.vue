@@ -20,36 +20,41 @@
 								placeholder="Your full name"
 							/></div
 					></Transition>
-					<div>
-						<button class="p-10" @click="() => loginWithWebAuth(false)">Login with WebAuthN</button>
-					</div>
-					<div>
-						<label for="email-address" class="sr-only">Email address</label>
-						<input
-							v-model="email"
-							type="email"
-							autocomplete="email"
-							required
-							autofocus
-							:class="{ 'rounded-t-md': renderLogin }"
-							class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-							placeholder="Email address"
-						/>
-					</div>
-					<div>
-						<label for="password" class="sr-only">Password</label>
-						<input
-							v-model="password"
-							type="password"
-							:autocomplete="renderLogin ? 'current-password' : 'new-password'"
-							required
-							pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
-							title="Password should be at least 8 letters, contain a number, small letter and capital letter"
-							class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-							:class="{ 'rounded-b-md': renderLogin }"
-							placeholder="Password"
-						/>
-					</div>
+					<Transition>
+						<div v-if="renderLogin && showWebauth">
+							<button class="p-10" @click="onWebauth">Login with WebAuthN</button>
+						</div></Transition
+					>
+					<Transition>
+						<div v-if="showEmail">
+							<label for="email-address" class="sr-only">Email address</label>
+							<input
+								v-model="email"
+								type="email"
+								autocomplete="email"
+								required
+								autofocus
+								:class="{ 'rounded-t-md': renderLogin, 'rounded-b-md': !showPassword }"
+								class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+								placeholder="Email address"
+							/>
+						</div>
+					</Transition>
+					<Transition>
+						<div v-if="showPassword">
+							<label for="password" class="sr-only">Password</label>
+							<input
+								v-model="password"
+								type="password"
+								:autocomplete="renderLogin ? 'current-password' : 'new-password'"
+								required
+								pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
+								title="Password should be at least 8 letters, contain a number, small letter and capital letter"
+								class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+								:class="{ 'rounded-b-md': renderLogin }"
+								placeholder="Password"
+							/></div
+					></Transition>
 					<Transition>
 						<div v-if="!renderLogin">
 							<label for="password" class="sr-only">Password confirmation</label>
@@ -121,6 +126,7 @@
 import { loginWithWebAuth } from "@/helpers/webauthn/login";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
+import { useToast } from "vue-toastification";
 
 // TODO: Implement social logins right here and link with accounts
 // Backend should have a pending user list?
@@ -140,21 +146,48 @@ export default defineComponent({
 			name: "",
 			error: "",
 			renderLogin: this.login,
+			webauthnPending: false,
 		};
 	},
 	setup() {
-		return { login: useUserStore() };
+		return { login: useUserStore(), toast: useToast() };
+	},
+	computed: {
+		showPassword() {
+			// If email is typed, and webauth is clicked hide it
+			// If webauth is selected hide both email and password
+			return !this.webauthnPending;
+		},
+		showEmail() {
+			return (this.email.length > 0 && this.webauthnPending) || !this.webauthnPending;
+		},
+		showWebauth() {
+			return !(this.email.length > 0 && this.password.length > 0 && !this.webauthnPending);
+		},
 	},
 	methods: {
-		loginWithWebAuth,
+		async onWebauth() {
+			this.webauthnPending = true;
+			this.error = "";
+			await this.$recaptchaLoaded();
+
+			// TODO: Here we should use a non resident key, to also support passwordlresss
+
+			if (this.email.length === 0) {
+				this.toast.warning("Trying to use a resident key to authenticate");
+				this.toast.error("Not implemented yet");
+			}
+			this.login.login(undefined, true);
+			try {
+				await loginWithWebAuth();
+			} catch (e: any) {
+				this.error = e?.message;
+			}
+			this.webauthnPending = false;
+		},
 		async onSubmit(e: Event) {
 			e.preventDefault();
-			if (
-				!this.email ||
-				!this.password ||
-				(!this.renderLogin && !this.passwordConfirm) ||
-				(!this.renderLogin && !this.name)
-			) {
+			if (!this.email || !this.password || (!this.renderLogin && (!this.passwordConfirm || !this.name))) {
 				return;
 			}
 			if (!this.renderLogin && this.password !== this.passwordConfirm) {
@@ -188,7 +221,7 @@ export default defineComponent({
 				}
 
 				try {
-					await this.login.login(body);
+					await this.login.login(body, false);
 				} catch (e: any) {
 					console.log(e);
 					this.error = e;

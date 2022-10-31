@@ -1,5 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
+import { loginWithWebAuth } from "@/helpers/webauthn";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import axios from "axios";
@@ -131,16 +132,23 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
-			// TODO: This doesn't work
-			this.$reset();
 			window.localStorage.clear();
+			this.$reset();
+
+			toast.warning("You have been logged out");
 		},
 
-		async login(data: LoginInformation) {
+		async login<W extends boolean>(data: W extends false ? LoginInformation : undefined, webauth: W) {
 			this.loading.form = true;
 			this.loggedIn = false;
 			try {
-				const tokens = await loginService.login(data);
+				let tokens: { access: string; refresh: string };
+				if (webauth) {
+					tokens = await loginWithWebAuth();
+				} else {
+					// @ts-ignore
+					tokens = await loginService.login(data);
+				}
 				this.accessToken = tokens.access;
 				this.refreshToken = tokens.refresh;
 

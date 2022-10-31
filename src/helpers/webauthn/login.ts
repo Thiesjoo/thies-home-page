@@ -19,11 +19,13 @@ export async function loginWithWebAuth(autofill = false) {
 
 		if (authResp.data) {
 			toast.success("Got data from authenticator");
+			return authResp.data as { access: string; refresh: string };
 		} else {
 			throw new Error(authResp.data);
 		}
 	} catch (e) {
 		console.error(e);
 		toast.error("Something went wrong!");
+		throw e;
 	}
 }
