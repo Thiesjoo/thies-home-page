@@ -185,12 +185,14 @@ export default defineComponent({
 			this.error = "";
 			await this.$recaptchaLoaded();
 
-			// TODO: Here we should use a non resident key, to also support passwordlresss
-
 			if (this.email.length === 0) {
 				this.toast.warning("Trying to use a resident key to authenticate");
+			} else {
+				// TODO: Here we should use a non resident key, to also support passwordlresss
 				this.toast.error("Not implemented yet");
+				throw new Error("Authenticating without a resident key is not supported yet.");
 			}
+
 			try {
 				this.login.login(undefined, true);
 			} catch (e: any) {
