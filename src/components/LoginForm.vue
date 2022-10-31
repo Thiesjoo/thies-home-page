@@ -191,9 +191,8 @@ export default defineComponent({
 				this.toast.warning("Trying to use a resident key to authenticate");
 				this.toast.error("Not implemented yet");
 			}
-			this.login.login(undefined, true);
 			try {
-				await loginWithWebAuth();
+				this.login.login(undefined, true);
 			} catch (e: any) {
 				this.error = e?.message;
 			}
