@@ -3,6 +3,23 @@ import axios from "axios";
 import { useToast } from "vue-toastification";
 import { getBaseURL } from "../auto-refresh-tokens";
 
+function toastOnCancel(e: any, toast: ReturnType<typeof useToast>) {
+	console.error(e);
+	if (e.message === "The operation was aborted.") {
+		toast.error("You cancelled the operation");
+
+		// Axios error
+	} else if (e.response) {
+		if (e.response.status === 0) {
+			toast.error("Server/you is not online");
+		} else {
+			toast.error("Something went wrong on the network");
+		}
+	} else {
+		toast.error("Something went wrong");
+	}
+}
+
 export async function loginWithEmailAndAuthenticator(email: string) {
 	const toast = useToast();
 	try {
@@ -11,15 +28,25 @@ export async function loginWithEmailAndAuthenticator(email: string) {
 				username: email,
 			},
 		});
-		console.log(resp);
-		// const authResult = await startAuthentication(resp.data, false);
+		const authResult = await startAuthentication(resp.data, false);
 
-		return { access: "granted", refresh: "granted" };
+		const authResp = await axios.request({
+			url: getBaseURL() + "/auth/webauthn/verify-authentication-user",
+			method: "POST",
+			data: {
+				username: email,
+				...authResult,
+			},
+		});
+
+		if (authResp.data) {
+			return authResp.data as { access: string; refresh: string };
+		} else {
+			throw new Error(authResp.data);
+		}
 	} catch (e) {
-		console.error(e);
-		// Check if user cancelled
-
-		// Check if user has no authenticator
+		// TODO: Check if user has no authenticator
+		toastOnCancel(e, toast);
 
 		throw e;
 	}
@@ -39,14 +66,12 @@ export async function loginWithPasskey() {
 		});
 
 		if (authResp.data) {
-			toast.success("Got data from authenticator");
 			return authResp.data as { access: string; refresh: string };
 		} else {
 			throw new Error(authResp.data);
 		}
 	} catch (e) {
-		console.error(e);
-		toast.error("Something went wrong!");
+		toastOnCancel(e, toast);
 		throw e;
 	}
 }
