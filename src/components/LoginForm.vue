@@ -20,11 +20,7 @@
 								placeholder="Your full name"
 							/></div
 					></Transition>
-					<Transition>
-						<div v-if="renderLogin && showWebauth">
-							<button class="p-10" @click="onWebauth">Login with WebAuthN</button>
-						</div></Transition
-					>
+
 					<Transition>
 						<div v-if="showEmail">
 							<label for="email-address" class="sr-only">Email address</label>
@@ -69,6 +65,24 @@
 								placeholder="Confirmation password"
 							/></div
 					></Transition>
+					<div v-if="renderLogin && showWebauth">
+						<Transition>
+							<div class="relative flex pt-5 pb-2 items-center w-full" v-if="!webauthnPending || showEmail">
+								<div class="flex-grow border-t border-gray-400 border-solid"></div>
+								<span class="flex-shrink mx-4 text-gray-400"
+									>Or use your fingerprint {{ !webauthnPending && email.length > 0 ? "for passwordless" : "" }}</span
+								>
+								<div class="flex-grow border-t border-gray-400 border-solid"></div></div></Transition
+						><Transition>
+							<div class="w-full flex justify-center mt-5">
+								<div
+									class="bg-fuchsia-800 rounded-full w-10 h-10 flex justify-center items-center text-center"
+									@click="onWebauth"
+								>
+									<font-awesome-icon :icon="['fas', 'fingerprint']" size="xl" class="mx-auto"></font-awesome-icon>
+								</div></div
+						></Transition>
+					</div>
 				</div>
 
 				<div class="flex items-center justify-between">
