@@ -137,7 +137,6 @@
 	</div>
 </template>
 <script lang="ts">
-import { loginWithWebAuth } from "@/helpers/webauthn/login";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
@@ -185,16 +184,14 @@ export default defineComponent({
 			this.error = "";
 			await this.$recaptchaLoaded();
 
-			if (this.email.length === 0) {
-				this.toast.warning("Trying to use a resident key to authenticate");
-			} else {
-				// TODO: Here we should use a non resident key, to also support passwordlresss
-				this.toast.error("Not implemented yet");
-				throw new Error("Authenticating without a resident key is not supported yet.");
-			}
+			// if (this.email.length === 0) {
+			// 	this.toast.info("Trying to store a credential with userid on your device.");
+			// } else {
+			// 	this.toast.info("Registering a new credential on your device.");
+			// }
 
 			try {
-				this.login.login(undefined, true);
+				this.login.loginWithWebauth(this.email);
 			} catch (e: any) {
 				this.error = e?.message;
 			}
@@ -236,9 +233,8 @@ export default defineComponent({
 				}
 
 				try {
-					await this.login.login(body, false);
+					await this.login.login(body);
 				} catch (e: any) {
-					console.log(e);
 					this.error = e;
 				}
 			} catch (e) {

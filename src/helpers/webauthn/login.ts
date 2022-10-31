@@ -3,16 +3,37 @@ import axios from "axios";
 import { useToast } from "vue-toastification";
 import { getBaseURL } from "../auto-refresh-tokens";
 
-export async function loginWithWebAuth(autofill = false) {
+export async function loginWithEmailAndAuthenticator(email: string) {
+	const toast = useToast();
+	try {
+		const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-authentication-options-user", {
+			params: {
+				username: email,
+			},
+		});
+		console.log(resp);
+		// const authResult = await startAuthentication(resp.data, false);
+
+		return { access: "granted", refresh: "granted" };
+	} catch (e) {
+		console.error(e);
+		// Check if user cancelled
+
+		// Check if user has no authenticator
+
+		throw e;
+	}
+}
+
+export async function loginWithPasskey() {
 	const toast = useToast();
 	try {
 		const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-authentication-options");
-		const authResult = await startAuthentication(resp.data, autofill);
+		const authResult = await startAuthentication(resp.data, false);
 
 		console.log("Auth result: ", authResult);
 
 		const authResp = await axios.post(getBaseURL() + "/auth/webauthn/verify-authentication", {
-			// We send the challenge we signed back: https://antony.cloud/posts/en/webauthn/`
 			challenge: resp.data.challenge,
 			...authResult,
 		});

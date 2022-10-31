@@ -1,6 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
-import { loginWithWebAuth } from "@/helpers/webauthn";
+import { loginWithEmailAndAuthenticator, loginWithPasskey } from "@/helpers/webauthn";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import axios from "axios";
@@ -138,17 +138,30 @@ export const useUserStore = defineStore("user", {
 			toast.warning("You have been logged out");
 		},
 
-		async login<W extends boolean>(data: W extends false ? LoginInformation : undefined, webauth: W) {
+		async loginWithWebauth(email: string) {
+			let tokens: { access: string; refresh: string };
+			if (email.length === 0) {
+				// Login with resident key
+				tokens = await loginWithPasskey();
+			} else {
+				//login with email
+				tokens = await loginWithEmailAndAuthenticator(email);
+			}
+
+			this.accessToken = tokens.access;
+			this.refreshToken = tokens.refresh;
+
+			this.loggedIn = true;
+			toast.success("Logged in!!");
+			this.getUserData();
+		},
+
+		async login(data: LoginInformation) {
 			this.loading.form = true;
 			this.loggedIn = false;
 			try {
-				let tokens: { access: string; refresh: string };
-				if (webauth) {
-					tokens = await loginWithWebAuth();
-				} else {
-					// @ts-ignore
-					tokens = await loginService.login(data);
-				}
+				let tokens: { access: string; refresh: string } = await loginService.login(data);
+
 				this.accessToken = tokens.access;
 				this.refreshToken = tokens.refresh;
 
@@ -156,6 +169,7 @@ export const useUserStore = defineStore("user", {
 				toast.success("Logged in!!");
 				this.getUserData();
 			} catch (e) {
+				console.warn("Login failed inside store: ", e);
 				toast.error("Something went wrong");
 				this.accessToken = "";
 				throw e;
