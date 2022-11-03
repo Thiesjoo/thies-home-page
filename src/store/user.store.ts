@@ -60,8 +60,8 @@ export const useUserStore = defineStore("user", {
 
 			try {
 				const userInformation = (await axios.get("/api/users/me")).data;
-				const userSettings = (await axios.get("/api/settings/me")).data;
-				console.log("Got user data: ", userInformation, "and settings: ", userSettings);
+				const syncedUserSettings = (await axios.get("/api/settings/me")).data;
+				console.log("Got user data: ", userInformation, "and settings: ", syncedUserSettings);
 				if (!this.user) {
 					// Default user data for testing
 					this.user = {
@@ -79,12 +79,12 @@ export const useUserStore = defineStore("user", {
 								bottomright: [{ name: "Pauze", id: "1" }],
 							},
 							widgetsAvailable: [],
+							...syncedUserSettings,
 						},
 					};
 				}
 				this.user.name = userInformation.name;
 				this.user.email = userInformation.email;
-				this.user.settings.background = userSettings.backgroundURL || "";
 
 				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
