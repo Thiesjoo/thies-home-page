@@ -30,7 +30,7 @@ export type User = {
 		showSeconds: boolean;
 		showDate: boolean;
 		showVersion: boolean;
-		background: string;
+		backgroundURL: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
 	};
@@ -61,6 +61,8 @@ export const useUserStore = defineStore("user", {
 			try {
 				const userInformation = (await axios.get("/api/users/me")).data;
 				const syncedUserSettings = (await axios.get("/api/settings/me")).data;
+				// TODO: Sync this data with the server
+
 				console.log("Got user data: ", userInformation, "and settings: ", syncedUserSettings);
 				if (!this.user) {
 					// Default user data for testing
@@ -71,7 +73,7 @@ export const useUserStore = defineStore("user", {
 							showDate: false,
 							showSeconds: true,
 							showVersion: false,
-							background: "",
+							backgroundURL: "",
 							widgets: {
 								topleft: [],
 								topright: [{ name: "VIA", id: "pos" }],

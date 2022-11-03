@@ -125,7 +125,7 @@ export default defineComponent({
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
 		background(): string {
-			const url = this.user.user?.settings.background;
+			const url = this.user.user?.settings.backgroundURL;
 
 			return (url ? `url("${url}"),` : "") + `url("https://source.unsplash.com/random/1920x1080/?landscape")`;
 		},
@@ -139,7 +139,6 @@ export default defineComponent({
 			this.dragging = 0;
 		},
 		childDrag(dragging: boolean) {
-			// console.log("HMmm");
 			this.dragging = dragging ? 2 : 0;
 		},
 	},
