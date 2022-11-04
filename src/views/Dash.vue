@@ -191,6 +191,7 @@ body {
 
 .info {
 	flex-direction: column;
+	font-family: "Roboto Mono", monospace;
 }
 
 .centered,
@@ -219,22 +220,16 @@ body {
 
 .seconds {
 	font-size: 75%;
-	position: fixed;
-	margin: 0 auto;
-	transform: translate(15%, 50%);
+	transform: translate(15%, 100%);
 }
 
 body.linux .seconds {
-	transform: translate(15%, 30%);
+	transform: translate(15%, 75%);
 }
 
 .greeting {
 	font-size: 3.375rem;
 	font-weight: 300;
-}
-
-.time {
-	font-family: monospace;
 }
 
 .time,
