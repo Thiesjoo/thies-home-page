@@ -48,6 +48,12 @@ export const routes: Route[] = [
 		exclude: true,
 	},
 	{
+		path: "/devices",
+		name: "Your devices",
+		component: () => import(/* webpackChunkName: "device" */ "../views/Devices.vue"),
+		exclude: true,
+	},
+	{
 		path: "/login",
 		name: "Login",
 		component: () => import(/* webpackChunkName: "login" */ "../views/Login.vue"),

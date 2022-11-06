@@ -10,11 +10,6 @@ const toast = useToast();
 // Default widgets are widgets that are available for everyone
 export const DEFAULT_WIDGETS = ["Battery", "Pauze", "Dummy", "RemoteDevices"];
 
-// if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
-// 	DEFAULT_WIDGETS.push("Dummy");
-// 	DEFAULT_WIDGETS.push("RemoteDevices");
-// }
-
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
 
@@ -107,6 +102,14 @@ export const useUserStore = defineStore("user", {
 				});
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
+
+				if (
+					!DEFAULT_WIDGETS.includes("Dummy") &&
+					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
+				) {
+					DEFAULT_WIDGETS.push("Dummy");
+					DEFAULT_WIDGETS.push("RemoteDevices");
+				}
 
 				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
 

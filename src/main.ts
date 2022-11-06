@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faTwitch, faDiscord, faSpotify, faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
 	faArrowRightFromBracket,
+	faBattery,
 	faBolt,
 	faDesktop,
 	faEthernet,
@@ -56,7 +57,7 @@ library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlu
 //Home page
 library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
 
-library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass);
+library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faBattery);
 
 const app = createApp(App, { router });
 app.use(router);

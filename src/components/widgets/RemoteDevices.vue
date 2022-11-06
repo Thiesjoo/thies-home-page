@@ -4,8 +4,7 @@
 			<div
 				v-for="device in devices"
 				class="flex flex-col justify-center mx-5 text-center"
-				v-on:click="openNewTabForDevice(device)"
-			>
+				v-on:click="openNewTabForDevice(device)">
 				<div class="inline-flex items-center justify-center overflow-hidden rounded-full">
 					<svg class="w-24 h-24">
 						<circle
@@ -15,15 +14,9 @@
 							fill="transparent"
 							:r="radius"
 							cx="48"
-							cy="48"
-						/>
+							cy="48" />
 						<circle
-							:class="{
-								'text-green-500': device.battery > 50,
-								'text-yellow-500': device.battery > 25 && device.battery <= 50,
-								'text-red-500': device.battery <= 25,
-								'text-gray-300': !hasBattery(device),
-							}"
+							:class="getColorForBattery(device)"
 							stroke-width="4"
 							:stroke-dasharray="circumference"
 							:stroke-dashoffset="circumference - (device.battery / 100) * circumference"
@@ -32,8 +25,7 @@
 							fill="transparent"
 							:r="radius"
 							cx="48"
-							cy="48"
-						/>
+							cy="48" />
 					</svg>
 
 					<!-- All device info -->
@@ -46,13 +38,12 @@
 								:icon="['fas', 'hourglass']"
 								class="text-red-600"
 								v-if="isInformationTooOld(device)"
-								title="We haven't received any information from this device for a while."
-							>
+								title="We haven't received any information from this device for a while.">
 							</font-awesome-icon>
 
 							<font-awesome-icon :icon="getIconForDeviceType(device)" :title="getTitleType(device)">
 							</font-awesome-icon>
-							<font-awesome-icon :icon="getIconForNetworkStatus(device)" :title="getTitleNetwork(device)">
+							<font-awesome-icon :icon="getIconForNetworkStatus(device)" :title="getNetworkTypeTitle(device)">
 							</font-awesome-icon>
 							<font-awesome-icon :icon="['fas', 'bolt']" v-if="device.batteryCharging" title="Battery is charging">
 							</font-awesome-icon>
@@ -70,14 +61,12 @@
 </template>
 
 <script lang="ts">
+import { allHelperFunctions } from "@/helpers/remoteDevices";
 import { Device } from "@/helpers/types/customdash.summary";
 import { defineComponent } from "@vue/runtime-core";
 import axios from "axios";
 import ms from "ms";
 import { Base } from ".";
-
-const MAX_AGE = ms("30m");
-const WARNING_AGE = ms("15m");
 
 export default defineComponent({
 	data() {
@@ -92,50 +81,7 @@ export default defineComponent({
 		openNewTabForDevice(device: Device) {
 			window.open(`https://customdash.thies.dev/output/devices/${device.id}`, "_blank");
 		},
-		getTitleType(device: Device) {
-			return device.type.charAt(0).toUpperCase() + device.type.slice(1);
-		},
-		getIconForDeviceType(device: Device) {
-			switch (device.type) {
-				case "mobile":
-					return ["fas", "mobile"];
-				case "laptop":
-					return ["fas", "laptop"];
-				default:
-					return ["fas", "desktop"];
-			}
-		},
-		isInformationTooOld(device: Device, warning = false) {
-			return Date.now() - device.lastConnected.time > (warning ? WARNING_AGE : MAX_AGE);
-		},
-		informationAgeShort(device: Device) {
-			return ms(Date.now() - device.lastConnected.time);
-		},
-		getIconForLTEStrength(device: Device) {
-			return ["fas", "signal"];
-		},
-		getIconForWifiStrength(device: Device) {
-			return ["fas", "wifi"];
-		},
-		getTitleNetwork(device: Device) {
-			// Capitalize first letter
-			return device.network.type.charAt(0).toUpperCase() + device.network.type.slice(1);
-		},
-		getIconForNetworkStatus(device: Device) {
-			switch (device.network.type) {
-				case "wifi":
-					return this.getIconForWifiStrength(device);
-				case "lte":
-					return this.getIconForLTEStrength(device);
-				case "ethernet":
-					return ["fas", "ethernet"];
-				default:
-					return ["fas", "plane-up"];
-			}
-		},
-		hasBattery(device: Device) {
-			return device.battery !== undefined;
-		},
+		...allHelperFunctions,
 		async getUpdatedDevices() {
 			if (window.env.VUE_APP_VERCEL_ENV === "development") {
 				return {
