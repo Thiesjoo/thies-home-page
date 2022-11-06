@@ -14,9 +14,8 @@ import { defineComponent } from "vue";
 import LoginForm from "@/components/LoginForm.vue";
 
 function processState(state: any) {
-	console.log("Processing state:", state, state.loggedIn, !(state.loading.form || state.loading.userdata));
 	// Next state mutation will toggle loading
-	if (state.loggedIn && !(state.loading.form || state.loading.userdata)) {
+	if (state.loggedIn && !state.isLoading) {
 		let params = new URL(window.location.href).searchParams;
 		let name = params.get("next");
 		window.location.href = decodeURIComponent(name || "/home");

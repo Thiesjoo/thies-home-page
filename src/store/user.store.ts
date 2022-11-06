@@ -49,6 +49,12 @@ export const useUserStore = defineStore("user", {
 		};
 	},
 
+	getters: {
+		isLoading(state) {
+			return state.loading.form || state.loading.userdata;
+		},
+	},
+
 	actions: {
 		async getUserData() {
 			if (!this.loggedIn) {
