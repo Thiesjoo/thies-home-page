@@ -14,7 +14,7 @@ router.beforeEach((to, from, next) => {
 	if (!to.meta.requiresLogin || userStore.loggedIn) {
 		next();
 	} else {
-		next("/login?next=" + to.path);
+		next("/login?to=" + to.path);
 	}
 });
 

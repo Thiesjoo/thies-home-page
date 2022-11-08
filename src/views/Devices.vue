@@ -4,7 +4,7 @@
 		<font-awesome-icon
 			:icon="['fas', 'arrows-rotate']"
 			class="text-gray-500 hover:text-gray-700 cursor-pointer"
-			@click="refreshDevices"
+			@click="forceReloadDevices"
 			size="xl"
 			title="Refresh devices"></font-awesome-icon>
 	</div>
@@ -105,11 +105,16 @@ import { defineComponent } from "@vue/runtime-core";
 
 export default defineComponent({
 	data() {
-		return {};
+		return {
+			interval: null as number | null,
+		};
 	},
 	errorCaptured,
 	setup() {
-		return { user: useUserStore(), devicesStore: useDevicesStore() };
+		const user = useUserStore();
+		// user.$subscribe((mutation, state) => processState(state));
+
+		return { user, devicesStore: useDevicesStore() };
 	},
 	computed: {
 		loading() {
@@ -121,12 +126,19 @@ export default defineComponent({
 	},
 	methods: {
 		...allHelperFunctions,
-		refreshDevices() {
+		forceReloadDevices() {
+			// Force reload the data
 			this.devicesStore.loadDeviceData();
 		},
 	},
-	async mounted() {
-		this.devicesStore.loadDeviceData();
+	mounted() {
+		this.user.$subscribe((mutation, state) => {
+			if (state.loggedIn && !state.loading.userdata && !this.interval) {
+				this.forceReloadDevices();
+
+				this.interval = 69;
+			}
+		});
 	},
 });
 </script>

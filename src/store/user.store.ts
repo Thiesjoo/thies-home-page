@@ -28,13 +28,40 @@ export type User = {
 		backgroundURL: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
+		devices: {
+			api: string;
+			enabled: boolean;
+		};
 	};
+};
+
+const defaultUser: User = {
+	name: "",
+	email: "",
+	settings: {
+		showDate: false,
+		showSeconds: true,
+		showVersion: false,
+		backgroundURL: "",
+		widgets: {
+			topleft: [],
+			topright: [{ name: "VIA", id: "pos" }],
+			bottomleft: [],
+			bottomright: [{ name: "Pauze", id: "1" }],
+		},
+		widgetsAvailable: [],
+		devices: {
+			api: "",
+			enabled: false,
+		},
+	},
 };
 
 export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
-			loading: { form: false, userdata: false },
+			// Always loading userdata, because we want to check if the user is logged in
+			loading: { form: false, userdata: true },
 			loggedIn: useLocalStorage("loggedIn", false),
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
@@ -53,11 +80,10 @@ export const useUserStore = defineStore("user", {
 	actions: {
 		async getUserData() {
 			if (!this.loggedIn) {
+				this.loading.userdata = false;
 				this.user = null;
 				return;
 			}
-
-			this.loading.userdata = true;
 
 			try {
 				const userInformation = (await axios.get("/api/users/me")).data;
@@ -67,25 +93,32 @@ export const useUserStore = defineStore("user", {
 				console.log("Got user data: ", userInformation, "and settings: ", syncedUserSettings);
 				if (!this.user) {
 					// Default user data for testing
+					this.user = JSON.parse(JSON.stringify(defaultUser)) as User;
+
+					// Sync the user settings with the default user object
+					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
+				} else {
+					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
+
+					// Check if the user has the required properties
 					this.user = {
-						name: "",
-						email: "",
+						...defaultUser,
+						...this.user,
 						settings: {
-							showDate: false,
-							showSeconds: true,
-							showVersion: false,
-							backgroundURL: "",
+							...defaultUser.settings,
+							...this.user.settings,
 							widgets: {
-								topleft: [],
-								topright: [{ name: "VIA", id: "pos" }],
-								bottomleft: [],
-								bottomright: [{ name: "Pauze", id: "1" }],
+								...defaultUser.settings.widgets,
+								...this.user.settings.widgets,
 							},
-							widgetsAvailable: [],
-							...syncedUserSettings,
+							devices: {
+								...defaultUser.settings.devices,
+								...this.user.settings.devices,
+							},
 						},
 					};
 				}
+
 				this.user.name = userInformation.name;
 				this.user.email = userInformation.email;
 
@@ -103,6 +136,7 @@ export const useUserStore = defineStore("user", {
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
+				// Add in dummy widget on preview and development
 				if (
 					!DEFAULT_WIDGETS.includes("Dummy") &&
 					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
@@ -129,6 +163,8 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with getting user data");
 				console.error(e);
+
+				window.localStorage.clear();
 				this.$reset();
 				window.localStorage.clear();
 			}
@@ -142,6 +178,7 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			window.localStorage.clear();
 			this.$reset();
 			window.localStorage.clear();
 		},
@@ -156,7 +193,7 @@ export const useUserStore = defineStore("user", {
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");
-				this.getUserData();
+				await this.getUserData();
 			} catch (e) {
 				toast.error("Something went wrong");
 				this.accessToken = "";
@@ -175,7 +212,7 @@ export const useUserStore = defineStore("user", {
 
 				this.loggedIn = true;
 				toast.success("Created new account!!");
-				this.getUserData();
+				await this.getUserData();
 			} catch (e) {
 				toast.error("Something went wrong");
 				throw e;

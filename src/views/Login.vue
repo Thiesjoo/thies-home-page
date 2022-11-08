@@ -23,7 +23,7 @@ function processState(state: any) {
 
 		if (nextPage) {
 			// Redirect using vue router
-			router.push({ name: nextPage });
+			router.push(nextPage);
 		} else {
 			// Redirect to nextURL
 			window.location.href = decodeURIComponent(nextURL || "/home");
