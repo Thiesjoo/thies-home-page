@@ -4,6 +4,7 @@ export type Route = RouteRecordRaw & {
 	meta?: {
 		/** Should the header be shown on this page. Default: false */
 		header?: boolean;
+		requiresLogin?: boolean;
 	};
 	/** Should this route be shown in the header */
 	exclude?: boolean;
@@ -52,6 +53,9 @@ export const routes: Route[] = [
 		name: "Your devices",
 		component: () => import(/* webpackChunkName: "device" */ "../views/Devices.vue"),
 		exclude: true,
+		meta: {
+			requiresLogin: true,
+		},
 	},
 	{
 		path: "/login",

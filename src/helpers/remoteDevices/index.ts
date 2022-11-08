@@ -46,9 +46,20 @@ export function getNetworkTypeTitle(device: Device) {
 	return device.network.type.charAt(0).toUpperCase() + device.network.type.slice(1);
 }
 
-export function getNetworkTitle(device: Device) {
-	return device.network.extraInfo?.split(" ")[0] || "Unknown";
+const MAX_WIFI_NAME_LENGTH = 11;
+
+export function getNetworkTitle(device: Device, ignoreLength = false) {
+	const extraInfo = device.network.extraInfo?.split(" ")[0];
+
+	if (extraInfo === "undefined" || !extraInfo || extraInfo === "-") {
+		return "unknown";
+	}
+
+	const tooLong = ignoreLength ? false : extraInfo.length > MAX_WIFI_NAME_LENGTH;
+
+	return extraInfo.slice(0, tooLong ? MAX_WIFI_NAME_LENGTH : 1000) + (tooLong ? "..." : "");
 }
+
 export function getColorForBattery(device: Device, background = false) {
 	const base = {
 		"text-green-600": device.battery > 50,

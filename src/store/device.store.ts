@@ -1,6 +1,7 @@
 import { Device } from "@/helpers/types/customdash.summary";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
 import { defineStore } from "pinia";
+import { useToast } from "vue-toastification";
 import { User, useUserStore } from "./user.store";
 
 export type DevicesInfo = {
@@ -16,7 +17,7 @@ const sampleData = [
 		uptime: 2390.19,
 		upsince: 1665662516,
 		battery: 37,
-		batteryCharging: false,
+		batteryCharging: true,
 		network: {
 			interval: 5116,
 			up: 2450.76892350709,
@@ -53,7 +54,7 @@ const sampleData = [
 			up: 0,
 			down: 0,
 			type: "wifi",
-			extraInfo: "- -70",
+			extraInfo: "RandomWifiNetwork -70",
 		},
 		connected: false,
 		lastConnected: {
@@ -80,16 +81,17 @@ export const useDevicesStore = defineStore("devices", {
 
 	actions: {
 		async loadDeviceData() {
+			const toast = useToast();
 			const user = useUserStore();
 			// If user is not logged in, return
 			if (!user.user) {
+				toast.error("You are not logged in!");
 				throw new Error("Trying to fetch devices, but user not logged in");
 			}
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
 			// Fetch data
-
 			if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
 				this.devices = {
 					api: "http://localhost:3000",

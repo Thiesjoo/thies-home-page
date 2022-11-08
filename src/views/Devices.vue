@@ -35,7 +35,8 @@
 			<!-- Header -->
 			<div class="header-container">
 				<div class="flex flex-row justify-between">
-					<div class="flex flex-col space-y-1">
+					<!-- Device info -->
+					<div class="flex flex-col space-y-1 max-w-[40%]">
 						<span class="text-lg font-bold">
 							<font-awesome-icon :icon="getIconForDeviceType(device)" :title="getTitleType(device)" class="mr-1">
 							</font-awesome-icon
@@ -43,9 +44,11 @@
 						>
 						<span class="text-sm italic">{{ device.id }}</span>
 					</div>
-					<div class="flex flex-col space-y-1">
-						<span class="text-lg font-bold"
-							>{{ informationAgeShort(device) }}-
+
+					<div class="flex flex-col space-y-1 min-w-[50%] text-right">
+						<!-- Device status -->
+						<span class="text-lg font-bold">
+							{{ informationAgeShort(device) }} -
 							<div
 								class="w-[12px] h-[12px]"
 								:style="{
@@ -54,14 +57,23 @@
 									display: 'inline-block',
 								}"></div
 						></span>
-						<span class="text-sm font-bold">
+
+						<!-- Network -->
+						<span class="text-sm font-bold" :title="getNetworkTitle(device, true)">
 							<font-awesome-icon :icon="getIconForNetworkStatus(device)" :title="getNetworkTypeTitle(device)">
 							</font-awesome-icon>
 							{{ getNetworkTitle(device) }}
 						</span>
-						<span class="text-sm font-bold whitespace-nowrap">
-							<font-awesome-icon :icon="['fas', 'battery']" class="mr-1"> </font-awesome-icon>
-							<div class="w-[80%] rounded-full h-2.5 bg-gray-700 inline-block">
+
+						<!-- Battery -->
+						<span class="text-sm font-bold whitespace-nowrap" v-if="device.battery != 0">
+							<font-awesome-icon :icon="['fas', 'battery']" class="mr-1" v-if="!device.batteryCharging">
+							</font-awesome-icon>
+							<font-awesome-icon :icon="['fas', 'bolt']" class="mr-1" v-if="device.batteryCharging">
+							</font-awesome-icon>
+
+							<span> {{ device.battery }}% </span>
+							<div class="w-[60%] rounded-full h-2.5 bg-gray-700 inline-block">
 								<div
 									class="0 h-2.5 rounded-full"
 									:class="getColorForBattery(device, true)"
@@ -87,7 +99,6 @@
 <script lang="ts">
 import errorCaptured from "@/components/widgets/errorCaptured";
 import { allHelperFunctions } from "@/helpers/remoteDevices";
-import { Device } from "@/helpers/types/customdash.summary";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "@vue/runtime-core";
@@ -108,12 +119,14 @@ export default defineComponent({
 			return this.devicesStore.devices?.summary || [];
 		},
 	},
-
 	methods: {
 		...allHelperFunctions,
 		refreshDevices() {
 			this.devicesStore.loadDeviceData();
 		},
+	},
+	async mounted() {
+		this.devicesStore.loadDeviceData();
 	},
 });
 </script>
@@ -126,6 +139,7 @@ export default defineComponent({
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 10px;
+	max-width: 450px;
 }
 
 .header-container {

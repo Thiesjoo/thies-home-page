@@ -12,13 +12,22 @@
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import LoginForm from "@/components/LoginForm.vue";
+import router from "@/router";
 
 function processState(state: any) {
 	// Next state mutation will toggle loading
 	if (state.loggedIn && !state.isLoading) {
-		let params = new URL(window.location.href).searchParams;
-		let name = params.get("next");
-		window.location.href = decodeURIComponent(name || "/home");
+		const params = new URL(window.location.href).searchParams;
+		const nextURL = params.get("next");
+		const nextPage = params.get("to");
+
+		if (nextPage) {
+			// Redirect using vue router
+			router.push({ name: nextPage });
+		} else {
+			// Redirect to nextURL
+			window.location.href = decodeURIComponent(nextURL || "/home");
+		}
 	}
 }
 
