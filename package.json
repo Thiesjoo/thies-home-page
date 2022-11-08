@@ -26,6 +26,7 @@
 		"date-fns": "^2.27.0",
 		"ms": "^3.0.0-canary.1",
 		"pinia": "^2.0.14",
+		"socket.io-client": "^4.5.3",
 		"tmi.js": "^1.8.5",
 		"vue": "^3.2.25",
 		"vue-class-component": "^8.0.0-0",

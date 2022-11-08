@@ -9,6 +9,8 @@
 			title="Refresh devices"></font-awesome-icon>
 	</div>
 
+	<button @click="devicesStore.requestCPU()">Fakka</button>
+
 	<!-- For every device in the list, get 1/4 of page width and make a nice looking colunm -->
 	<div class="total-container w-[100vw] h-[100vh] flex flex-row justify-center">
 		<!-- Loading indicator -->
@@ -102,6 +104,7 @@ import { allHelperFunctions } from "@/helpers/remoteDevices";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "@vue/runtime-core";
+import SocketService from "@/services/socket.service";
 
 export default defineComponent({
 	data() {
@@ -112,7 +115,6 @@ export default defineComponent({
 	errorCaptured,
 	setup() {
 		const user = useUserStore();
-		// user.$subscribe((mutation, state) => processState(state));
 
 		return { user, devicesStore: useDevicesStore() };
 	},
@@ -130,6 +132,12 @@ export default defineComponent({
 			// Force reload the data
 			this.devicesStore.loadDeviceData();
 		},
+	},
+	created() {
+		SocketService.setupSocketConnection();
+	},
+	beforeUnmount() {
+		SocketService.disconnect();
 	},
 	mounted() {
 		this.user.$subscribe((mutation, state) => {

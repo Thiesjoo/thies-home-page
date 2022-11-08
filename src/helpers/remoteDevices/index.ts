@@ -5,14 +5,13 @@ const MAX_AGE = ms("30m");
 const WARNING_AGE = ms("15m");
 
 export function getColorForAge(device: Device) {
-	const difference = Date.now() - device.lastConnected.time;
-
+	const difference = device.connected ? 0 : Date.now() - device.lastConnected.time;
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
 	} else if (difference > WARNING_AGE) {
 		return "#f5c350";
 	} else {
-		return "65cd57";
+		return "#65cd57";
 	}
 }
 
@@ -33,6 +32,9 @@ export function isInformationTooOld(device: Device, warning = false) {
 	return Date.now() - device.lastConnected.time > (warning ? WARNING_AGE : MAX_AGE);
 }
 export function informationAgeShortText(device: Device) {
+	if (device.connected) {
+		return "Connected";
+	}
 	return ms(Date.now() - device.lastConnected.time);
 }
 export function getIconForLTEStrength(device: Device) {
@@ -49,6 +51,10 @@ export function getNetworkTypeTitle(device: Device) {
 const MAX_WIFI_NAME_LENGTH = 11;
 
 export function getNetworkTitle(device: Device, ignoreLength = false) {
+	if (device.network.type === "ethernet") {
+		return "Ethernet";
+	}
+
 	const extraInfo = device.network.extraInfo?.split(" ")[0];
 
 	if (extraInfo === "undefined" || !extraInfo || extraInfo === "-") {

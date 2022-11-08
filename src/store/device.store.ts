@@ -1,5 +1,6 @@
 import { Device } from "@/helpers/types/customdash.summary";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
+import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import { User, useUserStore } from "./user.store";
@@ -7,6 +8,7 @@ import { User, useUserStore } from "./user.store";
 export type DevicesInfo = {
 	api: string;
 	summary: Device[];
+	extraInfo: Record<string, {}>;
 };
 
 const sampleData = [
@@ -76,6 +78,10 @@ export const useDevicesStore = defineStore("devices", {
 			devices: useLocalStorage("devices", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<DevicesInfo | null>,
+			socket: { connected: false, connecting: false, error: "" },
+
+			// Array that will be emptied when the socket requests it.
+			requests: [] as { deviceId: string; type: string }[],
 		};
 	},
 
@@ -88,18 +94,37 @@ export const useDevicesStore = defineStore("devices", {
 				toast.error("You are not logged in!");
 				throw new Error("Trying to fetch devices, but user not logged in");
 			}
+
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
 			// Fetch data
 			if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
 				this.devices = {
-					api: "http://localhost:3000",
+					api: "http://localhost:3001",
 					summary: sampleData,
+					extraInfo: {},
+				};
+			} else {
+				this.devices = {
+					api: "https://testing.thies.dev",
+					summary: [],
+					extraInfo: {},
 				};
 			}
 
+			const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
+
+			this.devices.summary = data.summary;
+
 			this.loading.userdata = false;
+		},
+
+		requestCPU() {
+			this.requests.push({ deviceId: "Thies-August-PC", type: "cpu" });
+		},
+		emptyRequests() {
+			this.requests = [];
 		},
 	},
 });

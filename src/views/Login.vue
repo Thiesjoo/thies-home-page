@@ -18,7 +18,6 @@ function processState(state: any) {
 	// Next state mutation will toggle loading
 	if (state.loggedIn && !state.isLoading) {
 		const params = new URL(window.location.href).searchParams;
-		const nextURL = params.get("next");
 		const nextPage = params.get("to");
 
 		if (nextPage) {
@@ -26,6 +25,7 @@ function processState(state: any) {
 			router.push(nextPage);
 		} else {
 			// Redirect to nextURL
+			const nextURL = params.get("next");
 			window.location.href = decodeURIComponent(nextURL || "/home");
 		}
 	}
