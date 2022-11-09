@@ -50,11 +50,11 @@
 					<div class="flex flex-col space-y-1 min-w-[50%] text-right">
 						<!-- Device status -->
 						<span class="text-lg font-bold">
-							{{ informationAgeShort(device) }} -
+							{{ informationAgeShort(device, now) }} -
 							<div
 								class="w-[12px] h-[12px]"
 								:style="{
-									'background-color': getColorForAge(device),
+									'background-color': getColorForAge(device, now),
 									'border-radius': '50%',
 									display: 'inline-block',
 								}"></div
@@ -110,6 +110,8 @@ export default defineComponent({
 	data() {
 		return {
 			interval: null as number | null,
+			// Refresh things such as dates
+			now: Date.now(),
 		};
 	},
 	errorCaptured,
@@ -139,12 +141,18 @@ export default defineComponent({
 	beforeUnmount() {
 		SocketService.disconnect();
 	},
+	beforeRouteLeave() {
+		SocketService.disconnect();
+	},
 	mounted() {
+		const self = this;
 		this.user.$subscribe((mutation, state) => {
 			if (state.loggedIn && !state.loading.userdata && !this.interval) {
 				this.forceReloadDevices();
 
-				this.interval = 69;
+				this.interval = setInterval(function () {
+					self.now = Date.now();
+				}, 1000);
 			}
 		});
 	},

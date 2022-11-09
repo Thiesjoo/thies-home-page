@@ -1,3 +1,4 @@
+import { GlobalLoad } from "@/helpers/types/pusher.types";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { io, Socket } from "socket.io-client";
@@ -25,7 +26,6 @@ class SocketService {
 			},
 			transports: ["websocket"],
 		});
-		console.log("Connected");
 
 		store.socket.connecting = false;
 		store.socket.error = "";
@@ -65,6 +65,14 @@ class SocketService {
 		this.socket?.onAny((event, ...args) => {
 			if (event.endsWith("-load")) {
 				console.log("Got event: ", event, args);
+			}
+			if (event === "global-load") {
+				const [data] = args as [GlobalLoad & { deviceId: string }];
+				const id = data.deviceId;
+
+				this.store?.updateDevice(id, data);
+
+				return;
 			}
 		});
 	}

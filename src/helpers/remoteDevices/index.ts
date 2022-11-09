@@ -4,8 +4,8 @@ import { Device } from "../types/customdash.summary";
 const MAX_AGE = ms("30m");
 const WARNING_AGE = ms("15m");
 
-export function getColorForAge(device: Device) {
-	const difference = device.connected ? 0 : Date.now() - device.lastConnected.time;
+export function getColorForAge(device: Device, now: number) {
+	const difference = device.connected ? 0 : now - device.lastConnected.time;
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
 	} else if (difference > WARNING_AGE || !device.connected) {
@@ -28,14 +28,14 @@ export function getIconForDeviceType(device: Device) {
 			return ["fas", "desktop"];
 	}
 }
-export function isInformationTooOld(device: Device, warning = false) {
-	return Date.now() - device.lastConnected.time > (warning ? WARNING_AGE : MAX_AGE);
+export function isInformationTooOld(device: Device, now: number, warning = false) {
+	return now - device.lastConnected.time > (warning ? WARNING_AGE : MAX_AGE);
 }
-export function informationAgeShortText(device: Device) {
+export function informationAgeShortText(device: Device, now: number) {
 	if (device.connected) {
 		return "Connected";
 	}
-	return ms(Date.now() - device.lastConnected.time);
+	return ms(now - device.lastConnected.time);
 }
 export function getIconForLTEStrength(device: Device) {
 	return ["fas", "signal"];

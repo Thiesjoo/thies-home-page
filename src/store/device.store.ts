@@ -1,4 +1,5 @@
 import { Device } from "@/helpers/types/customdash.summary";
+import { GlobalLoad } from "@/helpers/types/pusher.types";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
 import axios from "axios";
 import { defineStore } from "pinia";
@@ -74,7 +75,7 @@ const sampleData = [
 export const useDevicesStore = defineStore("devices", {
 	state: () => {
 		return {
-			loading: { userdata: false },
+			loading: { userdata: true },
 			devices: useLocalStorage("devices", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<DevicesInfo | null>,
@@ -121,10 +122,26 @@ export const useDevicesStore = defineStore("devices", {
 		},
 
 		requestCPU() {
-			this.requests.push({ deviceId: "Thies-August-PC", type: "cpu" });
+			// this.requests.push({ deviceId: "Thies-August-PC", type: "cpu" });
+			this.requests.push({ deviceId: "Thies-August-PC", type: "global" });
+			this.requests.push({ deviceId: "oneplusnord", type: "global" });
 		},
 		emptyRequests() {
 			this.requests = [];
+		},
+
+		updateDevice(id: string, data: GlobalLoad) {
+			if (!this.devices) return;
+			const device = this.devices.summary.find((d) => d.id === id);
+			if (!device) {
+				console.warn("Tried to update: ", id, "but it does not exist");
+				return;
+			}
+
+			device.connected = data.connected;
+			device.lastConnected = data.lastConnected;
+			device.battery = data.battery || 0;
+			device.batteryCharging = data.charging || false;
 		},
 	},
 });

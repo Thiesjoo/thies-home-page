@@ -15,7 +15,7 @@ export interface Device {
 export interface LastConnected {
 	time: number;
 	ip: string;
-	location: Location;
+	location?: Location;
 }
 
 export interface Location {
