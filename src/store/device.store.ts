@@ -99,7 +99,7 @@ export const useDevicesStore = defineStore("devices", {
 			this.loading.userdata = true;
 
 			// Fetch data
-			if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
+			if (window.env.VUE_APP_VERCEL_ENV === "development") {
 				this.devices = {
 					api: "http://localhost:3001",
 					summary: sampleData,
