@@ -1,4 +1,5 @@
 import { useDevicesStore } from "@/store/device.store";
+import { useUserStore } from "@/store/user.store";
 import { io, Socket } from "socket.io-client";
 
 class SocketService {
@@ -8,9 +9,15 @@ class SocketService {
 
 	async setupSocketConnection() {
 		const store = useDevicesStore();
+		const userStore = useUserStore();
+
 		this.store = store;
 		const url = await this.waitForDeviceURL();
-		this.socket = io(url);
+		this.socket = io(url, {
+			extraHeaders: {
+				Authorization: `Bearer ${userStore.accessToken}`,
+			},
+		});
 
 		store.socket.connecting = false;
 		store.socket.error = "";
