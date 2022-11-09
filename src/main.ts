@@ -26,6 +26,7 @@ import {
 	faMobile,
 	faPlaneUp,
 	faPlus,
+	faQuestion,
 	faRobot,
 	faScroll,
 	faServer,
@@ -57,7 +58,7 @@ library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlu
 //Home page
 library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
 
-library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faBattery, faArrowsRotate);
+library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faBattery, faArrowsRotate, faQuestion);
 
 const app = createApp(App, { router });
 app.use(router);

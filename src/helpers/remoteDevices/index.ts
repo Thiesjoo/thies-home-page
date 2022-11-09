@@ -8,7 +8,7 @@ export function getColorForAge(device: Device) {
 	const difference = device.connected ? 0 : Date.now() - device.lastConnected.time;
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
-	} else if (difference > WARNING_AGE) {
+	} else if (difference > WARNING_AGE || !device.connected) {
 		return "#f5c350";
 	} else {
 		return "#65cd57";
@@ -45,12 +45,19 @@ export function getIconForWifiStrength(device: Device) {
 }
 
 export function getNetworkTypeTitle(device: Device) {
+	if (!device.network) {
+		return "No network";
+	}
 	return device.network.type.charAt(0).toUpperCase() + device.network.type.slice(1);
 }
 
 const MAX_WIFI_NAME_LENGTH = 11;
 
 export function getNetworkTitle(device: Device, ignoreLength = false) {
+	if (!device.network) {
+		return "No network data";
+	}
+
 	if (device.network.type === "ethernet") {
 		return "Ethernet";
 	}
@@ -81,6 +88,9 @@ export function getColorForBattery(device: Device, background = false) {
 }
 
 export function getIconForNetworkStatus(device: Device) {
+	if (!device.network) {
+		return ["fas", "question"];
+	}
 	switch (device.network.type) {
 		case "wifi":
 			return getIconForWifiStrength(device);

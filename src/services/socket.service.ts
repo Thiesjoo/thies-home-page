@@ -8,16 +8,24 @@ class SocketService {
 	constructor() {}
 
 	async setupSocketConnection() {
+		console.log("Starting to setup socket connection");
 		const store = useDevicesStore();
 		const userStore = useUserStore();
 
 		this.store = store;
+		console.log("Waiting for URL");
 		const url = await this.waitForDeviceURL();
-		this.socket = io(url, {
+		console.log("Got base URL:", url);
+		// Append auth token as a query parameter
+		const finalURL = `${url}?access_token=${userStore.accessToken}`;
+
+		this.socket = io(finalURL, {
 			extraHeaders: {
 				Authorization: `Bearer ${userStore.accessToken}`,
 			},
+			transports: ["websocket"],
 		});
+		console.log("Connected");
 
 		store.socket.connecting = false;
 		store.socket.error = "";
@@ -54,7 +62,11 @@ class SocketService {
 
 	registerSocketEvents() {
 		this.socket?.on("initial-data", console.log);
-		this.socket?.on("cpu-load", console.log);
+		this.socket?.onAny((event, ...args) => {
+			if (event.endsWith("-load")) {
+				console.log("Got event: ", event, args);
+			}
+		});
 	}
 
 	registerStoreEvents() {
@@ -62,9 +74,8 @@ class SocketService {
 		this.store?.$subscribe((mut, state) => {
 			if (state.requests.length > 0) {
 				for (const request of state.requests) {
-					console.log("Should emit this: ", request);
 					this.socket?.emit("request-live-updates", request.deviceId, [request.type], (ack: any) => {
-						console.log("ACK: ", ack);
+						console.log("Ack for request:", request, ":", ack);
 					});
 				}
 				this.store?.emptyRequests();
@@ -85,6 +96,7 @@ class SocketService {
 	}
 
 	disconnect() {
+		console.log("Disconnecting");
 		if (this.socket) {
 			this.socket.disconnect();
 		}
