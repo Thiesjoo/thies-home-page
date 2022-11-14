@@ -61,19 +61,31 @@ class SocketService {
 	}
 
 	registerSocketEvents() {
+		if (!this.store) {
+			console.error("Store not initialized, but it is needed for socket events");
+			return;
+		}
+
+		const updateMap = {
+			"battery-load": this.store.updateBatteryLoad,
+			"global-load": this.store.updateGlobalLoad,
+			"network-load": this.store.updateNetworkLoad,
+		};
+
 		this.socket?.on("initial-data", console.log);
 		this.socket?.onAny((event, ...args) => {
 			if (event.endsWith("-load")) {
 				console.log("Got event: ", event, args);
 			}
-			if (event === "global-load") {
-				const [data] = args as [GlobalLoad & { deviceId: string }];
-				const id = data.deviceId;
 
-				this.store?.updateDevice(id, data);
-
+			const updateFunction = updateMap[event as "battery-load" | "global-load"];
+			if (!updateFunction) {
+				console.warn("No update function for event: ", event);
 				return;
 			}
+
+			const [data] = args as [any & { deviceId: string }];
+			updateFunction(data.deviceId, data);
 		});
 	}
 
@@ -94,8 +106,9 @@ class SocketService {
 	waitForDeviceURL(): Promise<string> {
 		return new Promise((resolve) => {
 			const store = useDevicesStore();
+			const userStore = useUserStore();
 			const interval = setInterval(() => {
-				if (store.devices?.api) {
+				if (store.devices?.api && userStore.accessToken && !userStore.isLoading) {
 					clearInterval(interval);
 					resolve(store.devices.api);
 				}
@@ -108,6 +121,18 @@ class SocketService {
 		if (this.socket) {
 			this.socket.disconnect();
 		}
+	}
+
+	onConnected(callback: () => void) {
+		this.on("connect", callback);
+	}
+
+	onNewDevice(callback: (deviceId: string) => void) {
+		this.on("new-device", callback);
+	}
+
+	private on(event: string, callback: (...args: any[]) => void) {
+		this.socket?.on(event, callback);
 	}
 }
 

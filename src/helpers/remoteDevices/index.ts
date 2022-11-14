@@ -35,7 +35,11 @@ export function informationAgeShortText(device: Device, now: number) {
 	if (device.connected) {
 		return "Connected";
 	}
-	return ms(now - device.lastConnected.time);
+	let diff = now - device.lastConnected.time;
+	if (diff < 1000) {
+		diff = 1001;
+	}
+	return ms(diff);
 }
 export function getIconForLTEStrength(device: Device) {
 	return ["fas", "signal"];
@@ -94,7 +98,7 @@ export function getIconForNetworkStatus(device: Device) {
 	switch (device.network.type) {
 		case "wifi":
 			return getIconForWifiStrength(device);
-		case "lte":
+		case "mobile":
 			return getIconForLTEStrength(device);
 		case "ethernet":
 			return ["fas", "ethernet"];

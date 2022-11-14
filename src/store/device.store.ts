@@ -1,5 +1,5 @@
 import { Device } from "@/helpers/types/customdash.summary";
-import { GlobalLoad } from "@/helpers/types/pusher.types";
+import { BatteryLoad, GlobalLoad, NetworkLoad } from "@/helpers/types/pusher.types";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
 import axios from "axios";
 import { defineStore } from "pinia";
@@ -100,7 +100,7 @@ export const useDevicesStore = defineStore("devices", {
 			this.loading.userdata = true;
 
 			// Fetch data
-			if (window.env.VUE_APP_VERCEL_ENV === "development") {
+			if (false && window.env.VUE_APP_VERCEL_ENV === "development") {
 				this.devices = {
 					api: "http://localhost:3001",
 					summary: sampleData,
@@ -121,27 +121,55 @@ export const useDevicesStore = defineStore("devices", {
 			this.loading.userdata = false;
 		},
 
-		requestCPU() {
-			// this.requests.push({ deviceId: "Thies-August-PC", type: "cpu" });
-			this.requests.push({ deviceId: "Thies-August-PC", type: "global" });
-			this.requests.push({ deviceId: "oneplusnord", type: "global" });
+		requestGlobalData(shownDevices: string[] = []) {
+			if (shownDevices.length === 0) {
+				this.devices?.summary.forEach((x) => {
+					shownDevices.push(x.id);
+				});
+			}
+			this.requests = [
+				...this.requests,
+				...shownDevices.flatMap((id) => [
+					{ deviceId: id, type: "global" },
+					{ deviceId: id, type: "battery" },
+					{ deviceId: id, type: "network" },
+				]),
+			];
 		},
+
 		emptyRequests() {
 			this.requests = [];
 		},
 
-		updateDevice(id: string, data: GlobalLoad) {
-			if (!this.devices) return;
+		findDevice(id: string) {
+			if (!this.devices) return null;
 			const device = this.devices.summary.find((d) => d.id === id);
 			if (!device) {
 				console.warn("Tried to update: ", id, "but it does not exist");
-				return;
+				return null;
 			}
+			return device;
+		},
+
+		updateGlobalLoad(id: string, data: GlobalLoad) {
+			const device = this.findDevice(id);
+			if (!device) return;
 
 			device.connected = data.connected;
 			device.lastConnected = data.lastConnected;
-			device.battery = data.battery || 0;
-			device.batteryCharging = data.charging || false;
+		},
+		updateBatteryLoad(id: string, data: BatteryLoad) {
+			const device = this.findDevice(id);
+			if (!device) return;
+
+			device.battery = data.percent;
+			device.batteryCharging = data.charging;
+		},
+		updateNetworkLoad(id: string, data: NetworkLoad) {
+			const device = this.findDevice(id);
+			if (!device) return;
+
+			device.network = data;
 		},
 	},
 });
