@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="user.loading.form || user.loading.userdata"
+		v-if="user.isLoading"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background" :style="{ backgroundImage: background }"></div>

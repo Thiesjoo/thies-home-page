@@ -9,13 +9,13 @@ export interface Device {
 	network: Network;
 	connected: boolean;
 	lastConnected: LastConnected;
-	dateReceived: number;
+	dateReceived?: number;
 }
 
 export interface LastConnected {
 	time: number;
 	ip: string;
-	location: Location;
+	location?: Location;
 }
 
 export interface Location {
@@ -25,12 +25,12 @@ export interface Location {
 }
 
 export interface Network {
-	interval: number;
+	interval?: number;
 	up: number;
 	down: number;
 	ip4: string;
 	ip6: string;
 	type: string;
 	extraInfo: string;
-	dateReceived: number;
+	dateReceived?: number;
 }
