@@ -1,4 +1,3 @@
-import { GlobalLoad } from "@/helpers/types/pusher.types";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { io, Socket } from "socket.io-client";
@@ -17,7 +16,7 @@ class SocketService {
 		console.log("Waiting for URL");
 		const url = await this.waitForDeviceURL();
 		console.log("Got base URL:", url);
-		// Append auth token as a query parameter
+		// Append auth token as a query parameter, because websocket initialization requests do not carry extra headers
 		const finalURL = `${url}?access_token=${userStore.accessToken}`;
 
 		this.socket = io(finalURL, {

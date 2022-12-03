@@ -10,7 +10,9 @@
 	</div>
 
 	<!-- Loading indicator -->
-	<div class="w-screen h-screen fixed flex justify-center items-center overflow-hidden bg-stone-300/50" v-if="loading">
+	<div
+		class="w-screen h-screen fixed flex justify-center items-center overflow-hidden bg-stone-300/50"
+		v-if="loading">
 		<div role="status ">
 			<svg
 				aria-hidden="true"
@@ -38,7 +40,10 @@
 					<!-- Device info -->
 					<div class="flex flex-col space-y-1 max-w-[40%]">
 						<span class="text-lg font-bold">
-							<font-awesome-icon :icon="getIconForDeviceType(device)" :title="getTitleType(device)" class="mr-1">
+							<font-awesome-icon
+								:icon="getIconForDeviceType(device)"
+								:title="getTitleType(device)"
+								class="mr-1">
 							</font-awesome-icon
 							>{{ device.name }}</span
 						>
@@ -60,7 +65,9 @@
 
 						<!-- Network -->
 						<span class="text-sm font-bold" :title="getNetworkTitle(device, true)">
-							<font-awesome-icon :icon="getIconForNetworkStatus(device)" :title="getNetworkTypeTitle(device)">
+							<font-awesome-icon
+								:icon="getIconForNetworkStatus(device)"
+								:title="getNetworkTypeTitle(device)">
 							</font-awesome-icon>
 							{{ getNetworkTitle(device) }}
 						</span>
@@ -88,10 +95,7 @@
 
 			<!-- Body -->
 			<!-- TODO: Blur body when information gets too old -->
-			<div class="flex flex-col space-y-2">
-				<div>fakka</div>
-				<div>fakka</div>
-			</div>
+			<div class="flex flex-col space-y-2"></div>
 		</div>
 	</div>
 </template>
@@ -133,9 +137,6 @@ export default defineComponent({
 			this.devicesStore.loadDeviceData();
 		},
 	},
-	// created() {
-	// 	SocketService.setupSocketConnection();
-	// },
 	beforeDestroy() {
 		SocketService.disconnect();
 		if (this.interval) clearInterval(this.interval);
@@ -146,6 +147,7 @@ export default defineComponent({
 	},
 	beforeRouteLeave() {
 		SocketService.disconnect();
+		if (this.interval) clearInterval(this.interval);
 	},
 	async mounted() {
 		const self = this;
