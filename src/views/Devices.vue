@@ -32,14 +32,15 @@
 	</div>
 
 	<!-- For every device in the list, get 1/4 of page width and make a nice looking colunm -->
-	<div class="total-container w-[100vw] h-[100vh] flex flex-row justify-center">
-		<div v-for="device in devices" class="single-container w-[25vw] p-2 m-3">
+	<div
+		class="total-container w-[100vw] h-[100vh] flex flex-col md:flex-row justify-center items-center md:items-start">
+		<div v-for="device in devices" class="single-container w-[80vw] md:w-[25vw] md:max-w-[450px] p-2 m-3">
 			<!-- Header -->
 			<div class="header-container">
 				<div class="flex flex-row justify-between">
 					<!-- Device info -->
 					<div class="flex flex-col space-y-1 max-w-[40%]">
-						<span class="text-lg font-bold">
+						<span class="text-lg font-bold break-words">
 							<font-awesome-icon
 								:icon="getIconForDeviceType(device)"
 								:title="getTitleType(device)"
@@ -184,7 +185,6 @@ export default defineComponent({
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 10px;
-	max-width: 450px;
 }
 
 .header-container {

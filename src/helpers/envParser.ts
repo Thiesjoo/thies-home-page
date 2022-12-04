@@ -5,7 +5,8 @@ declare global {
 			VUE_APP_VERCEL_URL: string;
 			VUE_APP_VERCEL_GIT_COMMIT_SHA: string;
 			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
-			BASEURL: string;
+			AUTHBASEURL: string;
+            DEVICEBASEURL: string;
 		};
 	}
 }

@@ -1,3 +1,4 @@
+import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import { Device } from "@/helpers/types/customdash.summary";
 import { BatteryLoad, GlobalLoad, NetworkLoad } from "@/helpers/types/pusher.types";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
@@ -99,19 +100,15 @@ export const useDevicesStore = defineStore("devices", {
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
+			this.devices = {
+				api: getDeviceBaseURL(),
+				summary: [],
+				extraInfo: {},
+			};
+
 			// Fetch data
 			if (window.env.VUE_APP_VERCEL_ENV === "development") {
-				this.devices = {
-					api: "http://localhost:3001",
-					summary: sampleData,
-					extraInfo: {},
-				};
-			} else {
-				this.devices = {
-					api: "https://testing.thies.dev",
-					summary: [],
-					extraInfo: {},
-				};
+				this.devices.summary = sampleData;
 			}
 
 			const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
