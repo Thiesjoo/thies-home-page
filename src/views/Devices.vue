@@ -96,7 +96,10 @@
 
 			<!-- Body -->
 			<!-- TODO: Blur body when information gets too old -->
-			<div class="flex flex-col space-y-2"></div>
+			<div class="flex flex-col space-y-2">
+				<button @click="devicesStore.requestCPUData(device.id)">Request CPU data</button>
+				Temp data: {{ devicesStore.livedata?.[device.id]?.cpu?.length }}
+			</div>
 		</div>
 	</div>
 </template>
