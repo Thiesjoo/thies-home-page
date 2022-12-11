@@ -2,10 +2,10 @@
 	<div id="app">
 		<div
 			v-if="preview"
-			class="absolute w-[300px] top-[10px] ml-[-100px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[100]"
-		>
+			class="absolute w-[300px] top-[20px] ml-[-90px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[100]">
 			<span class="font-extrabold text-sm"> {{ version }} </span>
 			<span class="text-xs">{{ gitSHA }}</span>
+			<span class="text-[10px]">{{ getBaseURL() }}</span>
 		</div>
 		<header class="header" v-if="show">
 			<div class="container">
@@ -33,6 +33,7 @@ import { routes } from "./router/routes";
 import VersionModalVue from "./components/VersionModal.vue";
 import LoginVue from "./components/LoginModal.vue";
 import { isProduction } from "./helpers/envParser";
+import { getBaseURL } from "./helpers/auto-refresh-tokens";
 
 export default defineComponent({
 	computed: {
@@ -44,6 +45,9 @@ export default defineComponent({
 		preview: () => !isProduction(),
 		gitSHA: () => window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7),
 		version: () => window.env.VUE_APP_VERCEL_ENV.toUpperCase(),
+	},
+	methods: {
+		getBaseURL,
 	},
 	watch: {
 		$route: {

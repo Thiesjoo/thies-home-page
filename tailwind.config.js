@@ -5,7 +5,7 @@ module.exports = {
   ],
   safelist: [
     {
-      pattern: /bg-(.*)-(600|400)/,
+      pattern: /(bg|text)-(.*)-(600|400)/,
     },
   ],
   theme: {

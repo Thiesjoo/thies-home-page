@@ -9,12 +9,7 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["Battery", "Pauze"];
-
-// if (window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development") {
-// 	DEFAULT_WIDGETS.push("Dummy");
-// 	DEFAULT_WIDGETS.push("RemoteDevices");
-// }
+export const DEFAULT_WIDGETS = ["Battery", "Pauze", "Dummy", "RemoteDevices"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
@@ -31,16 +26,43 @@ export type User = {
 		showSeconds: boolean;
 		showDate: boolean;
 		showVersion: boolean;
-		background: string;
+		backgroundURL: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
+		devices: {
+			api: string;
+			enabled: boolean;
+		};
 	};
+};
+
+const defaultUser: User = {
+	name: "",
+	email: "",
+	settings: {
+		showDate: false,
+		showSeconds: true,
+		showVersion: false,
+		backgroundURL: "",
+		widgets: {
+			topleft: [],
+			topright: [{ name: "VIA", id: "pos" }],
+			bottomleft: [],
+			bottomright: [{ name: "Pauze", id: "1" }],
+		},
+		widgetsAvailable: [],
+		devices: {
+			api: "",
+			enabled: false,
+		},
+	},
 };
 
 export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
-			loading: { form: false, userdata: false },
+			// Always loading userdata, because we want to check if the user is logged in
+			loading: { form: false, userdata: true },
 			loggedIn: useLocalStorage("loggedIn", false),
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
@@ -50,42 +72,56 @@ export const useUserStore = defineStore("user", {
 		};
 	},
 
+	getters: {
+		isLoading(state) {
+			return state.loading.form || state.loading.userdata;
+		},
+	},
+
 	actions: {
 		async getUserData() {
 			if (!this.loggedIn) {
+				this.loading.userdata = false;
 				this.user = null;
 				return;
 			}
 
-			this.loading.userdata = true;
-
 			try {
 				const userInformation = (await axios.get("/api/users/me")).data;
-				const userSettings = (await axios.get("/api/settings/me")).data;
-				console.log("Got user data: ", userInformation, "and settings: ", userSettings);
+				const syncedUserSettings = (await axios.get("/api/settings/me")).data;
+				// TODO: Sync this data with the server
+
+				console.log("Got user data: ", userInformation, "and settings: ", syncedUserSettings);
 				if (!this.user) {
 					// Default user data for testing
+					this.user = JSON.parse(JSON.stringify(defaultUser)) as User;
+
+					// Sync the user settings with the default user object
+					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
+				} else {
+					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
+
+					// Check if the user has the required properties
 					this.user = {
-						name: "",
-						email: "",
+						...defaultUser,
+						...this.user,
 						settings: {
-							showDate: false,
-							showSeconds: true,
-							showVersion: false,
-							background: "",
+							...defaultUser.settings,
+							...this.user.settings,
 							widgets: {
-								topleft: [],
-								topright: [{ name: "VIA", id: "pos" }],
-								bottomleft: [],
-								bottomright: [{ name: "Pauze", id: "1" }],
+								...defaultUser.settings.widgets,
+								...this.user.settings.widgets,
 							},
-							widgetsAvailable: [],
+							devices: {
+								...defaultUser.settings.devices,
+								...this.user.settings.devices,
+							},
 						},
 					};
 				}
+
 				this.user.name = userInformation.name;
 				this.user.email = userInformation.email;
-				this.user.settings.background = userSettings.backgroundURL || "";
 
 				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
 				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
@@ -100,6 +136,15 @@ export const useUserStore = defineStore("user", {
 				});
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
+
+				// Add in dummy widget on preview and development
+				if (
+					!DEFAULT_WIDGETS.includes("Dummy") &&
+					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
+				) {
+					DEFAULT_WIDGETS.push("Dummy");
+					DEFAULT_WIDGETS.push("RemoteDevices");
+				}
 
 				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
 
@@ -134,6 +179,7 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
+			this.$reset();
 			window.localStorage.clear();
 			this.$reset();
 
@@ -169,7 +215,7 @@ export const useUserStore = defineStore("user", {
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");
-				this.getUserData();
+				await this.getUserData();
 			} catch (e) {
 				console.warn("Login failed inside store: ", e);
 				toast.error("Something went wrong");
@@ -189,7 +235,7 @@ export const useUserStore = defineStore("user", {
 
 				this.loggedIn = true;
 				toast.success("Created new account!!");
-				this.getUserData();
+				await this.getUserData();
 			} catch (e) {
 				toast.error("Something went wrong");
 				throw e;

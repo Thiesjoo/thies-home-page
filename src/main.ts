@@ -11,9 +11,11 @@ import router from "./router";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { faTwitch, faDiscord, faSpotify, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord, faGithub, faSpotify, faTwitch } from "@fortawesome/free-brands-svg-icons";
 import {
 	faArrowRightFromBracket,
+	faArrowsRotate,
+	faBattery,
 	faBolt,
 	faDesktop,
 	faEthernet,
@@ -23,9 +25,9 @@ import {
 	faLinkSlash,
 	faLock,
 	faMobile,
-	faPhone,
 	faPlaneUp,
 	faPlus,
+	faQuestion,
 	faRobot,
 	faScroll,
 	faServer,
@@ -35,8 +37,8 @@ import {
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { clickOutsideDirective } from "./helpers/clickOutside";
 import "./helpers/auto-refresh-tokens";
+import { clickOutsideDirective } from "./helpers/clickOutside";
 
 import { VueReCaptcha } from "vue-recaptcha-v3";
 
@@ -46,8 +48,8 @@ import "./index.css";
 import { createPinia } from "pinia";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import { useUserStore } from "./store/user.store";
 import { getBaseURL } from "./helpers/auto-refresh-tokens";
+import { useUserStore } from "./store/user.store";
 
 import axios from "axios";
 axios.defaults.baseURL = getBaseURL();
@@ -56,8 +58,7 @@ library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
 //Home page
 library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
-
-library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faFingerprint);
+library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faFingerprint, faBattery, faArrowsRotate, faQuestion);
 
 const app = createApp(App, { router });
 app.use(router);
@@ -86,3 +87,10 @@ useUserStore()
 	.catch((e) => {
 		console.error("Something went wrong with getting userdata");
 	});
+
+// Watch the store for changes, and when a user logs out, redirect to the login page if on auth-required page
+useUserStore().$subscribe((mut, state) => {
+	if (!state.loggedIn && router.currentRoute.value.meta.requiresLogin) {
+		router.push("/login?to=" + router.currentRoute.value.path);
+	}
+});

@@ -1,6 +1,6 @@
 <template>
 	<span
-		v-if="user.loading.form || user.loading.userdata"
+		v-if="user.isLoading"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
 	></span>
 	<div class="background" :style="{ backgroundImage: background }"></div>
@@ -8,7 +8,9 @@
 	<div class="centered">
 		<div class="info">
 			<div class="flex items-center justify-center">
-				<span class="seconds absolute text-neutral-200" v-if="user.user?.settings?.showSeconds">{{ seconds }} </span>
+				<span class="seconds absolute text-neutral-200" v-if="true || user.user?.settings?.showSeconds"
+					>{{ seconds }}
+				</span>
 				<h2 class="time">{{ time }}</h2>
 			</div>
 			<span class="date text-neutral-200" v-if="user.user?.settings?.showDate">{{ date }}</span>
@@ -125,7 +127,7 @@ export default defineComponent({
 			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
 		},
 		background(): string {
-			const url = this.user.user?.settings.background;
+			const url = this.user.user?.settings.backgroundURL;
 
 			return (url ? `url("${url}"),` : "") + `url("https://source.unsplash.com/random/1920x1080/?landscape")`;
 		},
@@ -139,7 +141,6 @@ export default defineComponent({
 			this.dragging = 0;
 		},
 		childDrag(dragging: boolean) {
-			// console.log("HMmm");
 			this.dragging = dragging ? 2 : 0;
 		},
 	},
@@ -190,6 +191,7 @@ body {
 
 .info {
 	flex-direction: column;
+	font-family: "Roboto Mono", monospace;
 }
 
 .centered,
@@ -217,13 +219,12 @@ body {
 }
 
 .seconds {
-	font-size: 100%;
-	/* margin-left: 5px; */
-	transform: translate(15%, 50%);
+	font-size: 75%;
+	transform: translate(15%, 100%);
 }
 
 body.linux .seconds {
-	transform: translate(15%);
+	transform: translate(15%, 75%);
 }
 
 .greeting {
