@@ -20,7 +20,7 @@ export async function getProviderCredentials(req: VercelRequest, res: VercelResp
 			clientid: string;
 		} = (
 			await axios({
-				url: process.env.BASEURL + "/api/providers/me/" + provider,
+				url: process.env.AUTHBASEURL + "/api/providers/me/" + provider,
 				params: {
 					id,
 				},
