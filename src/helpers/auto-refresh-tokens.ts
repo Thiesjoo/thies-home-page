@@ -3,9 +3,12 @@ import axios from "axios";
 import { AxiosAuthRefreshRequestConfig, default as createAuthRefreshInterceptor } from "axios-auth-refresh";
 
 export const getBaseURL = () => {
-	return window?.env?.BASEURL || "https://auth.thies.dev";
+	return window?.env?.AUTHBASEURL || "https://auth.thies.dev";
 };
 
+export const getDeviceBaseURL = () => {
+	return window?.env?.DEVICEBASEURL || "https://testing.thies.dev";
+};
 // Function that will be called to refresh authorization
 const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => {
 	console.log("Going to refresh");
