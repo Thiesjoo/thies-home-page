@@ -19,7 +19,9 @@ import {
 	faBolt,
 	faDesktop,
 	faEthernet,
+	faFingerprint,
 	faHourglass,
+	faKey,
 	faLaptop,
 	faLinkSlash,
 	faLock,
@@ -57,8 +59,18 @@ library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
 //Home page
 library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
-
-library.add(faPlaneUp, faEthernet, faWifi, faSignal, faHourglass, faBattery, faArrowsRotate, faQuestion);
+library.add(
+	faPlaneUp,
+	faEthernet,
+	faWifi,
+	faSignal,
+	faHourglass,
+	faFingerprint,
+	faBattery,
+	faArrowsRotate,
+	faQuestion,
+	faKey
+);
 
 const app = createApp(App, { router });
 app.use(router);

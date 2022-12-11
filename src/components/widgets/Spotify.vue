@@ -63,8 +63,8 @@ export default defineComponent({
 		loaded: boolean;
 		spotifyAccesstoken?: string;
 		localProgress: number;
-		playerLoopInterval?: number;
-		progressInterval?: number;
+		playerLoopInterval?: ReturnType<typeof setInterval>;
+		progressInterval?: ReturnType<typeof setInterval>;
 	} {
 		const toReturn = {
 			localProgress: 0,

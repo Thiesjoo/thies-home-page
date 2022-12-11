@@ -157,7 +157,7 @@ export default defineComponent({
 
 				this.interval = setInterval(function () {
 					self.now = Date.now();
-				}, 1000);
+				}, 1000) as unknown as number;
 			}
 		});
 

@@ -1,5 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
+import { loginWithEmailAndAuthenticator, loginWithPasskey } from "@/helpers/webauthn";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import axios from "axios";
@@ -161,7 +162,7 @@ export const useUserStore = defineStore("user", {
 					}) as Widget[];
 				}
 			} catch (e) {
-				toast.error("Something went wrong with getting user data");
+				toast.warning("Please login again");
 				console.error(e);
 
 				window.localStorage.clear();
@@ -178,16 +179,37 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
-			window.localStorage.clear();
-			this.$reset();
-			window.localStorage.clear();
+			this.accessToken = "";
+			this.refreshToken = "";
+			this.loggedIn = false;
+			this.user = null;
+			toast.warning("You have been logged out");
+		},
+
+		async loginWithWebauth(email: string) {
+			let tokens: { access: string; refresh: string };
+			if (email.length === 0) {
+				// Login with resident key
+				tokens = await loginWithPasskey();
+			} else {
+				//login with email
+				tokens = await loginWithEmailAndAuthenticator(email);
+			}
+
+			this.accessToken = tokens.access;
+			this.refreshToken = tokens.refresh;
+
+			this.loggedIn = true;
+			toast.success("Logged in!!");
+			this.getUserData();
 		},
 
 		async login(data: LoginInformation) {
 			this.loading.form = true;
 			this.loggedIn = false;
 			try {
-				const tokens = await loginService.login(data);
+				let tokens: { access: string; refresh: string } = await loginService.login(data);
+
 				this.accessToken = tokens.access;
 				this.refreshToken = tokens.refresh;
 
@@ -195,6 +217,7 @@ export const useUserStore = defineStore("user", {
 				toast.success("Logged in!!");
 				await this.getUserData();
 			} catch (e) {
+				console.warn("Login failed inside store: ", e);
 				toast.error("Something went wrong");
 				this.accessToken = "";
 				throw e;
