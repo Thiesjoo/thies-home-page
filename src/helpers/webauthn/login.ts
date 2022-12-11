@@ -5,13 +5,17 @@ import { getBaseURL } from "../auto-refresh-tokens";
 
 function toastOnCancel(e: any, toast: ReturnType<typeof useToast>) {
 	console.error(e);
-	if (e.message === "The operation was aborted.") {
-		toast.error("You cancelled the operation");
 
-		// Axios error
+	if (e === "User not found") {
+		toast.error("User not found");
+	} else if (e.message === "The operation was aborted.") {
+		toast.error("You cancelled the operation");
+	} else if (e.message?.includes("No available authenticator") || e.message === "No authenticators found") {
+		toast.error("No authenticator found, please connect one and try again");
 	} else if (e.response) {
+		// Axios errors
 		if (e.response.status === 0) {
-			toast.error("Server/you is not online");
+			toast.error("Cannot make a connection to the server");
 		} else {
 			toast.error("Something went wrong on the network");
 		}
@@ -28,6 +32,11 @@ export async function loginWithEmailAndAuthenticator(email: string) {
 				username: email,
 			},
 		});
+
+		if (resp.data.allowCredentials.length === 0) {
+			throw new Error("No authenticators found");
+		}
+
 		const authResult = await startAuthentication(resp.data, false);
 
 		const authResp = await axios.request({
@@ -45,7 +54,6 @@ export async function loginWithEmailAndAuthenticator(email: string) {
 			throw new Error(authResp.data);
 		}
 	} catch (e) {
-		// TODO: Check if user has no authenticator
 		toastOnCancel(e, toast);
 
 		throw e;

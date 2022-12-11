@@ -179,10 +179,10 @@ export const useUserStore = defineStore("user", {
 			} catch (e) {
 				toast.error("Something went wrong with token deletion");
 			}
-			this.$reset();
-			window.localStorage.clear();
-			this.$reset();
-
+			this.accessToken = "";
+			this.refreshToken = "";
+			this.loggedIn = false;
+			this.user = null;
 			toast.warning("You have been logged out");
 		},
 
