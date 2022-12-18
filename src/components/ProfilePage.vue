@@ -67,16 +67,17 @@
 			</div>
 			<!-- 2fa Management -->
 			<div class="flex flex-row items-stretch py-5">
-				<div class="flex flex-col items-center" v-for="item in ['passkey', 'passwordless']">
+				<div class="flex flex-row items-center">
 					<a
 						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
 						:style="{
-							'background-color': LightenDarkenColor('#000000', -35),
+							'background-color': LightenDarkenColor('#000000', 35),
 						}"
-						@click="() => registerNewToken(item === 'passkey' ? true : false, 'TEMP')">
-						<font-awesome-icon :icon="[`fas`, item === `passkey` ? `fingerprint` : `key`]" class="mr-2" />
-						{{ item === "passkey" ? "Usernameless" : "Passwordless" }}</a
-					>
+						@click="registerNewToken">
+						<font-awesome-icon :icon="[`fas`, `fingerprint`]" class="mr-2" />
+						New Passkey
+					</a>
+					<PasskeyManagerModal></PasskeyManagerModal>
 				</div>
 			</div>
 
@@ -121,6 +122,8 @@ import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
+import { useToast } from "vue-toastification";
+import PasskeyManagerModal from "./PasskeyManagerModal.vue";
 
 export default defineComponent({
 	data() {
@@ -149,12 +152,19 @@ export default defineComponent({
 		return { user: useUserStore() };
 	},
 	methods: {
-		registerNewToken,
+		registerNewToken() {
+			const name = prompt("Enter a name for your new token");
+			if (!name) {
+				const toast = useToast();
+				toast.warning("You need to enter a name for your new token");
+				return;
+			}
+			registerNewToken(name);
+		},
 		async logout() {
 			this.user.logout();
 		},
 		change(event: Event) {
-			console.log(event);
 			if (this.user.user) {
 				//@ts-ignore
 				const string = event.target.id.split("-")?.[0];
@@ -191,8 +201,6 @@ export default defineComponent({
 			return !true;
 		},
 	},
-	mounted() {
-		// loginWithWebAuth(true);
-	},
+	components: { PasskeyManagerModal },
 });
 </script>

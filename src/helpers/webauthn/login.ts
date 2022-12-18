@@ -24,42 +24,6 @@ function toastOnCancel(e: any, toast: ReturnType<typeof useToast>) {
 	}
 }
 
-export async function loginWithEmailAndAuthenticator(email: string) {
-	const toast = useToast();
-	try {
-		const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-authentication-options-user", {
-			params: {
-				username: email,
-			},
-		});
-
-		if (resp.data.allowCredentials.length === 0) {
-			throw new Error("No authenticators found");
-		}
-
-		const authResult = await startAuthentication(resp.data, false);
-
-		const authResp = await axios.request({
-			url: getBaseURL() + "/auth/webauthn/verify-authentication-user",
-			method: "POST",
-			data: {
-				username: email,
-				...authResult,
-			},
-		});
-
-		if (authResp.data) {
-			return authResp.data as { access: string; refresh: string };
-		} else {
-			throw new Error(authResp.data);
-		}
-	} catch (e) {
-		toastOnCancel(e, toast);
-
-		throw e;
-	}
-}
-
 export async function loginWithPasskey() {
 	const toast = useToast();
 	try {

@@ -79,7 +79,7 @@ export default defineComponent({
 
 body {
 	height: 100vh;
-	background: #99aab5;
+	background: #76a0bc;
 	font-family: "Montserrat", sans-serif;
 }
 
@@ -105,7 +105,7 @@ footer > div {
 	position: fixed;
 	top: 0px;
 	width: 100%;
-	background: #23272a;
+	background: #252e35;
 	padding: 15px 0;
 	z-index: 10;
 }

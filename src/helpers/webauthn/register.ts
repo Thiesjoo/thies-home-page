@@ -10,7 +10,7 @@ import { getBaseURL } from "../auto-refresh-tokens";
  * A non resident key can only be used with email.
  * @param residentKey
  */
-export async function registerNewToken(residentKey: boolean, nickname: string) {
+export async function registerNewToken(nickname: string) {
 	const toast = useToast();
 
 	// GET registration options from the endpoint that calls
@@ -19,13 +19,11 @@ export async function registerNewToken(residentKey: boolean, nickname: string) {
 
 	let opts = resp.data;
 
-	if (residentKey) {
-		opts.authenticatorSelection.residentKey = "required";
-		opts.authenticatorSelection.requireResidentKey = true;
-		opts.extensions = {
-			credProps: true,
-		};
-	}
+	opts.authenticatorSelection.residentKey = "required";
+	opts.authenticatorSelection.requireResidentKey = true;
+	opts.extensions = {
+		credProps: true,
+	};
 
 	console.log("Data from server combined with options: ", opts);
 
@@ -49,7 +47,7 @@ export async function registerNewToken(residentKey: boolean, nickname: string) {
 	const verificationResp = await axios.post(getBaseURL() + "/auth/webauthn/verify-registration", {
 		...attResp,
 		nickname,
-		resident: residentKey,
+		resident: true,
 	});
 
 	// Wait for the results of verification
