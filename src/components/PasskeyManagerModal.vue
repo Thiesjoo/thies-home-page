@@ -12,7 +12,7 @@
 				class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full flex justify-center items-center"
 				v-if="open"
 				v-click-outside="toggle">
-				<div class="relative p-8 w-full max-w-2xl h-full md:h-auto z-100">
+				<div class="relative p-8 w-full max-w-2xl h-full md:h-auto z-[100]">
 					<div class="relative rounded-lg shadow bg-gray-800">
 						<div class="flex justify-between items-start p-5 rounded-t border-b border-gray-600">
 							<h2 class="mt-6 text-center w-full text-3xl font-extrabold">Manage Passkeys</h2>
