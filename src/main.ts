@@ -18,6 +18,7 @@ import {
 	faBattery,
 	faBolt,
 	faDesktop,
+	faEdit,
 	faEthernet,
 	faFingerprint,
 	faHourglass,
@@ -69,7 +70,8 @@ library.add(
 	faBattery,
 	faArrowsRotate,
 	faQuestion,
-	faKey
+	faKey,
+	faEdit
 );
 
 const app = createApp(App, { router });

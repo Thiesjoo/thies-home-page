@@ -21,63 +21,56 @@
 						</div>
 					</Transition>
 
+					<div>
+						<label for="email-address" class="sr-only">Email address</label>
+						<input
+							v-model="email"
+							type="email"
+							autocomplete="email"
+							required
+							autofocus
+							:class="{ 'rounded-t-md': renderLogin }"
+							class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+							placeholder="Email address" />
+					</div>
+					<div>
+						<label for="password" class="sr-only">Password</label>
+						<input
+							v-model="password"
+							type="password"
+							:autocomplete="renderLogin ? 'current-password' : 'new-password'"
+							required
+							pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
+							title="Password should be at least 8 letters, contain a number, small letter and capital letter"
+							class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+							:class="{ 'rounded-b-md': renderLogin }"
+							placeholder="Password" />
+					</div>
+					<div v-if="!renderLogin">
+						<label for="password" class="sr-only">Password confirmation</label>
+						<input
+							v-model="passwordConfirm"
+							type="password"
+							autocomplete="new-password"
+							required
+							pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
+							title="Password should be at least 8 letters, contain a number, small letter and capital letter"
+							class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+							placeholder="Confirmation password" />
+					</div>
 					<Transition>
-						<div v-if="showEmail">
-							<label for="email-address" class="sr-only">Email address</label>
-							<input
-								v-model="email"
-								type="email"
-								autocomplete="email"
-								required
-								autofocus
-								:class="{ 'rounded-t-md': renderLogin, 'rounded-b-md': !showPassword }"
-								class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-								placeholder="Email address" />
-						</div>
-					</Transition>
-					<Transition>
-						<div v-if="showPassword">
-							<label for="password" class="sr-only">Password</label>
-							<input
-								v-model="password"
-								type="password"
-								:autocomplete="renderLogin ? 'current-password' : 'new-password'"
-								required
-								pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
-								title="Password should be at least 8 letters, contain a number, small letter and capital letter"
-								class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-								:class="{ 'rounded-b-md': renderLogin }"
-								placeholder="Password" />
-						</div>
-					</Transition>
-					<Transition>
-						<div v-if="!renderLogin">
-							<label for="password" class="sr-only">Password confirmation</label>
-							<input
-								v-model="passwordConfirm"
-								type="password"
-								autocomplete="new-password"
-								required
-								pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,64}$"
-								title="Password should be at least 8 letters, contain a number, small letter and capital letter"
-								class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-								placeholder="Confirmation password" />
-						</div>
-					</Transition>
-					<div v-if="renderLogin && showWebauth">
-						<Transition>
-							<div
-								class="relative flex pt-5 pb-2 items-center w-full"
-								v-if="!webauthnPending || showEmail">
+						<div v-if="renderLogin && showWebauth">
+							<div class="relative flex pt-5 pb-2 items-center w-full">
 								<div class="flex-grow border-t border-gray-400 border-solid"></div>
 								<span class="flex-shrink mx-4 text-gray-400">Or use your fingerprint</span>
 								<div class="flex-grow border-t border-gray-400 border-solid"></div>
 							</div>
-						</Transition>
-						<Transition>
 							<div class="w-full flex justify-center mt-5">
 								<div
 									class="bg-fuchsia-800 rounded-full w-10 h-10 flex justify-center items-center text-center"
+									:class="{
+										'opacity-40': webauthnPending,
+									}"
 									@click="onWebauth">
 									<font-awesome-icon
 										:icon="['fas', 'fingerprint']"
@@ -85,8 +78,8 @@
 										class="mx-auto"></font-awesome-icon>
 								</div>
 							</div>
-						</Transition>
-					</div>
+						</div>
+					</Transition>
 				</div>
 
 				<div class="flex items-center justify-between">
@@ -165,16 +158,8 @@ export default defineComponent({
 		return { login: useUserStore(), toast: useToast() };
 	},
 	computed: {
-		showPassword() {
-			// If email is typed, and webauth is clicked hide it
-			// If webauth is selected hide both email and password
-			return !this.webauthnPending;
-		},
-		showEmail() {
-			return (this.email.length > 0 && this.webauthnPending) || !this.webauthnPending;
-		},
 		showWebauth() {
-			return !(this.email.length > 0 && this.password.length > 0 && !this.webauthnPending);
+			return !((this.email.length > 0 || this.password.length > 0) && !this.webauthnPending);
 		},
 	},
 	methods: {
