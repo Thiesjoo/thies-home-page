@@ -9,6 +9,7 @@ export const getBaseURL = () => {
 export const getDeviceBaseURL = () => {
 	return window?.env?.DEVICEBASEURL || "https://testing.thies.dev";
 };
+
 // Function that will be called to refresh authorization
 const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => {
 	console.log("Going to refresh");

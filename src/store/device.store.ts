@@ -1,15 +1,25 @@
+import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import { Device } from "@/helpers/types/customdash.summary";
-import { BatteryLoad, GlobalLoad, NetworkLoad } from "@/helpers/types/pusher.types";
+import {
+	BatteryLoad,
+	CpuLoad,
+	GlobalLoad,
+	LiveData,
+	NetworkLoad,
+	PossibleLiveDataKeys,
+} from "@/helpers/types/pusher.types";
 import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
 import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import { User, useUserStore } from "./user.store";
 
+export const MAX_ARRAY_LENGTH = 20;
+export type Timestamp = { dateReceived: number };
+
 export type DevicesInfo = {
 	api: string;
 	summary: Device[];
-	extraInfo: Record<string, {}>;
 };
 
 const sampleData = [
@@ -83,6 +93,8 @@ export const useDevicesStore = defineStore("devices", {
 
 			// Array that will be emptied when the socket requests it.
 			requests: [] as { deviceId: string; type: string }[],
+
+			livedata: {} as Record<string, { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }>,
 		};
 	},
 
@@ -99,19 +111,14 @@ export const useDevicesStore = defineStore("devices", {
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
+			this.devices = {
+				api: getDeviceBaseURL(),
+				summary: [],
+			};
+
 			// Fetch data
 			if (window.env.VUE_APP_VERCEL_ENV === "development") {
-				this.devices = {
-					api: "http://localhost:3001",
-					summary: sampleData,
-					extraInfo: {},
-				};
-			} else {
-				this.devices = {
-					api: "https://testing.thies.dev",
-					summary: [],
-					extraInfo: {},
-				};
+				this.devices.summary = sampleData;
 			}
 
 			const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
@@ -136,40 +143,75 @@ export const useDevicesStore = defineStore("devices", {
 				]),
 			];
 		},
+		requestCPUData(device: string) {
+			this.requests = [...this.requests, { deviceId: device, type: "cpu" }];
+		},
 
 		emptyRequests() {
 			this.requests = [];
 		},
 
 		findDevice(id: string) {
-			if (!this.devices) return null;
+			if (!this.devices) return { device: null, livedata: null };
+
 			const device = this.devices.summary.find((d) => d.id === id);
 			if (!device) {
 				console.warn("Tried to update: ", id, "but it does not exist");
-				return null;
+				return { device: null, livedata: null };
 			}
-			return device;
+			if (!this.livedata[id]) {
+				this.livedata[id] = {};
+			}
+
+			return { device, livedata: this.livedata[id] };
 		},
 
-		updateGlobalLoad(id: string, data: GlobalLoad) {
-			const device = this.findDevice(id);
+		// Processing functions
+		updateGlobalLoad(id: string, data: GlobalLoad & Timestamp) {
+			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
 			device.connected = data.connected;
 			device.lastConnected = data.lastConnected;
+			this.updateLiveData("global", data, livedata);
 		},
-		updateBatteryLoad(id: string, data: BatteryLoad) {
-			const device = this.findDevice(id);
+		updateBatteryLoad(id: string, data: BatteryLoad & Timestamp) {
+			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
 			device.battery = data.percent;
 			device.batteryCharging = data.charging;
+			this.updateLiveData("battery", data, livedata);
 		},
-		updateNetworkLoad(id: string, data: NetworkLoad) {
-			const device = this.findDevice(id);
+		updateNetworkLoad(id: string, data: NetworkLoad & Timestamp) {
+			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
 			device.network = data;
+			this.updateLiveData("network", data, livedata);
+		},
+
+		updateCPULoad(id: string, data: CpuLoad & Timestamp) {
+			const { device, livedata } = this.findDevice(id);
+			if (!device) return;
+			this.updateLiveData("cpu", data, livedata);
+		},
+
+		updateLiveData<T extends PossibleLiveDataKeys>(
+			key: T,
+			data: LiveData[T] & Timestamp,
+			livedata: { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }
+		) {
+			if (!(key in livedata)) {
+				livedata[key] = [] as any;
+			}
+			livedata[key]!.push(data);
+
+			if (livedata[key].length > MAX_ARRAY_LENGTH) {
+				const diff = livedata[key].length - MAX_ARRAY_LENGTH;
+				//@ts-ignore Nested type errors
+				livedata[key] = livedata[key].slice(diff);
+			}
 		},
 	},
 });

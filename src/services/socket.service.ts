@@ -69,6 +69,7 @@ class SocketService {
 			"battery-load": this.store.updateBatteryLoad,
 			"global-load": this.store.updateGlobalLoad,
 			"network-load": this.store.updateNetworkLoad,
+			"cpu-load": this.store.updateCPULoad,
 		};
 
 		this.socket?.on("initial-data", console.log);
