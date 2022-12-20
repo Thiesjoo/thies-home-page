@@ -21,7 +21,6 @@
 									style="position: absolute; left: 50%; transform: translateX(-50%)">
 									<slot name="title"> </slot>
 								</h2>
-								<!-- FIXME: The text is not centered, because button is not in the correct place -->
 								<button
 									type="button"
 									@click="toggle"
