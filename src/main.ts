@@ -54,6 +54,7 @@ import { getBaseURL } from "./helpers/auto-refresh-tokens";
 import { useUserStore } from "./store/user.store";
 
 import axios from "axios";
+import ModalVue from "./components/Modal.vue";
 axios.defaults.baseURL = getBaseURL();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
@@ -88,6 +89,7 @@ app.use(VueReCaptcha, {
 clickOutsideDirective(app);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
+app.component("Modal", ModalVue);
 
 if (/\blinux\b/i.test(navigator.userAgent)) {
 	document.body.className += " linux";

@@ -67,7 +67,7 @@ export default defineComponent({
 			}
 		});
 	},
-	components: { LoginForm, ProfilePage, Modal },
+	components: { LoginForm, ProfilePage },
 });
 </script>
 <style>
