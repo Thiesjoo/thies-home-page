@@ -9,10 +9,14 @@
 					class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-100 w-[100vw] md:inset-0 h-modal h-[100vh] flex justify-center items-center"
 					v-if="open"
 					v-click-outside="toggle">
-					<div class="relative p-4 w-full max-w-2xl h-auto">
-						<div class="relative rounded-lg shadow bg-gray-700">
+					<div class="relative p-10 max-w-2xl h-auto">
+						<div
+							class="relative rounded-lg shadow bg-gray-700"
+							:style="{
+								backgroundColor,
+							}">
 							<div class="flex justify-between items-start p-5 rounded-t border-b border-gray-600">
-								<h2 class="mt-6 text-center w-full text-3xl font-extrabold">
+								<h2 class="mt-6 text-center w-full text-3xl font-extrabold text-white">
 									<slot name="title"> </slot>
 								</h2>
 								<!-- FIXME: The text is not centered, because button is not in the correct place -->
@@ -34,6 +38,7 @@
 	</div>
 </template>
 <script lang="ts">
+import { lightenDarkenColor } from "@/helpers/colors";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -50,15 +55,21 @@ export default defineComponent({
 			open: false,
 		};
 	},
+	computed: {
+		backgroundColor() {
+			return lightenDarkenColor("#374151", (window.openModals - 1) * -10);
+		},
+	},
 	methods: {
 		toggle() {
 			this.open = !this.open;
 			this.$emit("toggle", this.open);
+
+			window.openModals += this.open ? 1 : -1;
 		},
 	},
 	mounted() {
-		this.open = this.openOnMount;
-		this.$emit("toggle", this.open);
+		if (this.openOnMount) this.toggle();
 	},
 	emits: ["toggle"],
 });

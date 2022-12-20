@@ -13,28 +13,22 @@
 		<template #title>Add new widget</template>
 
 		<template #content>
-			<div class="relative p-4 w-full max-w-2xl h-full md:h-auto z-[100]">
-				<div class="relative rounded-lg shadow bg-gray-700">
-					<h4 class="w-full text-center italic text-gray-300 p-0">
-						These widgets are displayed with sample data
-					</h4>
+			<h4 class="w-full text-center italic text-gray-300 p-0">These widgets are displayed with sample data</h4>
 
-					<div class="pt-3 p-6 space-y-6 items-center flex flex-col">
-						<draggable
-							id="newly_created"
-							:list="allItems"
-							:group="{ name: 'widgets', put: false }"
-							:item-key="generateKey"
-							@start="start"
-							@end="end">
-							<template #item="{ element }">
-								<div>
-									<component :is="element.name" :sample="true"></component>
-								</div>
-							</template>
-						</draggable>
-					</div>
-				</div>
+			<div class="pt-3 p-6 space-y-6 items-center flex flex-col">
+				<draggable
+					id="newly_created"
+					:list="allItems"
+					:group="{ name: 'widgets', put: false }"
+					:item-key="generateKey"
+					@start="start"
+					@end="end">
+					<template #item="{ element }">
+						<div>
+							<component :is="element.name" :sample="true"></component>
+						</div>
+					</template>
+				</draggable>
 			</div>
 		</template>
 	</Modal>

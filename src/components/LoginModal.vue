@@ -10,8 +10,10 @@
 		</template>
 
 		<template #content>
-			<ProfilePage v-if="user.loggedIn" />
-			<LoginForm v-else />
+			<div class="min-w-[30vw]">
+				<ProfilePage v-if="user.loggedIn" />
+				<LoginForm v-else />
+			</div>
 		</template>
 	</Modal>
 </template>

@@ -2,6 +2,7 @@
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development";
+window.openModals = 0;
 
 import { createApp } from "vue";
 import App from "./App.vue";

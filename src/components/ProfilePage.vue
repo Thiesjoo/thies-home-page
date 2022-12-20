@@ -46,7 +46,7 @@
 					<a
 						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
 						:style="{
-							'background-color': LightenDarkenColor(item.color, canAddExtraAccount(item.name) ? -35 : 0),
+							'background-color': lightenDarkenColor(item.color, canAddExtraAccount(item.name) ? -35 : 0),
 						}"
 						:class="{
 							disabled: canAddExtraAccount(item.name),
@@ -71,7 +71,7 @@
 					<a
 						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
 						:style="{
-							'background-color': LightenDarkenColor('#000000', 35),
+							'background-color': lightenDarkenColor('#000000', 35),
 						}"
 						@click="registerNewToken">
 						<font-awesome-icon :icon="[`fas`, `fingerprint`]" class="mr-2" />
@@ -119,6 +119,7 @@
 </template>
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
+import { lightenDarkenColor } from "@/helpers/colors";
 import { registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
@@ -174,19 +175,7 @@ export default defineComponent({
 					event.target.checked;
 			}
 		},
-		LightenDarkenColor(color: string, percent: number) {
-			return (
-				"#" +
-				[1, 3, 5]
-					.map((x) => {
-						let temp = parseInt(color.substring(x, x + 2), 16);
-						temp = ~~((temp * (100 + percent)) / 100);
-						temp = Math.min(temp, 255);
-						return temp.toString(16).padStart(2, "0");
-					})
-					.join("")
-			);
-		},
+		lightenDarkenColor,
 		getURL(name: string) {
 			if (name == "POS") {
 				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";

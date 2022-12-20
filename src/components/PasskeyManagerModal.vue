@@ -12,7 +12,7 @@
 		<template #title>Manage Passkeys</template>
 
 		<template #content
-			><div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
+			><div class="flex items-center flex-col space-y-2 min-w-[25vw]" v-if="!user.loading.userdata">
 				<div
 					v-for="passkey in passkeys"
 					class="bg-gray-900 rounded-md m-3 p-2 flex flex-row items-center text-lg w-[75%]">
