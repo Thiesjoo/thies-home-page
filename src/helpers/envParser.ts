@@ -8,6 +8,7 @@ declare global {
 			AUTHBASEURL: string;
 			DEVICEBASEURL: string;
 		};
+		openModals: number;
 	}
 }
 

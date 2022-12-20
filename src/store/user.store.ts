@@ -1,6 +1,6 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
-import { loginWithEmailAndAuthenticator, loginWithPasskey } from "@/helpers/webauthn";
+import { loginWithPasskey } from "@/helpers/webauthn";
 import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import axios from "axios";
@@ -186,15 +186,9 @@ export const useUserStore = defineStore("user", {
 			toast.warning("You have been logged out");
 		},
 
-		async loginWithWebauth(email: string) {
+		async loginWithWebauth() {
 			let tokens: { access: string; refresh: string };
-			if (email.length === 0) {
-				// Login with resident key
-				tokens = await loginWithPasskey();
-			} else {
-				//login with email
-				tokens = await loginWithEmailAndAuthenticator(email);
-			}
+			tokens = await loginWithPasskey();
 
 			this.accessToken = tokens.access;
 			this.refreshToken = tokens.refresh;

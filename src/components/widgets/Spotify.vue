@@ -120,7 +120,6 @@ export default defineComponent({
 	},
 	methods: {
 		async refreshTrack() {
-			// TODO: Is pending request really needed
 			if (!this.spotifyAccesstoken || this.pendingRequest) return;
 			const offset = Date.now() - (this.track?.timestamp || 0);
 

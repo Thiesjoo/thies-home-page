@@ -2,6 +2,7 @@
 window.env = ENV;
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development";
+window.openModals = 0;
 
 import { createApp } from "vue";
 import App from "./App.vue";
@@ -18,6 +19,7 @@ import {
 	faBattery,
 	faBolt,
 	faDesktop,
+	faEdit,
 	faEthernet,
 	faFingerprint,
 	faHourglass,
@@ -53,6 +55,7 @@ import { getBaseURL } from "./helpers/auto-refresh-tokens";
 import { useUserStore } from "./store/user.store";
 
 import axios from "axios";
+import ModalVue from "./components/Modal.vue";
 axios.defaults.baseURL = getBaseURL();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
@@ -69,7 +72,8 @@ library.add(
 	faBattery,
 	faArrowsRotate,
 	faQuestion,
-	faKey
+	faKey,
+	faEdit
 );
 
 const app = createApp(App, { router });
@@ -86,6 +90,7 @@ app.use(VueReCaptcha, {
 clickOutsideDirective(app);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
+app.component("Modal", ModalVue);
 
 if (/\blinux\b/i.test(navigator.userAgent)) {
 	document.body.className += " linux";

@@ -2,7 +2,7 @@
 	<div id="app">
 		<div
 			v-if="preview"
-			class="absolute w-[300px] top-[20px] ml-[-90px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[100]">
+			class="absolute w-[300px] top-[20px] ml-[-90px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[10]">
 			<span class="font-extrabold text-sm"> {{ version }} </span>
 			<span class="text-xs">{{ gitSHA }}</span>
 			<span class="text-[10px]">{{ getBaseURL() }}</span>
@@ -79,7 +79,7 @@ export default defineComponent({
 
 body {
 	height: 100vh;
-	background: #99aab5;
+	background: #76a0bc;
 	font-family: "Montserrat", sans-serif;
 }
 
@@ -105,9 +105,8 @@ footer > div {
 	position: fixed;
 	top: 0px;
 	width: 100%;
-	background: #23272a;
+	background: #252e35;
 	padding: 15px 0;
-	z-index: 10;
 }
 
 .header_menu {
