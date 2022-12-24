@@ -94,6 +94,9 @@ Sentry.init({
 	// of transactions for performance monitoring.
 	// We recommend adjusting this value in production
 	tracesSampleRate: 0.5,
+	environment: window.env.VUE_APP_VERCEL_ENV,
+	enabled: window.env.VUE_APP_VERCEL_ENV !== "development",
+	release: "thies-home-page@" + window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA,
 });
 
 app.use(router);

@@ -18,7 +18,10 @@ module.exports = {
                 'style-src': false,
                 'script-src': true,
             },
-        })],
+        }),
+        new webpack.DefinePlugin({
+            __SENTRY_DEBUG__: false,
+        }),],
     },
     chainWebpack: config => {
         config.plugin('define').tap(([options = {}]) => {
