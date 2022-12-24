@@ -54,6 +54,9 @@ import "vue-toastification/dist/index.css";
 import { getBaseURL } from "./helpers/auto-refresh-tokens";
 import { useUserStore } from "./store/user.store";
 
+import * as Sentry from "@sentry/vue";
+import { BrowserTracing } from "@sentry/tracing";
+
 import axios from "axios";
 import ModalVue from "./components/Modal.vue";
 axios.defaults.baseURL = getBaseURL();
@@ -77,6 +80,22 @@ library.add(
 );
 
 const app = createApp(App, { router });
+
+Sentry.init({
+	app,
+	dsn: "https://6cedfceff1414c40a3850e36e6302816@o4504384319258624.ingest.sentry.io/4504384441417728",
+	integrations: [
+		new BrowserTracing({
+			routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+			tracePropagationTargets: ["localhost", "thies.dev", /^\//],
+		}),
+	],
+	// Set tracesSampleRate to 1.0 to capture 100%
+	// of transactions for performance monitoring.
+	// We recommend adjusting this value in production
+	tracesSampleRate: 0.5,
+});
+
 app.use(router);
 
 app.use(createPinia());
