@@ -1,6 +1,6 @@
 const EXTRA_KEYS = ["AUTHBASEURL", "DEVICEBASEURL"]
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
-
+const webpack = require("webpack")
 
 module.exports = {
     configureWebpack: {
