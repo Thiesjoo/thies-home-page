@@ -94,9 +94,15 @@ class SocketService {
 		this.store?.$subscribe((mut, state) => {
 			if (state.requests.length > 0) {
 				for (const request of state.requests) {
-					this.socket?.emit("request-live-updates", request.deviceId, [request.type], (ack: any) => {
-						console.log("Ack for request:", request, ":", ack);
-					});
+					this.socket?.emit(
+						"request-live-updates",
+						request.deviceId,
+						[request.type],
+						request.type !== "cpu",
+						(ack: any) => {
+							console.log("Ack for request:", request, ":", ack);
+						}
+					);
 				}
 				this.store?.emptyRequests();
 			}

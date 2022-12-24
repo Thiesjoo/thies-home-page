@@ -48,7 +48,7 @@ const defaultUser: User = {
 			topleft: [],
 			topright: [{ name: "VIA", id: "pos" }],
 			bottomleft: [],
-			bottomright: [{ name: "Pauze", id: "1" }],
+			bottomright: [],
 		},
 		widgetsAvailable: [],
 		devices: {

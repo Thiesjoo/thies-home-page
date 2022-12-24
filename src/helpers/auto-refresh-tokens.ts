@@ -68,8 +68,12 @@ axios.interceptors.request.use((request) => {
 
 	// Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
 	if (
-		request.url?.includes("thies.dev") ||
-		(request.baseURL?.includes("thies.dev") && !request.url?.includes("http"))
+		// Actually going to thies.dev domain
+		(request.url?.includes("thies.dev") ||
+			// Axios shortcut. If you do not specify a domain, it will use the baseURL
+			(request.baseURL?.includes("thies.dev") && !request.url?.includes("http"))) &&
+		// We ALWAYS want to cache the rooster_parser, because it is a static file
+		!request.url?.includes("rooster_parser")
 	) {
 		console.info("Including anti-caching header because CORS and Vercel and multiple domains do not work together");
 		request.headers["pragma"] = "no-cache";
