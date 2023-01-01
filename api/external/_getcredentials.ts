@@ -26,7 +26,7 @@ export async function getProviderCredentials(req: VercelRequest, res: VercelResp
 				},
 				headers: {
 					Authorization: `Bearer ${token}`,
-					"X-Secret": process.env.secret,
+					"X-Secret": process.env.secret || "",
 				},
 				method: "GET",
 			})

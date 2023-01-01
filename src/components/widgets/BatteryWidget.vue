@@ -1,4 +1,5 @@
 <template>
+	<!-- If the level is 0, there is no battery in this computer -->
 	<Base :loaded="Math.abs(1 - level) > 0.01">
 		<template #content>
 			<Battery :percentage="percentage" :charging="charging"></Battery>

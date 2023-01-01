@@ -1,5 +1,5 @@
 <template>
-	<Base :loaded="true">
+	<Base :loaded="devices.length > 0">
 		<template #content>
 			<div
 				v-for="device in devices"
@@ -37,19 +37,26 @@
 							<font-awesome-icon
 								:icon="['fas', 'hourglass']"
 								class="text-red-600"
-								v-if="isInformationTooOld(device)"
+								v-if="isInformationTooOld(device, now)"
 								title="We haven't received any information from this device for a while.">
 							</font-awesome-icon>
 
 							<font-awesome-icon :icon="getIconForDeviceType(device)" :title="getTitleType(device)">
 							</font-awesome-icon>
-							<font-awesome-icon :icon="getIconForNetworkStatus(device)" :title="getNetworkTypeTitle(device)">
+							<font-awesome-icon
+								:icon="getIconForNetworkStatus(device)"
+								:title="getNetworkTypeTitle(device)">
 							</font-awesome-icon>
-							<font-awesome-icon :icon="['fas', 'bolt']" v-if="device.batteryCharging" title="Battery is charging">
+							<font-awesome-icon
+								:icon="['fas', 'bolt']"
+								v-if="device.batteryCharging"
+								title="Battery is charging">
 							</font-awesome-icon>
 						</div>
-						<span class="text-[12px] text-orange-700 text-center" v-if="isInformationTooOld(device, true)"
-							>Age: {{ informationAgeShort(device) }}
+						<span
+							class="text-[12px] text-orange-700 text-center"
+							v-if="isInformationTooOld(device, now, true)"
+							>Age: {{ informationAgeShort(device, now) }}
 						</span>
 					</div>
 				</div>
@@ -78,11 +85,15 @@ import { Base } from ".";
 
 export default defineComponent({
 	data() {
-		return { devices: [] as Device[], radius: 42 };
+		// TODO: Update this timer automatically
+		return { radius: 42, now: Date.now() };
 	},
 	computed: {
 		circumference() {
 			return this.radius * 2 * Math.PI;
+		},
+		devices(): Device[] {
+			return this.devicesStore.devices?.summary ?? [];
 		},
 	},
 	methods: {
@@ -90,22 +101,9 @@ export default defineComponent({
 			window.open(`https://customdash.thies.dev/output/devices/${device.id}`, "_blank");
 		},
 		...allHelperFunctions,
-		async getUpdatedDevices() {
-			// const res = (
-			// 	await axios.get("https://customdash.thies.dev/output/summary", {
-			// 		headers: {
-			// 			Authorization: "Bearer",
-			// 		},
-			// 	})
-			// ).data;
-			// console.log(res);
-			// return res.summary;
-			return this.devicesStore.devices?.summary || [];
-		},
 	},
 	async mounted() {
 		console.log("Requesting here:");
-		this.devices = await this.getUpdatedDevices();
 	},
 	setup() {
 		return { devicesStore: useDevicesStore() };
