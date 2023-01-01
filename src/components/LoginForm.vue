@@ -80,6 +80,15 @@
 							</div>
 						</div>
 					</Transition>
+
+					<div class="flex items-center align-center justify-center">
+						<TurnstileComponent
+							sitekey="0x4AAAAAAAAztLnn111I6OdT"
+							:action="recaptchaAction"
+							@verifyLogin="onValidLoginToken"
+							@verifyWebauth="onValidWebauthToken"
+							@fail="onError" />
+					</div>
 				</div>
 
 				<div class="flex items-center justify-between">
@@ -102,12 +111,12 @@
 				<div>
 					<button
 						type="submit"
-						:disabled="login.loading.form"
+						:disabled="allowInput"
 						class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:hover:bg-indigo-600">
 						<span class="absolute left-0 inset-y-0 flex items-center pl-3">
-							<font-awesome-icon :icon="['fas', 'lock']" size="lg" v-if="!login.loading.form" />
+							<font-awesome-icon :icon="['fas', 'lock']" size="lg" v-if="!allowInput" />
 							<svg
-								v-if="login.loading.form"
+								v-if="allowInput"
 								role="status"
 								class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
 								viewBox="0 0 100 101"
@@ -132,6 +141,7 @@
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
+import TurnstileComponent from "@/components/Turnstile.vue";
 
 // TODO: Implement social logins right here and link with accounts
 // Backend should have a pending user list?
@@ -152,6 +162,7 @@ export default defineComponent({
 			error: "",
 			renderLogin: this.login,
 			webauthnPending: false,
+			recaptchaAction: "",
 		};
 	},
 	setup() {
@@ -161,19 +172,62 @@ export default defineComponent({
 		showWebauth() {
 			return !((this.email.length > 0 || this.password.length > 0) && !this.webauthnPending);
 		},
+		allowInput() {
+			return this.login.loading.form;
+		},
 	},
 	methods: {
-		async onWebauth() {
-			this.webauthnPending = true;
-			this.error = "";
-			await this.$recaptchaLoaded();
+		async onError(error: any) {
+			if (error) {
+				console.error("Error from turnstile", error);
+				this.error = error?.message;
+				this.webauthnPending = false;
+				this.recaptchaAction = "";
+			}
+		},
+		async onValidLoginToken(recaptchaToken: string) {
+			const body = {
+				email: this.email,
+				password: this.password,
+				recaptchaToken,
+			};
+
+			if (!this.renderLogin) {
+				// Signup form
+				try {
+					await this.login.register({
+						...body,
+						name: this.name,
+					});
+				} catch (e: any) {
+					this.error = e?.message;
+				}
+
+				return;
+			}
 
 			try {
-				this.login.loginWithWebauth();
+				await this.login.login(body);
+			} catch (e: any) {
+				this.error = e;
+			}
+			this.recaptchaAction = "hide";
+		},
+		async onValidWebauthToken(recaptchaToken: string) {
+			try {
+				this.login.loginWithWebauth(recaptchaToken);
 			} catch (e: any) {
 				this.error = e?.message;
 			}
+
 			this.webauthnPending = false;
+			this.recaptchaAction = "hide";
+		},
+		async onWebauth() {
+			this.webauthnPending = true;
+			this.error = "";
+
+			this.recaptchaAction = "webauth";
 		},
 		async onSubmit(e: Event) {
 			e.preventDefault();
@@ -186,40 +240,11 @@ export default defineComponent({
 			}
 
 			this.error = "";
-
-			await this.$recaptchaLoaded();
-
-			try {
-				const body = {
-					email: this.email,
-					password: this.password,
-					recaptchaToken: await this.$recaptcha(!this.renderLogin ? "Register" : "Login"),
-				};
-
-				if (!this.renderLogin) {
-					//Signup form
-					try {
-						await this.login.register({
-							...body,
-							name: this.name,
-						});
-					} catch (e: any) {
-						this.error = e?.message;
-					}
-
-					return;
-				}
-
-				try {
-					await this.login.login(body);
-				} catch (e: any) {
-					this.error = e;
-				}
-			} catch (e) {
-				console.error("Recaptcha failed!");
-				this.error = "Something went wrong with the recaptcha";
-			}
+			this.recaptchaAction = "login";
 		},
+	},
+	components: {
+		TurnstileComponent,
 	},
 });
 </script>

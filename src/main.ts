@@ -43,8 +43,6 @@ import {
 import "./helpers/auto-refresh-tokens";
 import { clickOutsideDirective } from "./helpers/clickOutside";
 
-import { VueReCaptcha } from "vue-recaptcha-v3";
-
 /** Tailwind shizz */
 import "./index.css";
 
@@ -100,9 +98,6 @@ Sentry.init({
 			tracePropagationTargets: ["localhost", "thies.dev", /^\//],
 		}),
 	],
-	// Set tracesSampleRate to 1.0 to capture 100%
-	// of transactions for performance monitoring.
-	// We recommend adjusting this value in production
 	tracesSampleRate: 0.5,
 	environment: window.env.VUE_APP_VERCEL_ENV,
 	enabled: window.env.VUE_APP_VERCEL_ENV !== "development",
@@ -113,11 +108,6 @@ app.use(router);
 
 app.use(createPinia());
 app.use(Toast, {});
-
-// For more options see below
-app.use(VueReCaptcha, {
-	siteKey: "6LcpnaEfAAAAABlZfJ_rRIBUTgCuJHPRKNmm9768",
-});
 
 clickOutsideDirective(app);
 

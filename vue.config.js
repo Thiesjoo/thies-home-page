@@ -5,7 +5,7 @@ const webpack = require("webpack")
 module.exports = {
     configureWebpack: {
         plugins: [new CspHtmlWebpackPlugin({
-            'script-src': ["'self'", "https://challenges.cloudflare.com", "https://www.google.com/"],
+            'script-src': ["'self'", "https://challenges.cloudflare.com"],
             'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
             'object-src': ["'none'"],
         }, {

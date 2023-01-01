@@ -19,15 +19,21 @@ function toastOnCancel(e: any, toast: ReturnType<typeof useToast>) {
 		} else {
 			toast.error("Something went wrong on the network");
 		}
+	} else if (e.message === "WebAuthn is not supported in this browser") {
+		toast.error("WebAuthn is not supported in this browser");
 	} else {
 		toast.error("Something went wrong");
 	}
 }
 
-export async function loginWithPasskey() {
+export async function loginWithPasskey(recaptchaToken: string) {
 	const toast = useToast();
 	try {
-		const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-authentication-options");
+		const resp = await axios.get(getBaseURL() + "/auth/webauthn/generate-authentication-options", {
+			headers: {
+				recaptcha: recaptchaToken,
+			},
+		});
 		const authResult = await startAuthentication(resp.data, false);
 
 		console.log("Auth result: ", authResult);

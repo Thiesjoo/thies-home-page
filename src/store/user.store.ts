@@ -186,16 +186,23 @@ export const useUserStore = defineStore("user", {
 			toast.warning("You have been logged out");
 		},
 
-		async loginWithWebauth() {
-			let tokens: { access: string; refresh: string };
-			tokens = await loginWithPasskey();
+		async loginWithWebauth(recaptchaToken: string) {
+			try {
+				this.loading.form = true;
+				let tokens: { access: string; refresh: string };
+				tokens = await loginWithPasskey(recaptchaToken);
 
-			this.accessToken = tokens.access;
-			this.refreshToken = tokens.refresh;
+				this.accessToken = tokens.access;
+				this.refreshToken = tokens.refresh;
 
-			this.loggedIn = true;
-			toast.success("Logged in!!");
-			this.getUserData();
+				this.loggedIn = true;
+				toast.success("Logged in!!");
+				this.getUserData();
+			} catch (e) {
+				this.accessToken = "";
+			} finally {
+				this.loading.form = false;
+			}
 		},
 
 		async login(data: LoginInformation) {

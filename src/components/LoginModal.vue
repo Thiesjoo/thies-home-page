@@ -1,5 +1,5 @@
 <template>
-	<Modal :openOnMount="!!$route.query.open" @toggle="toggle">
+	<Modal :openOnMount="!!$route.query.open">
 		<template #button>
 			<div class="rounded p-1">
 				<span>{{ popupTitle }}</span>
@@ -10,7 +10,7 @@
 		</template>
 
 		<template #content>
-			<div class="min-w-[30vw]">
+			<div class="min-w-[40vw]">
 				<ProfilePage v-if="user.loggedIn" />
 				<LoginForm v-else />
 			</div>
@@ -31,41 +31,10 @@ export default defineComponent({
 			return this.user.loggedIn ? "Your profile" : "Login";
 		},
 	},
-	methods: {
-		toggle(state: boolean) {
-			//@ts-ignore
-			const recaptcha = this.$recaptchaInstance?.value;
-			if (!recaptcha) return;
-
-			if (!state) {
-				recaptcha.hideBadge();
-			} else if (!this.user.loggedIn && state) {
-				recaptcha.showBadge();
-			}
-		},
-	},
 	setup() {
 		const userStore = useUserStore();
 
 		return { user: userStore };
-	},
-	async created() {
-		await this.$recaptchaLoaded();
-		//@ts-ignore
-		this.$recaptchaInstance.value.hideBadge();
-
-		const self = this;
-		this.user.$subscribe(async function (mut, state) {
-			//@ts-ignore
-			const recaptcha = self.$recaptchaInstance.value;
-
-			if (state.loggedIn) {
-				recaptcha.hideBadge();
-			} else if (self.$route.query.open) {
-				// Not logged in, but view is open
-				recaptcha.showBadge();
-			}
-		});
 	},
 	components: {
 		LoginForm: defineAsyncComponent(() => import("./LoginForm.vue")),
