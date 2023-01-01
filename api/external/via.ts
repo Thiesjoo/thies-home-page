@@ -29,8 +29,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 				await axios({
 					url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
 					headers: {
-						Authorization: `Bearer ${req.cookies.accesstoken || req.headers.authorization?.split(" ")?.[1]}`,
-						"X-Secret": process.env.secret,
+						Authorization: `Bearer ${
+							req.cookies.accesstoken || req.headers.authorization?.split(" ")?.[1]
+						}`,
+						"X-Secret": process.env.secret || "",
 					},
 					data: {
 						accessToken: "",
