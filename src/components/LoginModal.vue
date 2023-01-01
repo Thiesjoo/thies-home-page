@@ -19,9 +19,7 @@
 </template>
 <script lang="ts">
 import { useUserStore } from "@/store/user.store";
-import { defineComponent } from "vue";
-import LoginForm from "./LoginForm.vue";
-import ProfilePage from "./ProfilePage.vue";
+import { defineAsyncComponent, defineComponent } from "vue";
 import Modal from "./Modal.vue";
 
 export default defineComponent({
@@ -69,7 +67,11 @@ export default defineComponent({
 			}
 		});
 	},
-	components: { LoginForm, ProfilePage },
+	components: {
+		LoginForm: defineAsyncComponent(() => import("./LoginForm.vue")),
+		ProfilePage: defineAsyncComponent(() => import("./ProfilePage.vue")),
+		Modal,
+	},
 });
 </script>
 <style>

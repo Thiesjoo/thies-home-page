@@ -77,12 +77,13 @@ export function getNetworkTitle(device: Device, ignoreLength = false) {
 	return extraInfo.slice(0, tooLong ? MAX_WIFI_NAME_LENGTH : 1000) + (tooLong ? "..." : "");
 }
 
+// Outputs an object with the color classes for the battery (In VUE format)
 export function getColorForBattery(device: Device, background = false) {
 	const base = {
 		"text-green-600": device.battery > 50,
 		"text-yellow-600": device.battery > 25 && device.battery <= 50,
 		"text-red-600": device.battery <= 25,
-		"text-gray-400": !hasBattery(device),
+		"text-gray-600": !hasBattery(device),
 	};
 	if (background) {
 		// Rename all keys to bg-*
