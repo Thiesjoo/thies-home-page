@@ -62,9 +62,6 @@ import ModalVue from "./components/Modal.vue";
 axios.defaults.baseURL = getBaseURL();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
-library.add(faXmark, faLock, faArrowRightFromBracket, faBolt, faLinkSlash, faPlus, faTrash);
-//Home page
-library.add(faRobot, faScroll, faServer, faMobile, faDesktop, faLaptop);
 library.add(
 	faPlaneUp,
 	faEthernet,
@@ -76,7 +73,20 @@ library.add(
 	faArrowsRotate,
 	faQuestion,
 	faKey,
-	faEdit
+	faEdit,
+	faXmark,
+	faLock,
+	faArrowRightFromBracket,
+	faBolt,
+	faLinkSlash,
+	faPlus,
+	faTrash,
+	faRobot,
+	faScroll,
+	faServer,
+	faMobile,
+	faDesktop,
+	faLaptop
 );
 
 const app = createApp(App, { router });

@@ -32,6 +32,7 @@
 		"pinia": "^2.0.14",
 		"socket.io-client": "^4.5.3",
 		"tmi.js": "^1.8.5",
+		"tslib": "^2.4.1",
 		"vue": "^3.2.25",
 		"vue-class-component": "^8.0.0-0",
 		"vue-recaptcha-v3": "^2.0.1",
