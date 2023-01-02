@@ -85,8 +85,7 @@ import { Base } from ".";
 
 export default defineComponent({
 	data() {
-		// TODO: Update this timer automatically
-		return { radius: 42, now: Date.now() };
+		return { radius: 42, now: Date.now(), interval: null as number | null };
 	},
 	computed: {
 		circumference() {
@@ -103,7 +102,15 @@ export default defineComponent({
 		...allHelperFunctions,
 	},
 	async mounted() {
-		console.log("Requesting here:");
+		const self = this;
+		this.interval = setInterval(function () {
+			self.now = Date.now();
+		}, 1000) as unknown as number;
+	},
+	beforeUnmount() {
+		if (this.interval) {
+			clearInterval(this.interval);
+		}
 	},
 	setup() {
 		return { devicesStore: useDevicesStore() };
