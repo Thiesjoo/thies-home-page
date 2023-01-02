@@ -85,6 +85,7 @@ export const useUserStore = defineStore("user", {
 				this.user = null;
 				return;
 			}
+			this.loading.userdata = true;
 
 			try {
 				const userInformation = (await axios.get("/api/users/me")).data;
