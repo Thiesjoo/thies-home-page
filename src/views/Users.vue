@@ -1,26 +1,22 @@
 <template>
 	<div class="container">
-		<h1>User list for {{ user }}</h1>
+		<h1>Chatter lijst voor {{ user }}</h1>
 		<p>
-			Initial data from: {{ initTime }}. Last updated:
+			Eerste data van: {{ initTime }}. Laatst geupdate:
 			{{ updateTime }}
 		</p>
 		<p>
-			Deze lijst heeft: Alle chatters van het afgelopen uur!
-			<em>(This list has all chatters from the previous hour!)</em>
+			Alle chatters van de afgelopen stream (Laatste duizend berichten)!
+			<em>(This list has all chatters from the past stream (Last thousand messages)!)</em>
 		</p>
 		<div class="content">
 			<div class="twitchList">
 				<h2 style="font-weight: 800">TwitchList</h2>
 				<p>
-					<em>Alle actieve chatters van het afgelopen uur</em>
+					<em>Alle actieve chatters</em>
 				</p>
 				<ul>
-					<li
-						style="list-style-type: none"
-						v-for="(type, index) in types"
-						:key="index"
-					>
+					<li style="list-style-type: none" v-for="(type, index) in types" :key="index">
 						<hr style="height: 20px" />
 						<h3 style="font-weight: 800">{{ userFriendlyTypes[type] }}</h3>
 						<ul>
@@ -34,17 +30,10 @@
 			<div class="liveList">
 				<h2 style="font-weight: 800">LiveList</h2>
 				<p>
-					<em>
-						Alle chatters van het afgelopen uur. Nieuwe gebruikers komen aan de
-						onderkant van de lijst
-					</em>
+					<em> Alle chatters. Nieuwe gebruikers komen aan de onderkant van de lijst </em>
 				</p>
 				<ul class="extraList">
-					<li
-						v-for="(item, index1) in allUsers"
-						:key="index1"
-						:class="item.type"
-					>
+					<li v-for="(item, index1) in allUsers" :key="index1" :class="item.type">
 						{{ item.name }}
 					</li>
 				</ul>
@@ -56,12 +45,7 @@
 <script lang="ts">
 import { filterArrayBasedOnType } from "@/helpers/filter";
 import { formatDate } from "@/helpers/formatDate";
-import {
-	disconnect,
-	getClient,
-	initTMIClient,
-	joinChannel,
-} from "@/helpers/tmi";
+import { disconnect, getClient, initTMIClient, joinChannel } from "@/helpers/tmi";
 import { defineComponent } from "@vue/runtime-core";
 
 const pause = initTMIClient();
