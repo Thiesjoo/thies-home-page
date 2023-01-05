@@ -157,7 +157,7 @@ const comp = defineComponent({
 export default comp;
 </script>
 
-<style>
+<style scoped>
 .content {
 	display: flex;
 	width: 100%;
