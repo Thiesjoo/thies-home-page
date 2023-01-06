@@ -1,8 +1,7 @@
 <template>
 	<span
 		v-if="user.isLoading"
-		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"
-	></span>
+		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"></span>
 	<div class="background" :style="{ backgroundImage: background }"></div>
 
 	<div class="centered">
@@ -36,16 +35,14 @@
 			group="widgets"
 			:item-key="generateKey"
 			@start="start"
-			@end="end"
-		>
+			@end="end">
 			<template #item="{ element }">
 				<div>
 					<component
 						:is="element.name"
 						:left="location.includes('left')"
 						:right="location.includes('right')"
-						:bottom="location.includes('bottom')"
-					></component>
+						:bottom="location.includes('bottom')"></component>
 				</div>
 			</template>
 		</draggable>
@@ -54,8 +51,7 @@
 			<draggable
 				class="p-[4rem] border-2 border-sky-500 border-dashed rounded-md bg-sky-500/[.1] flex flex-col items-center"
 				:group="{ name: 'widgets', pull: false }"
-				:item-key="generateKey"
-			>
+				:item-key="generateKey">
 				<template #header>
 					<font-awesome-icon :icon="['fas', 'trash']" class="w-16 h-16" />
 				</template>

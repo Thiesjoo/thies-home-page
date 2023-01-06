@@ -57,12 +57,7 @@ export default defineComponent({
 					return;
 				}
 
-				if (window.env.VUE_APP_VERCEL_ENV === "development") {
-					// @ts-ignore
-					this.$emit(this.action === "login" ? "verifyLogin" : "verifyWebauth", "dev-key");
-				} else {
-					this.renderTurnstile();
-				}
+				this.renderTurnstile();
 			}
 		},
 	},

@@ -1,3 +1,6 @@
+<!-- TODO: The lists automatically hides when hovering over the 6th streamer or so (On second monitor)
+This is because the floating widget area start there. Increasing the z index doesn't help.
+-->
 <template>
 	<div class="relative" @mouseleave="open = false">
 		<Base color="purple" :loaded="loaded" @mouseover="open = true" link="https://twitch.tv/" v-bind="$attrs">
@@ -10,8 +13,7 @@
 			enter-to-class="transform opacity-100 scale-100"
 			leave-active-class="transition ease-in duration-175"
 			leave-class="transform opacity-100 scale-100"
-			leave-to-class="transform opacity-0 scale-95"
-		>
+			leave-to-class="transform opacity-0 scale-95">
 			<div
 				v-if="open"
 				@mouseover="open = true"
@@ -20,15 +22,14 @@
 					'mb-16': $attrs.bottom,
 					'right-0': $attrs.right,
 				}"
-				class="absolute flex flex-col items-center w-64 py-2 mt-2 bg-gray-100 rounded-md shadow-xl"
-			>
+				class="absolute flex flex-col items-center w-64 py-2 mt-2 rounded-md shadow-xl"
+				style="background-color: #222222">
 				<a
 					:href="'https://twitch.tv/' + item.url"
 					rel="nofollow"
 					target="_parent"
 					class="grow inline-flex w-full px-1 py-3 text-sm text-gray-700 hover:bg-gray-400 hover:text-white no-underline"
-					v-for="item in data"
-				>
+					v-for="item in data">
 					<div class="px-4 w-36 items-center align-top">
 						<img :src="item.avatar" class="object-contain rounded-full w-full h-auto shadow-md" />
 					</div>

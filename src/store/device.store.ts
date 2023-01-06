@@ -121,9 +121,13 @@ export const useDevicesStore = defineStore("devices", {
 				this.devices.summary = sampleData;
 			}
 
-			const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
-
-			this.devices.summary = data.summary;
+			try {
+				const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
+				this.devices.summary = data.summary;
+			} catch (e) {
+				toast.error("Failed to fetch device data!");
+				console.error(e);
+			}
 
 			this.loading.userdata = false;
 		},

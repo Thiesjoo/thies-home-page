@@ -2,17 +2,15 @@
 	<Transition
 		name="slide-fade"
 		:enter-from-class="`enter-from-${right ? 'right' : 'left'}`"
-		:leave-to-class="`enter-from-${right ? 'right' : 'left'}`"
-	>
+		:leave-to-class="`enter-from-${right ? 'right' : 'left'}`">
 		<div class="p-2" v-if="loaded" @click="linkTo">
 			<div
-				class="inline-flex items-center bg-white leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
-			>
+				class="inline-flex items-center leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
+				style="background-color: #181818">
 				<span
 					v-if="showShort"
 					class="inline-flex text-white rounded-full h-6 px-3 justify-center items-center truncate"
-					:class="[color ? 'bg-' + color + '-600' : '']"
-				>
+					:class="[color ? 'bg-' + color + '-600' : '']">
 					<slot name="short"></slot>
 				</span>
 				<div class="flex flex-col items-center">
