@@ -142,12 +142,21 @@ export const useDevicesStore = defineStore("devices", {
 			}
 			this.requests = [
 				...this.requests,
-				...shownDevices.flatMap((id) => [
-					{ deviceId: id, type: "global" },
-					{ deviceId: id, type: "battery" },
-					{ deviceId: id, type: "network" },
-				]),
+				...shownDevices.flatMap((id) => {
+					const toReturn = [
+						{ deviceId: id, type: "global" },
+						{ deviceId: id, type: "battery" },
+						{ deviceId: id, type: "network" },
+					];
+					if (this.devices?.summary.find((x) => x.id === id)?.type === "mobile") {
+						toReturn.push({ deviceId: id, type: "mobile" });
+					}
+					return toReturn;
+				}),
 			];
+		},
+		requestNotifications(device: string) {
+			this.requests = [...this.requests, { deviceId: device, type: "notifications" }];
 		},
 		requestCPUData(device: string) {
 			this.requests = [...this.requests, { deviceId: device, type: "cpu" }];
@@ -179,7 +188,6 @@ export const useDevicesStore = defineStore("devices", {
 
 			device.connected = data.connected;
 			device.lastConnected = data.lastConnected;
-			this.updateLiveData("global", data, livedata);
 		},
 		updateBatteryLoad(id: string, data: BatteryLoad & Timestamp) {
 			const { device, livedata } = this.findDevice(id);
@@ -194,12 +202,14 @@ export const useDevicesStore = defineStore("devices", {
 			if (!device) return;
 
 			device.network = data;
-			this.updateLiveData("network", data, livedata);
+			if (device.type !== "mobile") {
+				this.updateLiveData("network", data, livedata);
+			}
 		},
-
 		updateCPULoad(id: string, data: CpuLoad & Timestamp) {
 			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
+
 			this.updateLiveData("cpu", data, livedata);
 		},
 
