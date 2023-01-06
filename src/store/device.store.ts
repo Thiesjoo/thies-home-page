@@ -38,7 +38,7 @@ const sampleData = [
 			ip4: "-",
 			ip6: "-",
 			type: "wifi",
-			extraInfo: "eduroam [e185fa14] (null)",
+			extraInfo: "eduroam [e185fa14]",
 			dateReceived: 1665666851741,
 		},
 		connected: false,

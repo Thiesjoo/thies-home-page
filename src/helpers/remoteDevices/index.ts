@@ -8,7 +8,7 @@ export function getColorForAge(device: Device, now: number) {
 	const difference = device.connected ? 0 : now - device.lastConnected.time;
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
-	} else if (difference > WARNING_AGE || !device.connected) {
+	} else if (difference > WARNING_AGE || (device.type !== "mobile" && !device.connected)) {
 		return "#f5c350";
 	} else {
 		return "#65cd57";

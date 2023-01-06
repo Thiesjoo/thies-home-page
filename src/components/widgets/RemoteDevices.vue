@@ -1,12 +1,14 @@
 <template>
-	<Base :loaded="devices.length > 0">
+	<Base
+		:loaded="devices.length > 0"
+		v-for="device in devices"
+		@mouseleave="open[device.id] = false"
+		@mouseover="open[device.id] = true"
+		@click="openNewTabForDevice(device)">
 		<template #content>
-			<div
-				v-for="device in devices"
-				class="flex flex-col justify-center m-0 p-0 text-center"
-				v-on:click="openNewTabForDevice(device)">
+			<div class="flex flex-col justify-center m-0 p-0 text-center">
 				<div class="inline-flex items-center justify-center overflow-hidden rounded-full">
-					<svg class="w-20 h-20 -rotate-90">
+					<svg class="w-20 h-20 -rotate-90 z-10">
 						<circle
 							style="color: #222222"
 							stroke-width="20"
@@ -42,41 +44,60 @@
 					</svg>
 
 					<!-- All device info -->
-					<div class="absolute text-md flex flex-col">
-						<!-- Icons -->
+					<div class="absolute text-md flex flex-col z-10">
 						<div class="flex flex-row justify-center space-x-1">
-							<!-- <font-awesome-icon
-								:icon="['fas', 'hourglass']"
-								class="text-red-600"
-								v-if="isInformationTooOld(device, now)"
-								title="We haven't received any information from this device for a while.">
-							</font-awesome-icon> -->
-
 							<font-awesome-icon
 								:icon="getIconForDeviceType(device)"
 								:title="getTitleType(device)"
 								style="font-size: 2em">
 							</font-awesome-icon>
-							<!-- <font-awesome-icon
-								:icon="getIconForNetworkStatus(device)"
-								:title="getNetworkTypeTitle(device)">
-							</font-awesome-icon>
-							<font-awesome-icon
-                            :icon="['fas', 'bolt']"
-                            v-if="device.batteryCharging"
-                            title="Battery is charging">
-                        </font-awesome-icon> -->
 						</div>
-						<!-- <span
-							class="text-[12px] text-orange-700 text-center"
-							v-if="isInformationTooOld(device, now, true)"
-							>Age: {{ informationAgeShort(device, now) }}
-						</span> -->
+
 						<span class="text-blue-700 text-center p-1">{{ device.battery }}% </span>
 					</div>
 				</div>
 
-				<!-- <span :title="device.name">{{ device.name.slice(0, 15) }}</span> -->
+				<Transition
+					enter-active-class="transition ease-out duration-200"
+					enter-class="transform opacity-0 scale-95"
+					enter-to-class="transform opacity-100 scale-100"
+					leave-active-class="transition ease-in duration-175"
+					leave-class="transform opacity-100 scale-100"
+					leave-to-class="transform opacity-0 scale-95">
+					<div
+						class="absolute ml-15 p-2 pl-10 rounded-full text-md flex flex-col w-[20rem] h-24 z-0 space-y-2"
+						style="background-color: #181818"
+						v-if="open[device.id]">
+						<span :title="device.name" class="font-bold">{{ device.name }}</span>
+						<!-- Icons -->
+						<div class="flex flex-row justify-center space-x-1">
+							<font-awesome-icon
+								:icon="['fas', 'hourglass']"
+								class="text-red-600"
+								v-if="isInformationTooOld(device, now)"
+								title="We haven't received any information from this device for a while.">
+							</font-awesome-icon>
+							<font-awesome-icon
+								:icon="getIconForNetworkStatus(device)"
+								:title="getNetworkTypeTitle(device)">
+							</font-awesome-icon>
+							<font-awesome-icon
+								:icon="['fas', 'bolt']"
+								v-if="device.batteryCharging"
+								title="Battery is charging">
+							</font-awesome-icon>
+						</div>
+
+						<span :title="device.network?.extraInfo" class="italic">{{ device.network?.extraInfo }}</span>
+						<span
+							class="text-[12px] text-center"
+							:style="{
+								color: getColorForAge(device, now),
+							}"
+							>Age: {{ informationAgeShort(device, now) }}
+						</span>
+					</div>
+				</Transition>
 			</div>
 		</template>
 	</Base>
@@ -91,9 +112,11 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { defineComponent } from "@vue/runtime-core";
 import { Base } from ".";
 
+const WAIT_FOR_SOCKET = 5;
+
 export default defineComponent({
 	data() {
-		return { radius: 42, now: Date.now(), interval: null as number | null };
+		return { radius: 42, now: Date.now(), interval: null as number | null, open: {} as Record<string, boolean> };
 	},
 	computed: {
 		circumference() {
@@ -105,7 +128,7 @@ export default defineComponent({
 	},
 	methods: {
 		openNewTabForDevice(device: Device) {
-			window.open(`https://customdash.thies.dev/output/devices/${device.id}`, "_blank");
+			window.open(`https://testing.thies.dev/output/devices/${device.id}`, "_blank");
 		},
 		...allHelperFunctions,
 	},
@@ -115,8 +138,8 @@ export default defineComponent({
 		this.interval = setInterval(async function () {
 			self.now = Date.now();
 			secondsRunning++;
-			if (secondsRunning === 10) {
-				console.log("Page open for 10 seconds, establishing socket connectiong");
+			if (secondsRunning === WAIT_FOR_SOCKET) {
+				console.log(`Page open for ${WAIT_FOR_SOCKET} seconds, establishing socket connectiong`);
 				await SocketService.setupSocketConnection();
 				SocketService.onConnected(() => {
 					console.log("connected in mounted");
