@@ -22,7 +22,7 @@ export type DevicesInfo = {
 	summary: Device[];
 };
 
-const sampleData = [
+export const SAMPLE_DEVICE_DATA = [
 	{
 		type: "laptop",
 		name: "thies-zenbook",
@@ -99,7 +99,7 @@ export const useDevicesStore = defineStore("devices", {
 	},
 
 	actions: {
-		async loadDeviceData() {
+		async loadDeviceData(sample = false) {
 			const toast = useToast();
 			const user = useUserStore();
 			// If user is not logged in, return
@@ -117,16 +117,18 @@ export const useDevicesStore = defineStore("devices", {
 			};
 
 			// Fetch data
-			if (window.env.VUE_APP_VERCEL_ENV === "development") {
-				this.devices.summary = sampleData;
+			if (sample || window.env.VUE_APP_VERCEL_ENV === "development") {
+				this.devices.summary = SAMPLE_DEVICE_DATA;
 			}
 
-			try {
-				const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
-				this.devices.summary = data.summary;
-			} catch (e) {
-				toast.error("Failed to fetch device data!");
-				console.error(e);
+			if (!sample) {
+				try {
+					const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
+					this.devices.summary = data.summary;
+				} catch (e) {
+					toast.error("Failed to fetch device data!");
+					console.error(e);
+				}
 			}
 
 			this.loading.userdata = false;

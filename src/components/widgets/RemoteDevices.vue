@@ -2,6 +2,7 @@
 	<Base
 		:loaded="devices.length > 0"
 		v-for="device in devices"
+		v-bind="$attrs"
 		@mouseleave="open[device.id] = false"
 		@mouseover="open[device.id] = true"
 		@click="openNewTabForDevice(device)">
@@ -133,6 +134,12 @@ export default defineComponent({
 		...allHelperFunctions,
 	},
 	async mounted() {
+		if (this.$attrs.sample) {
+			this.devicesStore.loadDeviceData(true);
+
+			return;
+		}
+
 		let secondsRunning = 0;
 		const self = this;
 		this.interval = setInterval(async function () {
