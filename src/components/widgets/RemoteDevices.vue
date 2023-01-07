@@ -95,7 +95,7 @@
 							:style="{
 								color: getColorForAge(device, now),
 							}"
-							>Age: {{ informationAgeShort(device, now) }}
+							>Last contact: {{ informationAgeShort(device, now) }}
 						</span>
 					</div>
 				</Transition>

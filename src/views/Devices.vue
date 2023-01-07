@@ -33,7 +33,7 @@
 
 	<!-- For every device in the list, get 1/4 of page width and make a nice looking colunm -->
 	<div
-		class="total-container w-[100vw] h-[100vh] flex flex-col md:flex-row justify-center items-center md:items-start">
+		class="total-container w-[100vw] h-[100vh] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-start">
 		<div v-for="device in devices" class="single-container w-[80vw] md:w-[25vw] md:max-w-[450px] p-2 m-3">
 			<!-- Header -->
 			<div class="header-container">
