@@ -61,8 +61,8 @@
 									'background-color': getColorForAge(device, now),
 									'border-radius': '50%',
 									display: 'inline-block',
-								}"></div
-						></span>
+								}"></div>
+						</span>
 
 						<!-- Network -->
 						<span class="text-sm font-bold" :title="getNetworkTitle(device, true)">
@@ -76,16 +76,16 @@
 						<!-- Battery -->
 						<span
 							class="text-sm font-bold whitespace-nowrap"
-							v-if="getLiveData(device)?.battery && getLiveData(device)!.battery != 0">
+							v-if="hasBattery(device) && device.livedata.battery.percent !== 0">
 							<font-awesome-icon
 								:icon="['fas', 'battery']"
 								class="mr-1"
-								v-if="!getLiveData(device)!.battery.charging">
+								v-if="!device.livedata.battery.charging">
 							</font-awesome-icon>
 							<font-awesome-icon
 								:icon="['fas', 'bolt']"
 								class="mr-1"
-								v-if="getLiveData(device)!.battery.charging">
+								v-if="device.livedata.battery.charging">
 							</font-awesome-icon>
 
 							<span> {{ device.battery }}% </span>
@@ -121,7 +121,7 @@ import SocketService from "@/services/socket.service";
 
 import { Notifications } from "@/components/device_widgets";
 import { Device } from "@/generated/models/Device";
-import { LiveData, LiveDataList, LiveDataSnapshot } from "@/helpers/types/pusher.types";
+import { FullDevice, LiveData, LiveDataList, LiveDataSnapshot } from "@/helpers/types/pusher.types";
 
 export default defineComponent({
 	data() {
@@ -141,8 +141,8 @@ export default defineComponent({
 		loading() {
 			return this.devicesStore.loading.userdata;
 		},
-		devices() {
-			return this.devicesStore.devices || [];
+		devices(): FullDevice[] {
+			return this.devicesStore.fullDeviceList;
 		},
 	},
 	methods: {
@@ -150,18 +150,6 @@ export default defineComponent({
 		forceReloadDevices() {
 			// Force reload the data
 			this.devicesStore.loadLiveData();
-		},
-
-		getLiveData(device: Device): LiveDataSnapshot | undefined {
-			const temp = this.devicesStore.getSpecificDevice(device.uid)?.livedata;
-			if (temp) {
-				return Object.entries(temp).reduce((acc, [key, value]) => {
-					//@ts-ignore
-					acc[key] = value[0];
-					return acc;
-				}, {} as LiveDataSnapshot);
-			}
-			return undefined;
 		},
 	},
 	beforeDestroy() {

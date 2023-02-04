@@ -1,3 +1,6 @@
+import { Device } from "@/generated";
+export type Timestamp = { dateReceived: number };
+
 export type CpuInfo = {
 	brand: string;
 	model: string;
@@ -144,7 +147,8 @@ export type LiveData = {
 	battery: BatteryLoad;
 	global: GlobalLoad;
 };
-export type PossibleLiveDataKeys = keyof LiveData;
 
-export type LiveDataSnapshot = { [K in keyof LiveData]?: LiveData[K] & Timestamp };
-export type LiveDataList = { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> };
+export type LiveDataSnapshot = { [A in keyof LiveData]: LiveData[A] & Timestamp };
+export type LiveDataList = { [K in keyof LiveData]?: Array<LiveData[K] & Timestamp> };
+
+export type FullDevice = Device & { livedata: LiveDataSnapshot };

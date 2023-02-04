@@ -3,9 +3,8 @@
 		:loaded="devices.length > 0"
 		v-for="device in devices"
 		v-bind="$attrs"
-		@mouseleave="open[device.id] = false"
-		@mouseover="open[device.id] = true"
-		@click="openNewTabForDevice(device)">
+		@mouseleave="open[device.uid] = false"
+		@mouseover="open[device.uid] = true">
 		<template #content>
 			<div class="flex flex-col justify-center m-0 p-0 text-center">
 				<div class="inline-flex items-center justify-center overflow-hidden rounded-full">
@@ -22,17 +21,17 @@
 							:class="getColorForBattery(device)"
 							stroke-width="19"
 							:stroke-dasharray="circumference"
-							:stroke-dashoffset="circumference * (1 - device.battery / 100)"
+							:stroke-dashoffset="circumference * (1 - device.livedata.battery.percent / 100)"
 							stroke="currentColor"
 							fill="transparent"
 							:r="radius"
 							cx="40"
 							cy="40" />
 						<circle
-							v-if="device.batteryCharging"
+							v-if="device.livedata.battery.charging"
 							class="text-gray-400/50 animate-charging"
 							:style="{
-								'--max': circumference * (1 - device.battery / 100),
+								'--max': circumference * (1 - device.livedata.battery.percent / 100),
 								'--r': circumference,
 							}"
 							stroke-width="19"
@@ -68,7 +67,7 @@
 					<div
 						class="absolute ml-15 p-2 pl-10 rounded-full text-md flex flex-col w-[20rem] h-24 z-0 space-y-2"
 						style="background-color: #181818"
-						v-if="open[device.id]">
+						v-if="open[device.uid]">
 						<span :title="device.name" class="font-bold">{{ device.name }}</span>
 						<!-- Icons -->
 						<div class="flex flex-row justify-center space-x-1">
@@ -84,12 +83,14 @@
 							</font-awesome-icon>
 							<font-awesome-icon
 								:icon="['fas', 'bolt']"
-								v-if="device.batteryCharging"
+								v-if="device.livedata.battery.charging"
 								title="Battery is charging">
 							</font-awesome-icon>
 						</div>
 
-						<span :title="device.network?.extraInfo" class="italic">{{ device.network?.extraInfo }}</span>
+						<span :title="device.livedata.network?.extraInfo" class="italic">{{
+							device.livedata.network?.extraInfo
+						}}</span>
 						<span
 							class="text-[12px] text-center"
 							:style="{
@@ -106,7 +107,7 @@
 
 <script lang="ts">
 import { allHelperFunctions, getColorForBattery, getIconForDeviceType, getTitleType } from "@/helpers/remoteDevices";
-import { Device } from "@/helpers/types/customdash.summary";
+import { FullDevice } from "@/helpers/types/pusher.types";
 import SocketService from "@/services/socket.service";
 import { useDevicesStore } from "@/store/device.store";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -123,19 +124,16 @@ export default defineComponent({
 		circumference() {
 			return this.radius * 2 * Math.PI;
 		},
-		devices(): Device[] {
-			return this.devicesStore.devices?.summary ?? [];
+		devices(): FullDevice[] {
+			return this.devicesStore.fullDeviceList ?? [];
 		},
 	},
 	methods: {
-		openNewTabForDevice(device: Device) {
-			window.open(`https://testing.thies.dev/output/devices/${device.id}`, "_blank");
-		},
 		...allHelperFunctions,
 	},
 	async mounted() {
 		if (this.$attrs.sample) {
-			this.devicesStore.loadDeviceData(true);
+			this.devicesStore.loadDeviceInformation(true);
 
 			return;
 		}
@@ -154,7 +152,7 @@ export default defineComponent({
 				});
 			}
 		}, 1000) as unknown as number;
-		this.devicesStore.loadDeviceData();
+		this.devicesStore.loadDeviceInformation();
 	},
 	beforeUnmount() {
 		SocketService.disconnect();

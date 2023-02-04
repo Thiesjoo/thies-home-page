@@ -1,22 +1,21 @@
 import { CreateDevice, Device, DevicesService } from "@/generated";
-import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import {
 	BatteryLoad,
 	CpuLoad,
+	FullDevice,
 	GlobalLoad,
 	LiveData,
 	LiveDataList,
+	LiveDataSnapshot,
 	NetworkLoad,
-	PossibleLiveDataKeys,
+	Timestamp,
 } from "@/helpers/types/pusher.types";
-import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
-import axios from "axios";
+import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
-import { User, useUserStore } from "./user.store";
+import { useUserStore } from "./user.store";
 
 export const MAX_ARRAY_LENGTH = 20;
-export type Timestamp = { dateReceived: number };
 
 export type DevicesInfo = {
 	api: string;
@@ -65,6 +64,22 @@ export const useDevicesStore = defineStore("devices", {
 			const info = state.devices.find((device) => device.uid === deviceId);
 			const livedata = state.livedata[deviceId];
 			return { info, livedata };
+		},
+		fullDeviceList: function (state) {
+			if (!state.devices) return [];
+
+			return state.devices
+				.map((x) => {
+					const info = state.devices!.find((device) => device.uid === x.uid)!;
+					const snapshot = Object.entries(info).reduce((acc, [key, value]) => {
+						//@ts-ignore
+						acc[key] = value[0];
+						return acc;
+					}, {} as LiveDataSnapshot);
+
+					return { ...x, livedata: snapshot };
+				})
+				.filter((x) => x) as FullDevice[];
 		},
 	},
 	actions: {
@@ -193,18 +208,14 @@ export const useDevicesStore = defineStore("devices", {
 			this.updateLiveData("cpu", data, livedata);
 		},
 
-		updateLiveData<T extends PossibleLiveDataKeys>(
-			key: T,
-			data: LiveData[T] & Timestamp,
-			livedata: { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }
-		) {
+		updateLiveData<T extends keyof LiveData>(key: T, data: LiveData[T] & Timestamp, livedata: LiveDataList) {
 			if (!(key in livedata)) {
 				livedata[key] = [] as any;
 			}
 			livedata[key]!.push(data);
 
-			if (livedata[key].length > MAX_ARRAY_LENGTH) {
-				const diff = livedata[key].length - MAX_ARRAY_LENGTH;
+			if (livedata[key]!.length > MAX_ARRAY_LENGTH) {
+				const diff = livedata[key]!.length - MAX_ARRAY_LENGTH;
 				//@ts-ignore Nested type errors
 				livedata[key] = livedata[key].slice(diff);
 			}
