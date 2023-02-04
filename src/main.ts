@@ -1,14 +1,14 @@
-window.env = Object.entries(import.meta.env).reduce((acc, [key, value]) => {
-	//@ts-ignore
-	acc[key.replace("VITE_", "")] = value;
+window.env = {
+	VUE_APP_VERCEL_ENV: import.meta.env.VITE_VERCEL_ENV || "development",
+	VUE_APP_VERCEL_URL: import.meta.env.VITE_VERCEL_URL || "PLACEHOLDER",
+	VUE_APP_VERCEL_GIT_COMMIT_SHA: import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERPLACEHOLDER",
+	VUE_APP_VERCEL_GIT_COMMIT_MESSAGE:
+		import.meta.env.VITE_VERCEL_GIT_COMMIT_MESSAGE || "PLACEHOLDERPLACEHOLDERPLACEHOLDER",
+	AUTHBASEURL: import.meta.env.VITE_AUTHBASEURL || "https://auth.thies.dev",
+	DEVICEBASEURL: import.meta.env.VITE_DEVICEBASEURL || "https://testing.thies.dev",
+};
 
-	return acc;
-}, {} as typeof window.env);
-
-window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
-window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development";
 window.openModals = 0;
-
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
