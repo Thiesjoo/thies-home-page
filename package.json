@@ -4,11 +4,11 @@
 	"description": "This is the main page for [thies.dev](https://thies.dev)",
 	"author": "Thies Nieborg",
 	"scripts": {
-		"serve": "vue-cli-service serve",
-		"serve:dev": "vue-cli-service serve --public http://turnstile.thies.dev --port 3000",
-		"build": "vue-cli-service build",
 		"inst": "npm ci && cd api/ && npm ci",
 		"start": "vercel dev",
+		"serve": "vite",
+		"preview": "vite preview",
+		"build": "vite build",
 		"build-report": "vue-cli-service build --report"
 	},
 	"main": "src/main.ts",
@@ -30,6 +30,7 @@
 		"date-fns": "^2.27.0",
 		"ms": "^3.0.0-canary.1",
 		"pinia": "^2.0.14",
+		"postcss": "^8.4.21",
 		"socket.io-client": "^4.5.3",
 		"tmi.js": "^1.8.5",
 		"tslib": "^2.4.1",
@@ -40,16 +41,20 @@
 		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
+		"@rollup/plugin-replace": "^5.0.2",
 		"@simplewebauthn/typescript-types": "^6.2.1",
 		"@types/tmi.js": "^1.8.1",
-		"@vue/cli-plugin-typescript": "^5.0.4",
-		"@vue/cli-service": "^5.0.4",
-		"autoprefixer": "^10.4.4",
+		"@vitejs/plugin-vue": "^1.6.1",
+		"autoprefixer": "^10.4.13",
 		"csp-html-webpack-plugin": "^5.1.0",
-		"postcss": "^8.4.12",
+		"rollup-plugin-visualizer": "^5.9.0",
 		"tailwindcss": "^3.0.24",
 		"typescript": "^4.7",
-		"vercel": "^28.2.2"
+		"vercel": "^28.2.2",
+		"vite": "^2.5.4",
+		"vite-plugin-checker": "^0.5.5",
+		"vite-plugin-csp": "^1.1.2",
+		"vue-template-compiler": "^2.6.11"
 	},
 	"browserslist": [
 		"> 1% and last 2 versions and not dead"

@@ -1,16 +1,15 @@
 {
 	"dependencies": {
-		"axios": "^0.21.1",
-		"discord.js": "^12.5.3",
+		"axios": "^0.27.2",
+		"discord.js": "^14.7.1",
 		"irc-message": "^3.0.2",
-		"mongodb": "^3.6.9",
-		"node-ical": "^0.15.1",
+		"node-ical": "^0.15.3",
 		"ms": "^3.0.0-canary.1"
 	},
 	"devDependencies": {
-		"@types/mongodb": "^3.6.18",
-		"@vercel/node": "^1.11.1",
-		"tslib": "^2.3.1",
-		"vercel": "^23.0.1"
-	}
+		"@vercel/node": "^2.9.0",
+		"tslib": "^2.5.0",
+		"vercel": "^28.15.0"
+	},
+	"type": "module"
 }
