@@ -1,6 +1,7 @@
 module.exports = {
+    jit: true,
     content: [
-        "./public/index.html",
+        "./index.html",
         "./src/**/*.{vue,js,ts,jsx,tsx}",
     ],
     safelist: [
