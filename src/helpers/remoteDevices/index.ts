@@ -1,5 +1,5 @@
+import { Device } from "@/generated";
 import ms from "ms";
-import { Device } from "../types/customdash.summary";
 
 const MAX_AGE = ms("30m");
 const WARNING_AGE = ms("15m");

@@ -48,7 +48,7 @@
 							</font-awesome-icon
 							>{{ device.name }}</span
 						>
-						<span class="text-sm italic">{{ device.id }}</span>
+						<span class="text-sm italic">{{ device.uid }}</span>
 					</div>
 
 					<div class="flex flex-col space-y-1 min-w-[50%] text-right">
@@ -74,10 +74,18 @@
 						</span>
 
 						<!-- Battery -->
-						<span class="text-sm font-bold whitespace-nowrap" v-if="device.battery && device.battery != 0">
-							<font-awesome-icon :icon="['fas', 'battery']" class="mr-1" v-if="!device.batteryCharging">
+						<span
+							class="text-sm font-bold whitespace-nowrap"
+							v-if="getLiveData(device)?.battery && getLiveData(device)!.battery != 0">
+							<font-awesome-icon
+								:icon="['fas', 'battery']"
+								class="mr-1"
+								v-if="!getLiveData(device)!.battery.charging">
 							</font-awesome-icon>
-							<font-awesome-icon :icon="['fas', 'bolt']" class="mr-1" v-if="device.batteryCharging">
+							<font-awesome-icon
+								:icon="['fas', 'bolt']"
+								class="mr-1"
+								v-if="getLiveData(device)!.battery.charging">
 							</font-awesome-icon>
 
 							<span> {{ device.battery }}% </span>
@@ -112,6 +120,8 @@ import { defineComponent } from "@vue/runtime-core";
 import SocketService from "@/services/socket.service";
 
 import { Notifications } from "@/components/device_widgets";
+import { Device } from "@/generated/models/Device";
+import { LiveData, LiveDataList, LiveDataSnapshot } from "@/helpers/types/pusher.types";
 
 export default defineComponent({
 	data() {
@@ -132,14 +142,26 @@ export default defineComponent({
 			return this.devicesStore.loading.userdata;
 		},
 		devices() {
-			return this.devicesStore.devices?.summary || [];
+			return this.devicesStore.devices || [];
 		},
 	},
 	methods: {
 		...allHelperFunctions,
 		forceReloadDevices() {
 			// Force reload the data
-			this.devicesStore.loadDeviceData();
+			this.devicesStore.loadLiveData();
+		},
+
+		getLiveData(device: Device): LiveDataSnapshot | undefined {
+			const temp = this.devicesStore.getSpecificDevice(device.uid)?.livedata;
+			if (temp) {
+				return Object.entries(temp).reduce((acc, [key, value]) => {
+					//@ts-ignore
+					acc[key] = value[0];
+					return acc;
+				}, {} as LiveDataSnapshot);
+			}
+			return undefined;
 		},
 	},
 	beforeDestroy() {
@@ -158,6 +180,7 @@ export default defineComponent({
 		const self = this;
 		this.user.$subscribe((mutation, state) => {
 			if (state.loggedIn && !state.loading.userdata && !this.interval) {
+				this.devicesStore.loadDeviceInformation();
 				this.forceReloadDevices();
 
 				this.interval = setInterval(function () {
@@ -166,7 +189,11 @@ export default defineComponent({
 			}
 		});
 
-		await SocketService.setupSocketConnection();
+		if (!this.devicesStore.loading.dataAlreadyLoaded) {
+			this.devicesStore.loadDeviceInformation();
+		}
+
+		// await SocketService.setupSocketConnection();
 
 		SocketService.onConnected(() => {
 			console.log("connected in mounted");

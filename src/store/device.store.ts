@@ -1,10 +1,11 @@
+import { CreateDevice, Device, DevicesService } from "@/generated";
 import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
-import { Device } from "@/helpers/types/customdash.summary";
 import {
 	BatteryLoad,
 	CpuLoad,
 	GlobalLoad,
 	LiveData,
+	LiveDataList,
 	NetworkLoad,
 	PossibleLiveDataKeys,
 } from "@/helpers/types/pusher.types";
@@ -22,84 +23,79 @@ export type DevicesInfo = {
 	summary: Device[];
 };
 
-export const SAMPLE_DEVICE_DATA = [
+const SAMPLE_DEVICE_DATA: Device[] = [
 	{
-		type: "laptop",
-		name: "thies-zenbook",
-		id: "test",
-		uptime: 2390.19,
-		upsince: 1665662516,
-		battery: 37,
-		batteryCharging: true,
-		network: {
-			interval: 5116,
-			up: 2450.76892350709,
-			down: 1773.7167964849211,
-			ip4: "-",
-			ip6: "-",
-			type: "wifi",
-			extraInfo: "eduroam [e185fa14]",
-			dateReceived: 1665666851741,
-		},
-		connected: false,
-		lastConnected: {
-			time: 1665666570337,
-			ip: "-",
-			location: {
-				age: 1665666570337,
-				lat: "-",
-				lon: "-",
-			},
-		},
-		dateReceived: 1665666857141,
-	},
-	{
-		type: "mobile",
-		name: "OnePlus Nord N10 5G",
-		id: "oneplusnord",
-		uptime: 231783,
-		upsince: 1666211679711,
-		battery: 64,
-		batteryCharging: false,
-		network: {
-			ip4: "192.168.1.131",
-			ip6: "fe80::1b32:cb0e:5db4:a611",
-			up: 0,
-			down: 0,
-			type: "wifi",
-			extraInfo: "RandomWifiNetwork -70",
-		},
-		connected: false,
-		lastConnected: {
-			time: 1666443462711,
-			ip: "fe80::1b32:cb0e:5db4:a611",
-			location: {
-				lat: "-",
-				lon: "-",
-				age: 1666446326000,
-			},
-		},
+		name: "string",
+		type: "string",
+		availableInformation: [],
+		contact: "string",
+		uid: "63dea51d6c59ad78f80d9497",
 	},
 ];
+
+const validateUser = () => {
+	const toast = useToast();
+	const user = useUserStore();
+	// If user is not logged in, return
+	if (!user.user) {
+		toast.error("You are not logged in!");
+		throw new Error("Trying to fetch devices, but user not logged in");
+	}
+
+	return { toast, user };
+};
 
 export const useDevicesStore = defineStore("devices", {
 	state: () => {
 		return {
-			loading: { userdata: true },
+			loading: { userdata: false, dataAlreadyLoaded: false },
 			devices: useLocalStorage("devices", null, {
 				serializer: StorageSerializers.object,
-			}) as RemovableRef<DevicesInfo | null>,
+			}) as RemovableRef<Device[] | null>,
 			socket: { connected: false, connecting: false, error: "" },
 
 			// Array that will be emptied when the socket requests it.
 			requests: [] as { deviceId: string; type: string }[],
-
-			livedata: {} as Record<string, { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }>,
+			livedata: {} as Record<string, LiveDataList>,
 		};
 	},
-
+	getters: {
+		getSpecificDevice: (state) => (deviceId: string) => {
+			if (!state.devices) return undefined;
+			const info = state.devices.find((device) => device.uid === deviceId);
+			const livedata = state.livedata[deviceId];
+			return { info, livedata };
+		},
+	},
 	actions: {
-		async loadDeviceData(sample = false) {
+		async loadDeviceInformation(sample = false) {
+			const { toast, user } = validateUser();
+
+			if (sample) {
+				this.devices = SAMPLE_DEVICE_DATA;
+				return;
+			}
+
+			this.loading.userdata = true;
+			const result = await DevicesService.devicesControllerFindAll();
+			this.devices = result;
+
+			this.loading.dataAlreadyLoaded = true;
+			this.loading.userdata = false;
+		},
+
+		async createNewDevice(device: CreateDevice) {
+			const { toast, user } = validateUser();
+
+			const result = await DevicesService.devicesControllerCreate(device);
+			if (!result) {
+				toast.error("Failed to create device!");
+				return;
+			}
+			await this.loadDeviceInformation();
+		},
+
+		async loadLiveData(sample = false) {
 			const toast = useToast();
 			const user = useUserStore();
 			// If user is not logged in, return
@@ -111,33 +107,17 @@ export const useDevicesStore = defineStore("devices", {
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
-			this.devices = {
-				api: getDeviceBaseURL(),
-				summary: [],
-			};
-
-			// Fetch data
-			if (sample || window.env.VUE_APP_VERCEL_ENV === "development") {
-				this.devices.summary = SAMPLE_DEVICE_DATA;
-			}
-
-			if (!sample) {
-				try {
-					const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
-					this.devices.summary = data.summary;
-				} catch (e) {
-					toast.error("Failed to fetch device data!");
-					console.error(e);
-				}
-			}
+			const test = await DevicesService.devicesControllerGetAllLiveData();
+			console.log(test);
 
 			this.loading.userdata = false;
 		},
 
+		// Related to sockets
 		requestGlobalData(shownDevices: string[] = []) {
 			if (shownDevices.length === 0) {
-				this.devices?.summary.forEach((x) => {
-					shownDevices.push(x.id);
+				this.devices?.forEach((x) => {
+					shownDevices.push(x.uid);
 				});
 			}
 			this.requests = [
@@ -148,7 +128,7 @@ export const useDevicesStore = defineStore("devices", {
 						{ deviceId: id, type: "battery" },
 						{ deviceId: id, type: "network" },
 					];
-					if (this.devices?.summary.find((x) => x.id === id)?.type === "mobile") {
+					if (this.devices?.find((x) => x.uid === id)?.type === "mobile") {
 						toReturn.push({ deviceId: id, type: "mobile" });
 					}
 					return toReturn;
@@ -169,7 +149,7 @@ export const useDevicesStore = defineStore("devices", {
 		findDevice(id: string) {
 			if (!this.devices) return { device: null, livedata: null };
 
-			const device = this.devices.summary.find((d) => d.id === id);
+			const device = this.devices.find((d) => d.uid === id);
 			if (!device) {
 				console.warn("Tried to update: ", id, "but it does not exist");
 				return { device: null, livedata: null };
@@ -186,15 +166,15 @@ export const useDevicesStore = defineStore("devices", {
 			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
-			device.connected = data.connected;
-			device.lastConnected = data.lastConnected;
+			// device.connected = data.connected;
+			// device.lastConnected = data.lastConnected;
 		},
 		updateBatteryLoad(id: string, data: BatteryLoad & Timestamp) {
 			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
-			device.battery = data.percent;
-			device.batteryCharging = data.charging;
+			// device.battery = data.percent;
+			// device.batteryCharging = data.charging;
 			this.updateLiveData("battery", data, livedata);
 		},
 		updateNetworkLoad(id: string, data: NetworkLoad & Timestamp) {

@@ -137,11 +137,14 @@ export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number }
 
 export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery";
 export type LiveData = {
-	cpu?: CpuLoad;
-	ram?: RamLoad;
-	network?: NetworkLoad;
-	bluetooth?: BluetoothLoad;
-	battery?: BatteryLoad;
-	global?: GlobalLoad;
+	cpu: CpuLoad;
+	ram: RamLoad;
+	network: NetworkLoad;
+	bluetooth: BluetoothLoad;
+	battery: BatteryLoad;
+	global: GlobalLoad;
 };
 export type PossibleLiveDataKeys = keyof LiveData;
+
+export type LiveDataSnapshot = { [K in keyof LiveData]?: LiveData[K] & Timestamp };
+export type LiveDataList = { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> };

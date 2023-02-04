@@ -1,3 +1,4 @@
+import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { io, Socket } from "socket.io-client";
@@ -114,17 +115,17 @@ class SocketService {
 			const store = useDevicesStore();
 			const userStore = useUserStore();
 			const interval = setInterval(() => {
-				if (store.devices?.api && userStore.accessToken && !userStore.isLoading) {
+				if (!store.loading.userdata && userStore.accessToken && !userStore.isLoading) {
 					clearInterval(interval);
-					resolve(store.devices.api);
+					resolve(getDeviceBaseURL());
 				}
 			}, 750);
 		});
 	}
 
 	disconnect() {
-		console.log("Disconnecting");
 		if (this.socket) {
+			console.log("Disconnecting");
 			this.socket.disconnect();
 		}
 	}
