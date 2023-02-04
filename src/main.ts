@@ -1,5 +1,10 @@
-//@ts-ignore This constant is inserted by webpack in vue.config.js
-window.env = ENV;
+window.env = Object.entries(import.meta.env).reduce((acc, [key, value]) => {
+	//@ts-ignore
+	acc[key.replace("VITE_", "")] = value;
+
+	return acc;
+}, {} as typeof window.env);
+
 window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA = window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERAood4vTEZvU";
 window.env.VUE_APP_VERCEL_ENV = window.env.VUE_APP_VERCEL_ENV || "development";
 window.openModals = 0;
@@ -7,7 +12,6 @@ window.openModals = 0;
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
