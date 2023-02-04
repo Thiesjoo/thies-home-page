@@ -3,11 +3,18 @@ import vue from '@vitejs/plugin-vue'
 import checker from 'vite-plugin-checker'
 import { ViteCspPlugin } from 'vite-plugin-csp';
 import replace from '@rollup/plugin-replace';
+import visualizer from 'rollup-plugin-visualizer'
 
-// https://vitejs.dev/config/
 const path = require("path");
 export default defineConfig({
     treeshake: "smallest",
+    build: {
+        rollupOptions: {
+            plugins: [
+                visualizer(),
+            ]
+        }
+    },
     plugins: [
         replace({
             __SENTRY_DEBUG__: false,
