@@ -59,7 +59,9 @@ export default defineComponent({
 	setup(props) {
 		return { devices: useDevicesStore(), current: props.device as Device };
 	},
-	unmounted() {
+	// TODO: FIX THISSSSS
+	// It still leaks tons of memory (i think)
+	beforeUnmount() {
 		Object.entries(this.images).forEach(([key, value]) => {
 			URL.revokeObjectURL(value);
 		});

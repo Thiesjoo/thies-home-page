@@ -60,12 +60,36 @@
 					</a>
 				</div>
 			</div>
+
 			<div class="flex items-center w-full">
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 				<div class="flex-grow-0 mx-5 text dark:text-white">Authentication Methods</div>
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
-			<!-- 2fa Management -->
+
+			<!-- 2FA Management -->
+			<div class="flex flex-row items-stretch py-5">
+				<div class="flex flex-row items-center">
+					<a
+						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
+						:style="{
+							'background-color': lightenDarkenColor('#000000', 35),
+						}"
+						@click="registerNewToken">
+						<font-awesome-icon :icon="[`fas`, `fingerprint`]" class="mr-2" />
+						New Passkey
+					</a>
+					<PasskeyManagerModal></PasskeyManagerModal>
+				</div>
+			</div>
+
+			<div class="flex items-center w-full">
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+				<div class="flex-grow-0 mx-5 text dark:text-white">or</div>
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+			</div>
+
+			<!-- Device Management -->
 			<div class="flex flex-row items-stretch py-5">
 				<div class="flex flex-row items-center">
 					<a
@@ -88,7 +112,6 @@
 			</div>
 
 			<!-- Logout -->
-
 			<button
 				@click="logout"
 				type="button"
