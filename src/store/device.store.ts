@@ -90,7 +90,6 @@ export const useDevicesStore = defineStore("devices", {
 				this.devices = SAMPLE_DEVICE_DATA;
 				return;
 			}
-
 			this.loading.userdata = true;
 			const result = await DevicesService.devicesControllerFindAll();
 			this.devices = result;

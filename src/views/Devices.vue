@@ -182,11 +182,6 @@ export default defineComponent({
 				}, 1000) as unknown as number;
 			}
 		});
-
-		if (!this.devicesStore.loading.dataAlreadyLoaded) {
-			this.devicesStore.loadDeviceInformation();
-		}
-
 		// await SocketService.setupSocketConnection();
 
 		SocketService.onConnected(() => {

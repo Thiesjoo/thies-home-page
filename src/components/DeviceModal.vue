@@ -59,11 +59,18 @@
 				<ul>
 					<li v-for="info in device.availableInformation">{{ info }}</li>
 				</ul>
+
+				<button
+					@click="authorizeToken()"
+					class="group relative w-full flex justify-center mt-5 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:hover:bg-indigo-600">
+					Authorize new token
+				</button>
 			</div>
 		</template>
 	</Modal>
 </template>
 <script lang="ts">
+import { DevicesService } from "@/generated";
 import { Device } from "@/generated/models/Device";
 import { colorFromString, lightenDarkenColor } from "@/helpers/colors";
 import { useDevicesStore } from "@/store/device.store";
@@ -93,6 +100,9 @@ export default defineComponent({
 
 			await this.devices.updateDevice(this.device.uid, this.device);
 			// Update device
+		},
+		async authorizeToken() {
+			await DevicesService.devicesControllerAuthorizeNewToken(this.device.uid);
 		},
 	},
 	setup(props) {
