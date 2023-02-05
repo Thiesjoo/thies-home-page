@@ -1,4 +1,4 @@
-import { CreateDevice, Device, DevicesService } from "@/generated";
+import { CreateDevice, Device, DevicesService, UpdateDevice } from "@/generated";
 import {
 	BatteryLoad,
 	CpuLoad,
@@ -48,9 +48,9 @@ export const useDevicesStore = defineStore("devices", {
 	state: () => {
 		return {
 			loading: { userdata: false, dataAlreadyLoaded: false },
-			devices: useLocalStorage("devices", null, {
+			devices: useLocalStorage("devices", [], {
 				serializer: StorageSerializers.object,
-			}) as RemovableRef<Device[] | null>,
+			}) as RemovableRef<Device[]>,
 			socket: { connected: false, connecting: false, error: "" },
 
 			// Array that will be emptied when the socket requests it.
@@ -108,6 +108,17 @@ export const useDevicesStore = defineStore("devices", {
 				return;
 			}
 			toast.success("Device created successfully!");
+			await this.loadDeviceInformation();
+		},
+		async updateDevice(uid: string, updateDevice: UpdateDevice) {
+			const { toast, user } = validateUser();
+
+			const result = await DevicesService.devicesControllerUpdate(uid, updateDevice);
+			if (!result) {
+				toast.error("Failed to update device!");
+				return;
+			}
+			toast.success("Device updated successfully!");
 			await this.loadDeviceInformation();
 		},
 

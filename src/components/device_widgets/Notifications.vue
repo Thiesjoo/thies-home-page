@@ -24,11 +24,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useDevicesStore } from "@/store/device.store";
-import { Device } from "@/helpers/types/customdash.summary";
-import axios from "axios";
+import { Device } from "@/generated/models/Device";
 import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
+import { useDevicesStore } from "@/store/device.store";
+import axios from "axios";
+import { defineComponent } from "vue";
 
 export default defineComponent({
 	props: {
@@ -68,16 +68,17 @@ export default defineComponent({
 	},
 
 	async mounted() {
+		return;
 		console.log("test", this.current);
-		this.devices.requestNotifications(this.current.id);
-		const tes = await axios.get(getDeviceBaseURL() + `/output/devices/${this.current.id}/notifs`);
+		this.devices.requestNotifications(this.current.uid);
+		const tes = await axios.get(getDeviceBaseURL() + `/output/devices/${this.current.uid}/notifs`);
 		console.log(tes.data);
 		this.notifications = tes.data.notifs;
 		const self = this;
 		tes.data.notifs.forEach((x: { icon: string }) => {
 			axios
 				.get(
-					getDeviceBaseURL() + `/output/devices/${this.current.id}/icons/${x.icon.replace("multer://", "")}`,
+					getDeviceBaseURL() + `/output/devices/${this.current.uid}/icons/${x.icon.replace("multer://", "")}`,
 					{
 						responseType: "blob",
 					}
