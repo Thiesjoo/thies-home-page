@@ -108,6 +108,7 @@
 				<Notifications :device="device" />
 			</div>
 		</div>
+		<CreateDeviceModal></CreateDeviceModal>
 	</div>
 </template>
 
@@ -122,6 +123,7 @@ import SocketService from "@/services/socket.service";
 import { Notifications } from "@/components/device_widgets";
 import { Device } from "@/generated/models/Device";
 import { FullDevice, LiveData, LiveDataList, LiveDataSnapshot } from "@/helpers/types/pusher.types";
+import CreateDeviceModal from "@/components/CreateNewDeviceModal.vue";
 
 export default defineComponent({
 	data() {
@@ -195,6 +197,7 @@ export default defineComponent({
 	},
 	components: {
 		Notifications,
+		CreateDeviceModal,
 	},
 });
 </script>

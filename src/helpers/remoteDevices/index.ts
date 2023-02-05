@@ -20,6 +20,7 @@ export function getColorForAge(device: FullDevice, now: number) {
 export function getTitleType(device: FullDevice) {
 	return device.type.charAt(0).toUpperCase() + device.type.slice(1);
 }
+
 export function getIconForDeviceType(device: FullDevice) {
 	switch (device.type) {
 		case "mobile":
@@ -30,22 +31,29 @@ export function getIconForDeviceType(device: FullDevice) {
 			return ["fas", "desktop"];
 	}
 }
+
 export function isInformationTooOld(device: FullDevice, now: number, warning = false) {
 	return now - (device.livedata.global.lastConnected.time || 10000000) > (warning ? WARNING_AGE : MAX_AGE);
 }
+
 export function informationAgeShortText(device: FullDevice, now: number) {
 	if (device.livedata?.global?.connected) {
 		return "Connected";
 	}
-	let diff = now - (device.livedata?.global?.lastConnected?.time || 10000000);
+	if (!device.livedata?.global?.lastConnected?.time) {
+		return "Never connected";
+	}
+	let diff = now - (device.livedata?.global?.lastConnected?.time || 0);
 	if (diff < 1000) {
 		diff = 1001;
 	}
 	return ms(diff);
 }
+
 export function getIconForLTEStrength(device: FullDevice) {
 	return ["fas", "signal"];
 }
+
 export function getIconForWifiStrength(device: FullDevice) {
 	return ["fas", "wifi"];
 }

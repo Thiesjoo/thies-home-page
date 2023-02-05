@@ -107,6 +107,7 @@ export const useDevicesStore = defineStore("devices", {
 				toast.error("Failed to create device!");
 				return;
 			}
+			toast.success("Device created successfully!");
 			await this.loadDeviceInformation();
 		},
 

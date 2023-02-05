@@ -65,6 +65,14 @@ export default defineComponent({
 		},
 	},
 	methods: {
+		forceOpen() {
+			if (this.open) return;
+			this.toggle();
+		},
+		forceClose() {
+			if (!this.open) return;
+			this.toggle();
+		},
 		toggle() {
 			this.open = !this.open;
 			this.$emit("toggle", this.open);
