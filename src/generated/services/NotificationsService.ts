@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { ActionOnNotificationDTO } from '../models/ActionOnNotificationDTO';
 import type { CreateNotification } from '../models/CreateNotification';
+import type { Notification } from '../models/Notification';
 import type { NotificationFileUpload } from '../models/NotificationFileUpload';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -32,10 +33,10 @@ export class NotificationsService {
 
     /**
      * Get all notifications from the current logged in user
-     * @returns any
+     * @returns Notification
      * @throws ApiError
      */
-    public static notificationsControllerFindAll(): CancelablePromise<Array<any>> {
+    public static notificationsControllerFindAll(): CancelablePromise<Array<Notification>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/notifications',
@@ -78,12 +79,12 @@ export class NotificationsService {
     /**
      * Get all notifications from a specific device
      * @param deviceid
-     * @returns any
+     * @returns Notification
      * @throws ApiError
      */
     public static notificationsControllerFindForDevice(
         deviceid: string,
-    ): CancelablePromise<Array<any>> {
+    ): CancelablePromise<Array<Notification>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/notifications/devices/{deviceid}/notifications',

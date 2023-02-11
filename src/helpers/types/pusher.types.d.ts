@@ -1,4 +1,4 @@
-import { Device } from "@/generated";
+import { Device, Notification } from "@/generated";
 export type Timestamp = { dateReceived: number };
 
 export type CpuInfo = {
@@ -126,6 +126,16 @@ export type MobileLoad = {
 	hotspot: boolean;
 };
 
+export type NotificationLoad =
+	| {
+			uid: string;
+			removed: true;
+	  }
+	| (Notification & {
+			uid: string;
+			removed: false;
+	  });
+
 export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number };
 
 export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery" | "mobile";
@@ -137,6 +147,7 @@ export type LiveData = {
 	battery: BatteryLoad;
 	global: GlobalLoad;
 	mobile: MobileLoad;
+	notifications: NotificationLoad;
 };
 
 export type LiveDataSnapshot = { [A in keyof LiveData]: LiveData[A] & Timestamp };

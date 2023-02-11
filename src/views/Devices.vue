@@ -187,16 +187,13 @@ export default defineComponent({
 	},
 	async mounted() {
 		const self = this;
-		this.user.$subscribe((mutation, state) => {
-			if (state.loggedIn && !state.loading.userdata && !this.interval) {
-				this.devicesStore.loadDeviceInformation();
-				this.forceReloadDevices();
+		this.devicesStore.loadDeviceInformation();
+		this.forceReloadDevices();
 
-				this.interval = setInterval(function () {
-					self.now = Date.now();
-				}, 1000) as unknown as number;
-			}
-		});
+		this.interval = setInterval(function () {
+			self.now = Date.now();
+		}, 1000) as unknown as number;
+
 		await SocketService.setupSocketConnection();
 
 		SocketService.onConnected(() => {

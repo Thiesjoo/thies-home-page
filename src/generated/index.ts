@@ -17,6 +17,7 @@ export type { CreateNotification } from './models/CreateNotification';
 export type { Device } from './models/Device';
 export type { network } from './models/network';
 export type { NetworkInfo } from './models/NetworkInfo';
+export type { Notification } from './models/Notification';
 export type { NotificationActions } from './models/NotificationActions';
 export type { NotificationFileUpload } from './models/NotificationFileUpload';
 export type { OsInfo } from './models/OsInfo';

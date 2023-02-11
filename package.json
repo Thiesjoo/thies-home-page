@@ -9,7 +9,7 @@
 		"serve": "vite",
 		"preview": "vite preview",
 		"build": "vite build",
-		"build-report": "vue-cli-service build --report"
+        "generate": "openapi --input http://localhost:3001/api-json -c axios -o src/generated/"
 	},
 	"main": "src/main.ts",
 	"dependencies": {

@@ -7,7 +7,6 @@ import { io, Socket } from "socket.io-client";
 class SocketService {
 	socket?: Socket;
 	store?: ReturnType<typeof useDevicesStore>;
-	constructor() {}
 
 	async setupSocketConnection() {
 		console.log("Starting to setup socket connection");
@@ -90,7 +89,7 @@ class SocketService {
 	registerStoreEvents() {
 		// Check if we want new data
 		this.store?.$subscribe((mut, state) => {
-			if (state.requests.length > 0) {
+			if (state.requests.length > 0 && !state.loading.userdata) {
 				for (const request of state.requests) {
 					this.socket?.emit(
 						"request-live-updates",

@@ -10,12 +10,12 @@ import type { RamInfo } from "./RamInfo";
 import type { StorageInfo } from "./StorageInfo";
 
 export type UpdateDevice = {
-	availableInformation?: Array<any>;
+	availableInformation?: Array<"os" | "cpu" | "ram" | "network" | "bluetooth" | "battery" | "mobile">;
+	contact?: string;
 	os?: OsInfo;
 	cpu?: CpuInfo;
 	ram?: RamInfo;
 	storage?: StorageInfo;
 	network?: NetworkInfo;
 	battery?: BatteryInfo;
-	contact?: string;
 };

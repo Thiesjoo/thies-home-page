@@ -11,7 +11,7 @@ import {
 	Timestamp,
 } from "@/helpers/types/pusher.types";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import { useUserStore } from "./user.store";
 

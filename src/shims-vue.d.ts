@@ -16,4 +16,7 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
 	readonly env: ImportMetaEnv;
+	readonly hot: {
+		accept(cb: (test: any) => void): void;
+	};
 }

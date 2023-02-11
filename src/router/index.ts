@@ -10,11 +10,16 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	const userStore = useUserStore();
 
-	// we wanted to use the store here
-	if (!to.meta.requiresLogin || userStore.loggedIn) {
-		next();
-	} else {
+	if (to.meta.requiresLogin && !userStore.loggedIn) {
+		console.log("User not logged in, redirecting to login page");
 		next("/login?to=" + to.path);
+	} else if (to.meta.requiresLogin) {
+		console.log("User logged in, waiting for user data to be loaded");
+		userStore.waitUntilLoaded().then(() => {
+			next();
+		});
+	} else {
+		next();
 	}
 });
 

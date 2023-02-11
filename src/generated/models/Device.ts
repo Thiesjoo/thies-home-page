@@ -10,13 +10,13 @@ import type { RamInfo } from "./RamInfo";
 import type { StorageInfo } from "./StorageInfo";
 
 export type Device = {
+	availableInformation: Array<"os" | "cpu" | "ram" | "network" | "bluetooth" | "battery" | "mobile">;
 	/**
 	 * The unique identifier of the device
 	 */
 	uid: string;
 	name: string;
 	type: string;
-	availableInformation: Array<any>;
 	os?: OsInfo;
 	cpu?: CpuInfo;
 	ram?: RamInfo;
