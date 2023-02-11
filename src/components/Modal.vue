@@ -18,7 +18,7 @@
 							<div class="flex p-5 border-gray-600 justify-end flex-row items-center align-center">
 								<h2
 									class="mt-6 text-center w-full text-3xl font-extrabold text-white"
-									style="position: absolute; left: 50%; transform: translateX(-50%)">
+									style="position: absolute; left: 50%; transform: translateX(-50%); max-width: 70%">
 									<slot name="title"> </slot>
 								</h2>
 								<button
@@ -51,6 +51,10 @@ export default defineComponent({
 			type: Boolean,
 			default: false,
 		},
+		color: {
+			type: String,
+			default: "",
+		},
 	},
 	data(): {
 		open: boolean;
@@ -61,10 +65,18 @@ export default defineComponent({
 	},
 	computed: {
 		backgroundColor() {
-			return lightenDarkenColor("#374151", (window.openModals - 1) * -30);
+			return this.$props.color ? this.$props.color : lightenDarkenColor("#374151", (window.openModals - 1) * -30);
 		},
 	},
 	methods: {
+		forceOpen() {
+			if (this.open) return;
+			this.toggle();
+		},
+		forceClose() {
+			if (!this.open) return;
+			this.toggle();
+		},
 		toggle() {
 			this.open = !this.open;
 			this.$emit("toggle", this.open);

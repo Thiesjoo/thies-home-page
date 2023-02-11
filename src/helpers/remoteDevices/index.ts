@@ -1,24 +1,27 @@
 import ms from "ms";
-import { Device } from "../types/customdash.summary";
+import { FullDevice } from "../types/pusher.types";
 
 const MAX_AGE = ms("30m");
 const WARNING_AGE = ms("15m");
 
-export function getColorForAge(device: Device, now: number) {
-	const difference = device.connected ? 0 : now - device.lastConnected.time;
+export function getColorForAge(device: FullDevice, now: number) {
+	const difference = device.livedata?.global?.connected
+		? 0
+		: now - (device.livedata?.global?.lastConnected?.time || 10000000);
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
-	} else if (difference > WARNING_AGE || !device.connected) {
+	} else if (difference > WARNING_AGE || (device.type !== "mobile" && !device.livedata?.global?.connected)) {
 		return "#f5c350";
 	} else {
 		return "#65cd57";
 	}
 }
 
-export function getTitleType(device: Device) {
+export function getTitleType(device: FullDevice) {
 	return device.type.charAt(0).toUpperCase() + device.type.slice(1);
 }
-export function getIconForDeviceType(device: Device) {
+
+export function getIconForDeviceType(device: FullDevice) {
 	switch (device.type) {
 		case "mobile":
 			return ["fas", "mobile"];
@@ -28,45 +31,52 @@ export function getIconForDeviceType(device: Device) {
 			return ["fas", "desktop"];
 	}
 }
-export function isInformationTooOld(device: Device, now: number, warning = false) {
-	return now - device.lastConnected.time > (warning ? WARNING_AGE : MAX_AGE);
+
+export function isInformationTooOld(device: FullDevice, now: number, warning = false) {
+	return now - (device.livedata.global?.lastConnected?.time || 10000000) > (warning ? WARNING_AGE : MAX_AGE);
 }
-export function informationAgeShortText(device: Device, now: number) {
-	if (device.connected) {
+
+export function informationAgeShortText(device: FullDevice, now: number) {
+	if (device.livedata?.global?.connected) {
 		return "Connected";
 	}
-	let diff = now - device.lastConnected.time;
+	if (!device.livedata?.global?.lastConnected?.time) {
+		return "Never connected";
+	}
+	let diff = now - (device.livedata?.global?.lastConnected?.time || 0);
 	if (diff < 1000) {
 		diff = 1001;
 	}
 	return ms(diff);
 }
-export function getIconForLTEStrength(device: Device) {
+
+export function getIconForLTEStrength(device: FullDevice) {
 	return ["fas", "signal"];
 }
-export function getIconForWifiStrength(device: Device) {
+
+export function getIconForWifiStrength(device: FullDevice) {
 	return ["fas", "wifi"];
 }
 
-export function getNetworkTypeTitle(device: Device) {
+export function getNetworkTypeTitle(device: FullDevice) {
 	if (!device.network) {
 		return "No network";
 	}
-	return device.network.type.charAt(0).toUpperCase() + device.network.type.slice(1);
+	return device.livedata.network.type.charAt(0).toUpperCase() + device.livedata.network.type.slice(1);
 }
 
 const MAX_WIFI_NAME_LENGTH = 11;
 
-export function getNetworkTitle(device: Device, ignoreLength = false) {
-	if (!device.network) {
+export function getNetworkTitle(device: FullDevice, ignoreLength = false) {
+	if (!device.livedata.network) {
 		return "No network data";
 	}
 
-	if (device.network.type === "ethernet") {
+	if (device.livedata.network.type === "ethernet") {
 		return "Ethernet";
 	}
 
-	const extraInfo = device.network.extraInfo?.split(" ")[0];
+	const extraInfo = device.livedata.network.extraInfo?.split(" ")[0];
 
 	if (extraInfo === "undefined" || !extraInfo || extraInfo === "-") {
 		return "unknown";
@@ -78,11 +88,12 @@ export function getNetworkTitle(device: Device, ignoreLength = false) {
 }
 
 // Outputs an object with the color classes for the battery (In VUE format)
-export function getColorForBattery(device: Device, background = false) {
+export function getColorForBattery(device: FullDevice, background = false) {
+	const pc = device.livedata?.battery?.percent || 100;
 	const base = {
-		"text-green-600": device.battery > 50,
-		"text-yellow-600": device.battery > 25 && device.battery <= 50,
-		"text-red-600": device.battery <= 25,
+		"text-green-600": pc > 50,
+		"text-yellow-600": pc > 25 && pc <= 50,
+		"text-red-600": pc <= 25,
 		"text-gray-600": !hasBattery(device),
 	};
 	if (background) {
@@ -92,11 +103,11 @@ export function getColorForBattery(device: Device, background = false) {
 	return base;
 }
 
-export function getIconForNetworkStatus(device: Device) {
-	if (!device.network) {
+export function getIconForNetworkStatus(device: FullDevice) {
+	if (!device.livedata.network) {
 		return ["fas", "question"];
 	}
-	switch (device.network.type) {
+	switch (device.livedata.network.type) {
 		case "wifi":
 			return getIconForWifiStrength(device);
 		case "mobile":
@@ -107,7 +118,7 @@ export function getIconForNetworkStatus(device: Device) {
 			return ["fas", "plane-up"];
 	}
 }
-export function hasBattery(device: Device) {
+export function hasBattery(device: FullDevice) {
 	return device.battery !== undefined;
 }
 

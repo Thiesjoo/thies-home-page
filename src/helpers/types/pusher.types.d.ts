@@ -1,3 +1,6 @@
+import { Device, Notification } from "@/generated";
+export type Timestamp = { dateReceived: number };
+
 export type CpuInfo = {
 	brand: string;
 	model: string;
@@ -116,32 +119,38 @@ export type BatteryLoad = {
 	temperature?: number;
 };
 
-export type HardwareInfo = {
-	type: "laptop";
-	os: OsInfo;
-	cpu: CpuInfo;
-	ram: RamInfo;
-	storage: StorageInfo;
-	network: NetworkInfo;
-	battery: BatteryInfo;
+export type MobileLoad = {
+	// Do not disturb on
+	dnd: boolean;
+	// Is the wifihostpot enabled
+	hotspot: boolean;
 };
 
-export type MobileInfo = {
-	type: "mobile";
-	battery: BatteryInfo;
-	network: NetworkInfo;
-	os: OsInfo;
-};
+export type NotificationLoad =
+	| {
+			uid: string;
+			removed: true;
+	  }
+	| (Notification & {
+			uid: string;
+			removed: false;
+	  });
 
 export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number };
 
-export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery";
+export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery" | "mobile";
 export type LiveData = {
-	cpu?: CpuLoad;
-	ram?: RamLoad;
-	network?: NetworkLoad;
-	bluetooth?: BluetoothLoad;
-	battery?: BatteryLoad;
-	global?: GlobalLoad;
+	cpu: CpuLoad;
+	ram: RamLoad;
+	network: NetworkLoad;
+	bluetooth: BluetoothLoad;
+	battery: BatteryLoad;
+	global: GlobalLoad;
+	mobile: MobileLoad;
+	notifications: NotificationLoad;
 };
-export type PossibleLiveDataKeys = keyof LiveData;
+
+export type LiveDataSnapshot = { [A in keyof LiveData]: LiveData[A] & Timestamp };
+export type LiveDataList = { [K in keyof LiveData]?: Array<LiveData[K] & Timestamp> };
+
+export type FullDevice = Device & { livedata: LiveDataSnapshot };

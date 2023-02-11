@@ -4,6 +4,8 @@
 		:enter-from-class="`enter-from-${right ? 'right' : 'left'}`"
 		:leave-to-class="`enter-from-${right ? 'right' : 'left'}`">
 		<div class="p-2" v-if="loaded" @click="linkTo">
+			<!-- TODO: Make some sort of theme manager to store background color
+            Source:  https://github.com/mabeltje/Recipe2/blob/5cc74d9ef37e91bc5fbc222dcabc944add58e9de/src/assets/base.css -->
 			<div
 				class="inline-flex items-center leading-none text-purple-600 rounded-full p-2 shadow text-teal text-sm"
 				style="background-color: #181818">

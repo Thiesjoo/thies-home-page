@@ -60,12 +60,14 @@
 					</a>
 				</div>
 			</div>
+
 			<div class="flex items-center w-full">
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 				<div class="flex-grow-0 mx-5 text dark:text-white">Authentication Methods</div>
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
-			<!-- 2fa Management -->
+
+			<!-- 2FA Management -->
 			<div class="flex flex-row items-stretch py-5">
 				<div class="flex flex-row items-center">
 					<a
@@ -88,7 +90,6 @@
 			</div>
 
 			<!-- Logout -->
-
 			<button
 				@click="logout"
 				type="button"

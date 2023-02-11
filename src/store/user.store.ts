@@ -79,6 +79,22 @@ export const useUserStore = defineStore("user", {
 	},
 
 	actions: {
+		waitUntilLoaded() {
+			return new Promise<void>((resolve) => {
+				if (this.loggedIn && !this.loading.userdata) {
+					resolve();
+					return;
+				}
+
+				const unsub = this.$subscribe((mut, state) => {
+					if (state.loggedIn && !state.loading.userdata) {
+						resolve();
+						unsub();
+					}
+				});
+			});
+		},
+
 		async getUserData() {
 			if (!this.loggedIn) {
 				this.loading.userdata = false;

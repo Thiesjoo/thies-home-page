@@ -1,3 +1,5 @@
+import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
+import { LiveData } from "@/helpers/types/pusher.types";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { io, Socket } from "socket.io-client";
@@ -5,7 +7,6 @@ import { io, Socket } from "socket.io-client";
 class SocketService {
 	socket?: Socket;
 	store?: ReturnType<typeof useDevicesStore>;
-	constructor() {}
 
 	async setupSocketConnection() {
 		console.log("Starting to setup socket connection");
@@ -55,6 +56,10 @@ class SocketService {
 			store.socket.connecting = false;
 		});
 
+		this.socket.on("exception", (error: any) => {
+			console.error("Socket exception: ", error);
+		});
+
 		this.registerSocketEvents();
 		this.registerStoreEvents();
 	}
@@ -65,40 +70,30 @@ class SocketService {
 			return;
 		}
 
-		const updateMap = {
-			"battery-load": this.store.updateBatteryLoad,
-			"global-load": this.store.updateGlobalLoad,
-			"network-load": this.store.updateNetworkLoad,
-			"cpu-load": this.store.updateCPULoad,
-		};
-
 		this.socket?.on("initial-data", console.log);
 		this.socket?.onAny((event, ...args) => {
 			if (event.endsWith("-load")) {
 				console.log("Got event: ", event, args);
-			}
 
-			const updateFunction = updateMap[event as "battery-load" | "global-load"];
-			if (!updateFunction) {
-				console.warn("No update function for event: ", event);
-				return;
-			}
+				if (!this.store) {
+					console.error("Store not initialized, but it is needed for socket events");
+					return;
+				}
 
-			const [data] = args as [any & { deviceId: string }];
-			updateFunction(data.deviceId, data);
+				const [data] = args as [{ type: keyof LiveData; data: any; deviceID: string }];
+				this.store.updateLoad(data.deviceID, data.type, data.data);
+			}
 		});
 	}
 
 	registerStoreEvents() {
 		// Check if we want new data
 		this.store?.$subscribe((mut, state) => {
-			if (state.requests.length > 0) {
+			if (state.requests.length > 0 && !state.loading.userdata) {
 				for (const request of state.requests) {
 					this.socket?.emit(
 						"request-live-updates",
-						request.deviceId,
-						[request.type],
-						request.type !== "cpu",
+						{ deviceID: request.deviceID, properties: [request.type], throttle: request.type !== "cpu" },
 						(ack: any) => {
 							console.log("Ack for request:", request, ":", ack);
 						}
@@ -114,17 +109,17 @@ class SocketService {
 			const store = useDevicesStore();
 			const userStore = useUserStore();
 			const interval = setInterval(() => {
-				if (store.devices?.api && userStore.accessToken && !userStore.isLoading) {
+				if (!store.loading.userdata && userStore.accessToken && !userStore.isLoading) {
 					clearInterval(interval);
-					resolve(store.devices.api);
+					resolve(getDeviceBaseURL());
 				}
 			}, 750);
 		});
 	}
 
 	disconnect() {
-		console.log("Disconnecting");
 		if (this.socket) {
+			console.log("Disconnecting");
 			this.socket.disconnect();
 		}
 	}
@@ -133,7 +128,7 @@ class SocketService {
 		this.on("connect", callback);
 	}
 
-	onNewDevice(callback: (deviceId: string) => void) {
+	onNewDevice(callback: (deviceID: string) => void) {
 		this.on("new-device", callback);
 	}
 

@@ -25,11 +25,11 @@ const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => 
 		failedRequest.response.config.headers["Authorization"] = "Bearer " + tokenRefreshResponse.data.token;
 		return await Promise.resolve();
 	} catch (e) {
-		console.error("WIPING USER STATE BECAUSE REFRESH WENT WRONG: ", e);
-		const userStore = useUserStore();
-		window.localStorage.clear();
-		userStore.$reset();
-		console.log(userStore.user);
+		// console.error("WIPING USER STATE BECAUSE REFRESH WENT WRONG: ", e);
+		// const userStore = useUserStore();
+		// window.localStorage.clear();
+		// userStore.$reset();
+		// console.log(userStore.user);
 		throw e;
 	}
 };

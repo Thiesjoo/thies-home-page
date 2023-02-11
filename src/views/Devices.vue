@@ -33,84 +33,116 @@
 
 	<!-- For every device in the list, get 1/4 of page width and make a nice looking colunm -->
 	<div
-		class="total-container w-[100vw] h-[100vh] flex flex-col md:flex-row justify-center items-center md:items-start">
+		class="total-container w-[100vw] h-[100vh] overflow-hidden flex flex-col md:flex-row justify-center items-center md:items-start">
 		<div v-for="device in devices" class="single-container w-[80vw] md:w-[25vw] md:max-w-[450px] p-2 m-3">
 			<!-- Header -->
-			<div class="header-container">
-				<div class="flex flex-row justify-between">
-					<!-- Device info -->
-					<div class="flex flex-col space-y-1 max-w-[40%]">
-						<span class="text-lg font-bold break-words">
-							<font-awesome-icon
-								:icon="getIconForDeviceType(device)"
-								:title="getTitleType(device)"
-								class="mr-1">
-							</font-awesome-icon
-							>{{ device.name }}</span
-						>
-						<span class="text-sm italic">{{ device.id }}</span>
-					</div>
-
-					<div class="flex flex-col space-y-1 min-w-[50%] text-right">
-						<!-- Device status -->
-						<span class="text-lg font-bold">
-							{{ informationAgeShort(device, now) }} -
-							<div
-								class="w-[12px] h-[12px]"
-								:style="{
-									'background-color': getColorForAge(device, now),
-									'border-radius': '50%',
-									display: 'inline-block',
-								}"></div
-						></span>
-
-						<!-- Network -->
-						<span class="text-sm font-bold" :title="getNetworkTitle(device, true)">
-							<font-awesome-icon
-								:icon="getIconForNetworkStatus(device)"
-								:title="getNetworkTypeTitle(device)">
-							</font-awesome-icon>
-							{{ getNetworkTitle(device) }}
-						</span>
-
-						<!-- Battery -->
-						<span class="text-sm font-bold whitespace-nowrap" v-if="device.battery && device.battery != 0">
-							<font-awesome-icon :icon="['fas', 'battery']" class="mr-1" v-if="!device.batteryCharging">
-							</font-awesome-icon>
-							<font-awesome-icon :icon="['fas', 'bolt']" class="mr-1" v-if="device.batteryCharging">
-							</font-awesome-icon>
-
-							<span> {{ device.battery }}% </span>
-							<div class="w-[60%] rounded-full h-2.5 bg-gray-700 inline-block">
-								<div
-									class="0 h-2.5 rounded-full"
-									:class="getColorForBattery(device, true)"
-									:style="{
-										width: device.battery + '%',
-									}"></div>
+			<DeviceModal :deviceToShow="device">
+				<template #button>
+					<div class="header-container">
+						<div class="flex flex-row justify-between">
+							<!-- Device info -->
+							<div class="flex flex-col space-y-1 max-w-[40%]">
+								<span class="text-lg font-bold break-words">
+									<font-awesome-icon
+										:icon="getIconForDeviceType(device)"
+										:title="getTitleType(device)"
+										class="mr-1">
+									</font-awesome-icon
+									>{{ device.name }}</span
+								>
+								<span class="text-sm italic">{{ device.uid }}</span>
 							</div>
-						</span>
+
+							<div class="flex flex-col space-y-1 min-w-[50%] text-right">
+								<!-- Device status -->
+								<span class="text-lg font-bold">
+									{{ informationAgeShort(device, now) }} -
+									<div
+										class="w-[12px] h-[12px]"
+										:style="{
+											'background-color': getColorForAge(device, now),
+											'border-radius': '50%',
+											display: 'inline-block',
+										}"></div>
+								</span>
+
+								<!-- Network -->
+								<span class="text-sm font-bold" :title="getNetworkTitle(device, true)">
+									<font-awesome-icon
+										:icon="getIconForNetworkStatus(device)"
+										:title="getNetworkTypeTitle(device)">
+									</font-awesome-icon>
+									{{ getNetworkTitle(device) }}
+								</span>
+
+								<span v-if="device.livedata?.mobile?.dnd">
+									Do Not Disturb
+									<font-awesome-icon :icon="['fas', 'ban']" title="Do Not Disturb is on">
+									</font-awesome-icon>
+								</span>
+
+								<span v-if="device.livedata?.mobile?.hotspot">
+									Hotspot enabled
+									<font-awesome-icon :icon="['fas', 'house-signal']" title="Hotspot is enabled">
+									</font-awesome-icon>
+								</span>
+
+								<!-- Battery -->
+								<span
+									class="text-sm font-bold whitespace-nowrap"
+									v-if="
+										(hasBattery(device) || device.livedata?.battery) &&
+										device.livedata?.battery?.percent !== 0
+									">
+									<font-awesome-icon
+										:icon="['fas', 'battery']"
+										class="mr-1"
+										v-if="!device.livedata?.battery?.charging">
+									</font-awesome-icon>
+									<font-awesome-icon
+										:icon="['fas', 'bolt']"
+										class="mr-1"
+										v-if="device.livedata?.battery?.charging">
+									</font-awesome-icon>
+
+									<span> {{ device.livedata?.battery?.percent }}% </span>
+									<div class="w-[60%] rounded-full h-2.5 bg-gray-700 inline-block">
+										<div
+											class="0 h-2.5 rounded-full"
+											:class="getColorForBattery(device, true)"
+											:style="{
+												width: device.livedata?.battery?.percent + '%',
+											}"></div>
+									</div>
+								</span>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
+				</template>
+			</DeviceModal>
 
 			<!-- Body -->
 			<!-- TODO: Blur body when information gets too old -->
 			<div class="flex flex-col space-y-2">
-				<button @click="devicesStore.requestCPUData(device.id)">Request CPU data</button>
-				Temp data: {{ devicesStore.livedata?.[device.id]?.cpu?.length }}
+				<Notifications :device="device" />
 			</div>
 		</div>
+		<CreateDeviceModal></CreateDeviceModal>
 	</div>
 </template>
 
 <script lang="ts">
 import errorCaptured from "@/components/widgets/errorCaptured";
 import { allHelperFunctions } from "@/helpers/remoteDevices";
+import SocketService from "@/services/socket.service";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "@vue/runtime-core";
-import SocketService from "@/services/socket.service";
+
+import CreateDeviceModal from "@/components/CreateNewDeviceModal.vue";
+import DeviceModal from "@/components/DeviceModal.vue";
+import { Notifications } from "@/components/device_widgets";
+import { FullDevice } from "@/helpers/types/pusher.types";
 
 export default defineComponent({
 	data() {
@@ -130,15 +162,15 @@ export default defineComponent({
 		loading() {
 			return this.devicesStore.loading.userdata;
 		},
-		devices() {
-			return this.devicesStore.devices?.summary || [];
+		devices(): FullDevice[] {
+			return this.devicesStore.fullDeviceList;
 		},
 	},
 	methods: {
 		...allHelperFunctions,
 		forceReloadDevices() {
 			// Force reload the data
-			this.devicesStore.loadDeviceData();
+			this.devicesStore.loadLiveData();
 		},
 	},
 	beforeDestroy() {
@@ -155,15 +187,12 @@ export default defineComponent({
 	},
 	async mounted() {
 		const self = this;
-		this.user.$subscribe((mutation, state) => {
-			if (state.loggedIn && !state.loading.userdata && !this.interval) {
-				this.forceReloadDevices();
+		this.devicesStore.loadDeviceInformation();
+		this.forceReloadDevices();
 
-				this.interval = setInterval(function () {
-					self.now = Date.now();
-				}, 1000) as unknown as number;
-			}
-		});
+		this.interval = setInterval(function () {
+			self.now = Date.now();
+		}, 1000) as unknown as number;
 
 		await SocketService.setupSocketConnection();
 
@@ -176,6 +205,11 @@ export default defineComponent({
 			console.log("New device added", device);
 			this.devicesStore.requestGlobalData();
 		});
+	},
+	components: {
+		Notifications,
+		CreateDeviceModal,
+		DeviceModal,
 	},
 });
 </script>

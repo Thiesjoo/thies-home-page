@@ -1,105 +1,121 @@
-import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
-import { Device } from "@/helpers/types/customdash.summary";
+import { CreateDevice, Device, DevicesService, UpdateDevice } from "@/generated";
 import {
 	BatteryLoad,
 	CpuLoad,
+	FullDevice,
 	GlobalLoad,
 	LiveData,
+	LiveDataList,
+	LiveDataSnapshot,
 	NetworkLoad,
-	PossibleLiveDataKeys,
+	Timestamp,
 } from "@/helpers/types/pusher.types";
-import { useLocalStorage, StorageSerializers, RemovableRef } from "@vueuse/core";
-import axios from "axios";
-import { defineStore } from "pinia";
+import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
+import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
-import { User, useUserStore } from "./user.store";
+import { useUserStore } from "./user.store";
 
 export const MAX_ARRAY_LENGTH = 20;
-export type Timestamp = { dateReceived: number };
-
-export type DevicesInfo = {
-	api: string;
-	summary: Device[];
-};
-
-const sampleData = [
+const SAMPLE_DEVICE_DATA: Device[] = [
 	{
-		type: "laptop",
-		name: "thies-zenbook",
-		id: "test",
-		uptime: 2390.19,
-		upsince: 1665662516,
-		battery: 37,
-		batteryCharging: true,
-		network: {
-			interval: 5116,
-			up: 2450.76892350709,
-			down: 1773.7167964849211,
-			ip4: "-",
-			ip6: "-",
-			type: "wifi",
-			extraInfo: "eduroam [e185fa14] (null)",
-			dateReceived: 1665666851741,
-		},
-		connected: false,
-		lastConnected: {
-			time: 1665666570337,
-			ip: "-",
-			location: {
-				age: 1665666570337,
-				lat: "-",
-				lon: "-",
-			},
-		},
-		dateReceived: 1665666857141,
-	},
-	{
-		type: "mobile",
-		name: "OnePlus Nord N10 5G",
-		id: "oneplusnord",
-		uptime: 231783,
-		upsince: 1666211679711,
-		battery: 64,
-		batteryCharging: false,
-		network: {
-			ip4: "192.168.1.131",
-			ip6: "fe80::1b32:cb0e:5db4:a611",
-			up: 0,
-			down: 0,
-			type: "wifi",
-			extraInfo: "RandomWifiNetwork -70",
-		},
-		connected: false,
-		lastConnected: {
-			time: 1666443462711,
-			ip: "fe80::1b32:cb0e:5db4:a611",
-			location: {
-				lat: "-",
-				lon: "-",
-				age: 1666446326000,
-			},
-		},
+		name: "Sample name",
+		type: "laptop1",
+		availableInformation: [],
+		contact: "",
+		uid: "63dea51d6c59ad78f80d9497",
 	},
 ];
+
+const validateUser = () => {
+	const toast = useToast();
+	const user = useUserStore();
+	// If user is not logged in, return
+	if (!user.user) {
+		toast.error("You are not logged in!");
+		throw new Error("Trying to fetch devices, but user not logged in");
+	}
+
+	return { toast, user };
+};
 
 export const useDevicesStore = defineStore("devices", {
 	state: () => {
 		return {
-			loading: { userdata: true },
-			devices: useLocalStorage("devices", null, {
+			loading: { userdata: true, dataAlreadyLoaded: false },
+			devices: useLocalStorage("devices", [], {
 				serializer: StorageSerializers.object,
-			}) as RemovableRef<DevicesInfo | null>,
+			}) as RemovableRef<Device[]>,
 			socket: { connected: false, connecting: false, error: "" },
 
 			// Array that will be emptied when the socket requests it.
-			requests: [] as { deviceId: string; type: string }[],
-
-			livedata: {} as Record<string, { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }>,
+			requests: [] as { deviceID: string; type: string }[],
+			livedata: {} as Record<string, LiveDataList>,
 		};
 	},
+	getters: {
+		getSpecificDevice: (state) => (deviceID: string) => {
+			if (!state.devices) return undefined;
+			const info = state.devices.find((device) => device.uid === deviceID);
+			const livedata = state.livedata[deviceID];
+			return { info, livedata };
+		},
+		fullDeviceList: function (state) {
+			if (!state.devices) return [];
 
+			return state.devices
+				.map((x) => {
+					const snapshot = Object.entries(state.livedata[x.uid] || {}).reduce((acc, [key, value]) => {
+						//@ts-ignore
+						acc[key] = value[0];
+						return acc;
+					}, {} as LiveDataSnapshot);
+
+					return { ...x, livedata: snapshot };
+				})
+				.filter((x) => x) as FullDevice[];
+		},
+	},
 	actions: {
-		async loadDeviceData() {
+		async loadDeviceInformation(sample = false) {
+			const { toast, user } = validateUser();
+
+			if (sample) {
+				this.devices = SAMPLE_DEVICE_DATA;
+				return;
+			}
+			this.loading.userdata = true;
+			const result = await DevicesService.devicesControllerFindAll();
+			this.devices = result;
+			console.log("New device list loaded", result);
+
+			this.loading.dataAlreadyLoaded = true;
+			this.loading.userdata = false;
+		},
+
+		async createNewDevice(device: CreateDevice) {
+			const { toast, user } = validateUser();
+
+			const result = await DevicesService.devicesControllerCreate(device);
+			if (!result) {
+				toast.error("Failed to create device!");
+				return;
+			}
+			toast.success("Device created successfully!");
+			await this.loadDeviceInformation();
+		},
+		async updateDevice(uid: string, updateDevice: UpdateDevice) {
+			const { toast, user } = validateUser();
+
+			const result = await DevicesService.devicesControllerUpdate(uid, updateDevice);
+			if (!result) {
+				toast.error("Failed to update device!");
+				return;
+			}
+			toast.success("Device updated successfully!");
+			await this.loadDeviceInformation();
+		},
+
+		async loadLiveData(sample = false) {
 			const toast = useToast();
 			const user = useUserStore();
 			// If user is not logged in, return
@@ -111,44 +127,45 @@ export const useDevicesStore = defineStore("devices", {
 			// If user is logged in, get device data
 			this.loading.userdata = true;
 
-			this.devices = {
-				api: getDeviceBaseURL(),
-				summary: [],
-			};
-
-			// Fetch data
-			if (window.env.VUE_APP_VERCEL_ENV === "development") {
-				this.devices.summary = sampleData;
-			}
-
-			try {
-				const data = (await axios.get(`${this.devices.api}/output/summary`)).data;
-				this.devices.summary = data.summary;
-			} catch (e) {
-				toast.error("Failed to fetch device data!");
-				console.error(e);
-			}
+			const allLiveData = await DevicesService.devicesControllerGetAllLiveData();
+			allLiveData.forEach((x) => {
+				if (!this.livedata[x.deviceID]) {
+					this.livedata[x.deviceID] = {};
+				}
+				this.updateLiveData(x.type, x.data, this.livedata[x.deviceID]);
+			});
+			console.log("Loaded livedata", allLiveData);
 
 			this.loading.userdata = false;
 		},
 
+		// Related to sockets
 		requestGlobalData(shownDevices: string[] = []) {
 			if (shownDevices.length === 0) {
-				this.devices?.summary.forEach((x) => {
-					shownDevices.push(x.id);
+				this.devices?.forEach((x) => {
+					shownDevices.push(x.uid);
 				});
 			}
 			this.requests = [
 				...this.requests,
-				...shownDevices.flatMap((id) => [
-					{ deviceId: id, type: "global" },
-					{ deviceId: id, type: "battery" },
-					{ deviceId: id, type: "network" },
-				]),
+				...shownDevices.flatMap((id) => {
+					const toReturn = [
+						{ deviceID: id, type: "global" },
+						{ deviceID: id, type: "battery" },
+						{ deviceID: id, type: "network" },
+					];
+					if (this.devices?.find((x) => x.uid === id)?.type === "mobile") {
+						toReturn.push({ deviceID: id, type: "mobile" });
+					}
+					return toReturn;
+				}),
 			];
 		},
+		requestNotifications(device: string) {
+			this.requests = [...this.requests, { deviceID: device, type: "notifications" }];
+		},
 		requestCPUData(device: string) {
-			this.requests = [...this.requests, { deviceId: device, type: "cpu" }];
+			this.requests = [...this.requests, { deviceID: device, type: "cpu" }];
 		},
 
 		emptyRequests() {
@@ -158,7 +175,7 @@ export const useDevicesStore = defineStore("devices", {
 		findDevice(id: string) {
 			if (!this.devices) return { device: null, livedata: null };
 
-			const device = this.devices.summary.find((d) => d.id === id);
+			const device = this.devices.find((d) => d.uid === id);
 			if (!device) {
 				console.warn("Tried to update: ", id, "but it does not exist");
 				return { device: null, livedata: null };
@@ -171,48 +188,22 @@ export const useDevicesStore = defineStore("devices", {
 		},
 
 		// Processing functions
-		updateGlobalLoad(id: string, data: GlobalLoad & Timestamp) {
+
+		updateLoad(id: string, type: keyof LiveData, data: (GlobalLoad | BatteryLoad) & Timestamp) {
 			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
-			device.connected = data.connected;
-			device.lastConnected = data.lastConnected;
-			this.updateLiveData("global", data, livedata);
-		},
-		updateBatteryLoad(id: string, data: BatteryLoad & Timestamp) {
-			const { device, livedata } = this.findDevice(id);
-			if (!device) return;
-
-			device.battery = data.percent;
-			device.batteryCharging = data.charging;
-			this.updateLiveData("battery", data, livedata);
-		},
-		updateNetworkLoad(id: string, data: NetworkLoad & Timestamp) {
-			const { device, livedata } = this.findDevice(id);
-			if (!device) return;
-
-			device.network = data;
-			this.updateLiveData("network", data, livedata);
+			this.updateLiveData(type, data, livedata);
 		},
 
-		updateCPULoad(id: string, data: CpuLoad & Timestamp) {
-			const { device, livedata } = this.findDevice(id);
-			if (!device) return;
-			this.updateLiveData("cpu", data, livedata);
-		},
-
-		updateLiveData<T extends PossibleLiveDataKeys>(
-			key: T,
-			data: LiveData[T] & Timestamp,
-			livedata: { [K in keyof LiveData]: Array<LiveData[K] & Timestamp> }
-		) {
+		updateLiveData<T extends keyof LiveData>(key: T, data: LiveData[T] & Timestamp, livedata: LiveDataList) {
 			if (!(key in livedata)) {
 				livedata[key] = [] as any;
 			}
-			livedata[key]!.push(data);
+			livedata[key]!.unshift(data);
 
-			if (livedata[key].length > MAX_ARRAY_LENGTH) {
-				const diff = livedata[key].length - MAX_ARRAY_LENGTH;
+			if (livedata[key]!.length > MAX_ARRAY_LENGTH) {
+				const diff = livedata[key]!.length - MAX_ARRAY_LENGTH;
 				//@ts-ignore Nested type errors
 				livedata[key] = livedata[key].slice(diff);
 			}
