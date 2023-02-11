@@ -54,12 +54,15 @@
 					<div class="flex-grow-0 mx-5 text dark:text-white">Info</div>
 					<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 				</div>
-				<!-- Horizontal line -->
 				<h4 class="font-bold text-xl">Available specs</h4>
 				<ul>
 					<li v-for="info in device.availableInformation">{{ info }}</li>
 				</ul>
-
+				<div class="flex items-center w-full mt-5 mb-5">
+					<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+					<div class="flex-grow-0 mx-5 text dark:text-white">Tokens</div>
+					<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+				</div>
 				<button
 					@click="authorizeToken()"
 					class="group relative w-full flex justify-center mt-5 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:hover:bg-indigo-600">
@@ -76,6 +79,7 @@ import { colorFromString, lightenDarkenColor } from "@/helpers/colors";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
+import { useToast } from "vue-toastification";
 
 export default defineComponent({
 	props: {
@@ -102,7 +106,13 @@ export default defineComponent({
 			// Update device
 		},
 		async authorizeToken() {
-			await DevicesService.devicesControllerAuthorizeNewToken(this.device.uid);
+			const toast = useToast();
+			try {
+				await DevicesService.devicesControllerAuthorizeNewToken(this.device.uid);
+				toast.success("New token authorized! Check your device for the new token.");
+			} catch (e: any) {
+				toast.error(e.message || e || "Something went wrong");
+			}
 		},
 	},
 	setup(props) {

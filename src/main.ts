@@ -42,6 +42,8 @@ import {
 	faTrash,
 	faWifi,
 	faXmark,
+	faBan,
+	faHouseSignal,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./helpers/auto-refresh-tokens";
@@ -88,7 +90,9 @@ library.add(
 	faServer,
 	faMobile,
 	faDesktop,
-	faLaptop
+	faLaptop,
+	faBan,
+	faHouseSignal
 );
 
 const app = createApp(App, { router });

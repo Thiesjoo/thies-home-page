@@ -119,26 +119,16 @@ export type BatteryLoad = {
 	temperature?: number;
 };
 
-export type HardwareInfo = {
-	type: "laptop";
-	os: OsInfo;
-	cpu: CpuInfo;
-	ram: RamInfo;
-	storage: StorageInfo;
-	network: NetworkInfo;
-	battery: BatteryInfo;
-};
-
-export type MobileInfo = {
-	type: "mobile";
-	battery: BatteryInfo;
-	network: NetworkInfo;
-	os: OsInfo;
+export type MobileLoad = {
+	// Do not disturb on
+	dnd: boolean;
+	// Is the wifihostpot enabled
+	hotspot: boolean;
 };
 
 export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number };
 
-export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery";
+export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery" | "mobile";
 export type LiveData = {
 	cpu: CpuLoad;
 	ram: RamLoad;
@@ -146,6 +136,7 @@ export type LiveData = {
 	bluetooth: BluetoothLoad;
 	battery: BatteryLoad;
 	global: GlobalLoad;
+	mobile: MobileLoad;
 };
 
 export type LiveDataSnapshot = { [A in keyof LiveData]: LiveData[A] & Timestamp };

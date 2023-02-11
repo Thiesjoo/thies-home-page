@@ -8,6 +8,7 @@
 		<template #content>
 			<div class="flex flex-col justify-center m-0 p-0 text-center">
 				<div class="inline-flex items-center justify-center overflow-hidden rounded-full">
+					<!-- TODO: This still displays battery info, even if there is no battery -->
 					<svg class="w-20 h-20 -rotate-90 z-10">
 						<circle
 							style="color: #222222"
@@ -21,17 +22,17 @@
 							:class="getColorForBattery(device)"
 							stroke-width="19"
 							:stroke-dasharray="circumference"
-							:stroke-dashoffset="circumference * (1 - device.livedata.battery.percent / 100)"
+							:stroke-dashoffset="circumference * (1 - (device.livedata?.battery?.percent || 100) / 100)"
 							stroke="currentColor"
 							fill="transparent"
 							:r="radius"
 							cx="40"
 							cy="40" />
 						<circle
-							v-if="device.livedata.battery.charging"
+							v-if="device.livedata?.battery?.charging"
 							class="text-gray-400/50 animate-charging"
 							:style="{
-								'--max': circumference * (1 - device.livedata.battery.percent / 100),
+								'--max': circumference * (1 - (device.livedata?.battery?.percent || 100) / 100),
 								'--r': circumference,
 							}"
 							stroke-width="19"
@@ -53,7 +54,9 @@
 							</font-awesome-icon>
 						</div>
 
-						<span class="text-blue-700 text-center p-1">{{ device.battery }}% </span>
+						<span class="text-blue-700 text-center p-1"
+							>{{ device.livedata?.battery?.percent || 100 }}%
+						</span>
 					</div>
 				</div>
 
@@ -83,8 +86,18 @@
 							</font-awesome-icon>
 							<font-awesome-icon
 								:icon="['fas', 'bolt']"
-								v-if="device.livedata.battery.charging"
+								v-if="device.livedata?.battery?.charging"
 								title="Battery is charging">
+							</font-awesome-icon>
+							<font-awesome-icon
+								:icon="['fas', 'ban']"
+								v-if="device.livedata?.mobile?.dnd"
+								title="Do Not Disturb is on">
+							</font-awesome-icon>
+							<font-awesome-icon
+								:icon="['fas', 'house-signal']"
+								v-if="device.livedata?.mobile?.hotspot"
+								title="Hotspot is enabled">
 							</font-awesome-icon>
 						</div>
 
@@ -153,6 +166,7 @@ export default defineComponent({
 			}
 		}, 1000) as unknown as number;
 		this.devicesStore.loadDeviceInformation();
+		this.devicesStore.loadLiveData();
 	},
 	beforeUnmount() {
 		SocketService.disconnect();

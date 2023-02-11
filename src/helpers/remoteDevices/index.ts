@@ -33,7 +33,7 @@ export function getIconForDeviceType(device: FullDevice) {
 }
 
 export function isInformationTooOld(device: FullDevice, now: number, warning = false) {
-	return now - (device.livedata.global.lastConnected.time || 10000000) > (warning ? WARNING_AGE : MAX_AGE);
+	return now - (device.livedata.global?.lastConnected?.time || 10000000) > (warning ? WARNING_AGE : MAX_AGE);
 }
 
 export function informationAgeShortText(device: FullDevice, now: number) {
@@ -89,7 +89,7 @@ export function getNetworkTitle(device: FullDevice, ignoreLength = false) {
 
 // Outputs an object with the color classes for the battery (In VUE format)
 export function getColorForBattery(device: FullDevice, background = false) {
-	const pc = device.livedata.battery.percent;
+	const pc = device.livedata?.battery?.percent || 100;
 	const base = {
 		"text-green-600": pc > 50,
 		"text-yellow-600": pc > 25 && pc <= 50,
@@ -104,7 +104,7 @@ export function getColorForBattery(device: FullDevice, background = false) {
 }
 
 export function getIconForNetworkStatus(device: FullDevice) {
-	if (!device.network) {
+	if (!device.livedata.network) {
 		return ["fas", "question"];
 	}
 	switch (device.livedata.network.type) {

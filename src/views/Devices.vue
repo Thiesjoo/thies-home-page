@@ -75,28 +75,43 @@
 									{{ getNetworkTitle(device) }}
 								</span>
 
+								<span v-if="device.livedata?.mobile?.dnd">
+									Do Not Disturb
+									<font-awesome-icon :icon="['fas', 'ban']" title="Do Not Disturb is on">
+									</font-awesome-icon>
+								</span>
+
+								<span v-if="device.livedata?.mobile?.hotspot">
+									Hotspot enabled
+									<font-awesome-icon :icon="['fas', 'house-signal']" title="Hotspot is enabled">
+									</font-awesome-icon>
+								</span>
+
 								<!-- Battery -->
 								<span
 									class="text-sm font-bold whitespace-nowrap"
-									v-if="hasBattery(device) && device.livedata.battery.percent !== 0">
+									v-if="
+										(hasBattery(device) || device.livedata?.battery) &&
+										device.livedata?.battery?.percent !== 0
+									">
 									<font-awesome-icon
 										:icon="['fas', 'battery']"
 										class="mr-1"
-										v-if="!device.livedata.battery.charging">
+										v-if="!device.livedata?.battery?.charging">
 									</font-awesome-icon>
 									<font-awesome-icon
 										:icon="['fas', 'bolt']"
 										class="mr-1"
-										v-if="device.livedata.battery.charging">
+										v-if="device.livedata?.battery?.charging">
 									</font-awesome-icon>
 
-									<span> {{ device.battery }}% </span>
+									<span> {{ device.livedata?.battery?.percent }}% </span>
 									<div class="w-[60%] rounded-full h-2.5 bg-gray-700 inline-block">
 										<div
 											class="0 h-2.5 rounded-full"
 											:class="getColorForBattery(device, true)"
 											:style="{
-												width: device.battery + '%',
+												width: device.livedata?.battery?.percent + '%',
 											}"></div>
 									</div>
 								</span>
@@ -182,7 +197,7 @@ export default defineComponent({
 				}, 1000) as unknown as number;
 			}
 		});
-		// await SocketService.setupSocketConnection();
+		await SocketService.setupSocketConnection();
 
 		SocketService.onConnected(() => {
 			console.log("connected in mounted");
