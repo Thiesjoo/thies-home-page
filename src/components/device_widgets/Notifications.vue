@@ -18,7 +18,7 @@
 
 					<!-- TODO: Auto update timestamps -->
 					<div class="ml-auto" style="order: 2" :title="formatDate(new Date(notf.timestamp))">
-						<i> {{ ms(Date.now() - +notf.timestamp) }} ago </i>
+						<i> {{ ms(now - +notf.timestamp) }} ago </i>
 					</div>
 				</div>
 				<div>
@@ -28,6 +28,12 @@
 
 				<!-- <div>{{ notf.click_action }}</div> -->
 			</div>
+		</div>
+
+		<div>
+			<button class="appearance-none bg-slate-200 rounded-full p-2" @click="clearAll">
+				Clear all notifications
+			</button>
 		</div>
 	</div>
 </template>
@@ -40,6 +46,7 @@ import { useDevicesStore } from "@/store/device.store";
 import axios from "axios";
 import ms from "ms";
 import { defineComponent, toRaw, unref } from "vue";
+import { useToast } from "vue-toastification";
 
 export default defineComponent({
 	props: {
@@ -54,6 +61,8 @@ export default defineComponent({
 			images: {} as Record<string, string>,
 			notfSub: undefined as undefined | (() => void),
 			vueTrigger: true,
+			now: Date.now(),
+			interval: 0,
 		};
 	},
 	methods: {
@@ -80,6 +89,13 @@ export default defineComponent({
 					}, 1000 * retry);
 				});
 		},
+		clearAll() {
+			const toast = useToast();
+			NotificationsService.notificationsControllerDeleteAllForDevice(this.current.uid).catch((e: any) => {
+				console.error("Failed to clear notifications", e);
+				toast.error("Failed to clear notifications");
+			});
+		},
 	},
 	setup(props) {
 		return { devices: useDevicesStore(), current: props.device as Device };
@@ -88,6 +104,7 @@ export default defineComponent({
 		Object.entries(this.images).forEach(([key, value]) => {
 			URL.revokeObjectURL(value);
 		});
+		clearInterval(this.interval);
 	},
 
 	async mounted() {
@@ -132,6 +149,11 @@ export default defineComponent({
 				state.livedata[this.current.uid].notifications = [];
 			}
 		});
+
+		const self = this;
+		this.interval = setInterval(async function () {
+			self.now = Date.now();
+		}, 1000) as unknown as number;
 
 		console.log("Notification list loaded:", result);
 		this.notifications.forEach(this.loadImage.bind(this));
