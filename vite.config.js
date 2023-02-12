@@ -16,14 +16,18 @@ export default defineConfig({
         }
     },
     plugins: [
+        // Sentry optimilzation
         replace({
             __SENTRY_DEBUG__: false,
             preventAssignment: true
         },),
+        // Vue
         vue(),
+        // Typescript checker
         checker({
             typescript: true,
         }),
+        // CSP
         ViteCspPlugin({
             'script-src': ["'self'", "https://challenges.cloudflare.com"],
             'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
@@ -41,9 +45,10 @@ export default defineConfig({
             },
         }),
     ],
+    // Cool typescript aliases
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
         },
-    },
+    }
 });

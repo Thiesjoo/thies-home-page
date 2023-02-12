@@ -14,11 +14,8 @@
 		"noImplicitThis": true,
 		"sourceMap": true,
 		"baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		},
 		"lib": ["ESNext", "dom", "dom.iterable", "scripthost"]
 	},
-	"include": ["src/**/*.ts", "src/**/*.vue"],
+	"include": ["./**/*.ts"],
 	"exclude": ["node_modules"]
 }
