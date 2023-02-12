@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
-import getProviderCredentials from "./_getcredentials";
+import { getProviderCredentials } from "./getcredentials";
 import { default as ms } from "ms";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
