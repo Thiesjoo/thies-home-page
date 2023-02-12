@@ -18,10 +18,5 @@
 			]
 		}
 	],
-	"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-	"functions": {
-		"api/external/*.ts": {
-			"includeFiles": "api/external/_getcredentials.ts"
-		}
-	}
+	"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
