@@ -18,7 +18,7 @@ export class DevicesService {
      */
     public static devicesControllerCreate(
         requestBody: CreateDevice,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Device> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/devices',

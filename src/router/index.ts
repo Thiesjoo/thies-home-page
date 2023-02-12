@@ -15,9 +15,14 @@ router.beforeEach((to, from, next) => {
 		next("/login?to=" + to.path);
 	} else if (to.meta.requiresLogin) {
 		console.log("User logged in, waiting for user data to be loaded");
-		userStore.waitUntilLoaded().then(() => {
-			next();
-		});
+		userStore
+			.waitUntilLoaded()
+			.then(() => {
+				next();
+			})
+			.catch(() => {
+				next("/login?to=" + to.path);
+			});
 	} else {
 		next();
 	}
