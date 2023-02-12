@@ -44,7 +44,3 @@ export async function getProviderCredentials(req: VercelRequest, res: VercelResp
 		return false;
 	}
 }
-
-export default async function (req: VercelRequest, res: VercelResponse) {
-	res.json({ ok: true });
-}

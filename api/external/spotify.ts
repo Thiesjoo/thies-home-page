@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { getProviderCredentials } from "./getcredentials";
+import { getProviderCredentials } from "./_getcredentials";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	try {
