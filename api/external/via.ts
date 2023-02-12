@@ -22,7 +22,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 	} catch (e: any) {
 		if (!e?.message?.startsWith("POS")) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
-			console.log("EXTERNAL ERROR: ", e);
+			console.log("EXTERNAL ERROR: ", e?.data || e);
 			try {
 				console.log("Deleting pos token");
 				await axios({
