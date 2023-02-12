@@ -20,7 +20,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			method: "GET",
 		});
 		balance = fetchRes?.data?.balance;
-	} catch (e) {
+	} catch (e: any) {
 		if (!e?.message?.startsWith("POS")) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
 			console.log("EXTERNAL ERROR: ", e);

@@ -32,7 +32,7 @@ export async function getProviderCredentials(req: VercelRequest, res: VercelResp
 			})
 		)?.data;
 		return result;
-	} catch (e) {
+	} catch (e: any) {
 		console.error("PROVIDER (myapi): ", e, " msg: " + e?.response?.data?.message, e?.response?.data);
 		res.statusCode = e?.message?.includes("401") ? 401 : 404;
 		res.json({
