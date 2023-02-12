@@ -27,8 +27,9 @@ class SocketService {
 			transports: ["websocket"],
 		});
 
-		store.socket.connecting = false;
+		store.socket.connecting = true;
 		store.socket.error = "";
+		this.registerInstantEvents();
 
 		this.socket.on("connect", () => {
 			store.socket.connected = true;
@@ -93,7 +94,8 @@ class SocketService {
 				for (const request of state.requests) {
 					this.socket?.emit(
 						"request-live-updates",
-						{ deviceID: request.deviceID, properties: [request.type], throttle: request.type !== "cpu" },
+						// TODO: throttle is not used, used to be used with CPU data
+						{ deviceID: request.deviceID, properties: request.type, throttle: false },
 						(ack: any) => {
 							console.log("Ack for request:", request, ":", ack);
 						}
@@ -101,6 +103,14 @@ class SocketService {
 				}
 				this.store?.emptyRequests();
 			}
+		});
+	}
+
+	registerInstantEvents() {
+		this.onConnected(() => {
+			this.socket?.emit("request-new-devices", (ack: any) => {
+				console.log("Result from new device request:", ack);
+			});
 		});
 	}
 
@@ -128,7 +138,7 @@ class SocketService {
 		this.on("connect", callback);
 	}
 
-	onNewDevice(callback: (deviceID: string) => void) {
+	onNewDevice(callback: (payload: { deviceID: string; userID: string }) => void) {
 		this.on("new-device", callback);
 	}
 

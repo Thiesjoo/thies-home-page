@@ -203,7 +203,9 @@ export default defineComponent({
 
 		SocketService.onNewDevice((device) => {
 			console.log("New device added", device);
-			this.devicesStore.requestGlobalData();
+			this.devicesStore.loadDeviceInformation();
+			this.forceReloadDevices();
+			this.devicesStore.requestGlobalData([device.deviceID]);
 		});
 	},
 	components: {

@@ -103,16 +103,9 @@ export default defineComponent({
 			e.preventDefault();
 
 			await this.devices.updateDevice(this.device.uid, this.device);
-			// Update device
 		},
 		async authorizeToken() {
-			const toast = useToast();
-			try {
-				await DevicesService.devicesControllerAuthorizeNewToken(this.device.uid);
-				toast.success("New token authorized! Check your device for the new token.");
-			} catch (e: any) {
-				toast.error(e.message || e || "Something went wrong");
-			}
+			this.devices.authorizeNewDeviceToken(this.device.uid);
 		},
 	},
 	setup(props) {

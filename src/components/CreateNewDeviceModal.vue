@@ -82,14 +82,26 @@ export default defineComponent({
 		async addDevice(e: Event) {
 			e.preventDefault();
 
-			await this.devices.createNewDevice(this.values);
+			const newDevice = await this.devices.createNewDevice(this.values);
 			(this.$refs.modal as any)?.forceClose();
+			if (newDevice && this.values.type === "mobile") {
+				// Grant new token
+				await this.devices.authorizeNewDeviceToken(newDevice.uid);
+			}
 		},
 	},
 	setup() {
 		const userStore = useUserStore();
 
 		return { user: userStore, devices: useDevicesStore() };
+	},
+	mounted() {
+		// Check route params
+		const params = new URLSearchParams(window.location.search);
+		if (params.has("contact")) {
+			this.values.contact = params.get("contact")!;
+			(this.$refs.modal as any)?.forceOpen();
+		}
 	},
 });
 </script>

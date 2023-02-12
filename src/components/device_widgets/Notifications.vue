@@ -16,7 +16,6 @@
 					</div>
 					<span class="font-light"> {{ notf.appname }} </span>
 
-					<!-- TODO: Auto update timestamps -->
 					<div class="ml-auto" style="order: 2" :title="formatDate(new Date(notf.timestamp))">
 						<i> {{ ms(now - +notf.timestamp) }} ago </i>
 					</div>
@@ -115,7 +114,7 @@ export default defineComponent({
 
 		this.devices.$subscribe((mut, state) => {
 			if (
-				state.livedata[this.current.uid].notifications &&
+				state.livedata[this.current.uid]?.notifications &&
 				state.livedata[this.current.uid].notifications!.length > 0
 			) {
 				const rawNotificationList = toRaw(state.livedata[this.current.uid].notifications!);

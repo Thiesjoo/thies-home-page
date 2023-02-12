@@ -48,7 +48,7 @@ export const useDevicesStore = defineStore("devices", {
 			socket: { connected: false, connecting: false, error: "" },
 
 			// Array that will be emptied when the socket requests it.
-			requests: [] as { deviceID: string; type: string }[],
+			requests: [] as { deviceID: string; type: string[] }[],
 			livedata: {} as Record<string, LiveDataList>,
 		};
 	},
@@ -102,6 +102,7 @@ export const useDevicesStore = defineStore("devices", {
 			}
 			toast.success("Device created successfully!");
 			await this.loadDeviceInformation();
+			return result;
 		},
 		async updateDevice(uid: string, updateDevice: UpdateDevice) {
 			const { toast, user } = validateUser();
@@ -139,6 +140,16 @@ export const useDevicesStore = defineStore("devices", {
 			this.loading.userdata = false;
 		},
 
+		async authorizeNewDeviceToken(deviceID: string) {
+			const toast = useToast();
+			try {
+				await DevicesService.devicesControllerAuthorizeNewToken(deviceID);
+				toast.success("New token authorized! Check your device for the new token.");
+			} catch (e: any) {
+				toast.error(e.message || e || "Something went wrong");
+			}
+		},
+
 		// Related to sockets
 		requestGlobalData(shownDevices: string[] = []) {
 			if (shownDevices.length === 0) {
@@ -148,24 +159,20 @@ export const useDevicesStore = defineStore("devices", {
 			}
 			this.requests = [
 				...this.requests,
-				...shownDevices.flatMap((id) => {
-					const toReturn = [
-						{ deviceID: id, type: "global" },
-						{ deviceID: id, type: "battery" },
-						{ deviceID: id, type: "network" },
-					];
+				...shownDevices.map((id) => {
+					const toReturn = ["global", "network", "battery"];
 					if (this.devices?.find((x) => x.uid === id)?.type === "mobile") {
-						toReturn.push({ deviceID: id, type: "mobile" });
+						toReturn.push("mobile");
 					}
-					return toReturn;
+					return { deviceID: id, type: toReturn };
 				}),
 			];
 		},
 		requestNotifications(device: string) {
-			this.requests = [...this.requests, { deviceID: device, type: "notifications" }];
+			this.requests = [...this.requests, { deviceID: device, type: ["notifications"] }];
 		},
 		requestCPUData(device: string) {
-			this.requests = [...this.requests, { deviceID: device, type: "cpu" }];
+			this.requests = [...this.requests, { deviceID: device, type: ["cpu"] }];
 		},
 
 		emptyRequests() {
