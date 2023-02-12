@@ -1,8 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import "axios";
 import axios from "axios";
-import { getProviderCredentials } from "./_getcredentials";
-import { default as ms } from "ms";
+import { getProviderCredentials } from "./_getcredentials.js";
+import ms from "ms";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	const result = await getProviderCredentials(req, res, "via");
