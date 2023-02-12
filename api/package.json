@@ -3,13 +3,14 @@
 		"axios": "^0.27.2",
 		"discord.js": "^14.7.1",
 		"irc-message": "^3.0.2",
+		"ms": "^3.0.0-canary.1",
 		"node-ical": "^0.15.3",
-		"ms": "^3.0.0-canary.1"
+		"typescript": "^4.9.5"
 	},
 	"devDependencies": {
-		"@vercel/node": "^2.9.0",
+		"@vercel/node": "^2.9.2",
 		"tslib": "^2.5.0",
-		"vercel": "^28.15.0"
+		"vercel": "^28.15.3"
 	},
 	"type": "module"
 }

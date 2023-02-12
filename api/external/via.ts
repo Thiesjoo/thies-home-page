@@ -1,8 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import "axios";
 import axios from "axios";
-import getProviderCredentials from "./_getcredentials";
-import { default as ms } from "ms";
+import { getProviderCredentials } from "./_getcredentials.js";
+import ms from "ms";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	const result = await getProviderCredentials(req, res, "via");
@@ -20,10 +19,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			method: "GET",
 		});
 		balance = fetchRes?.data?.balance;
-	} catch (e) {
+	} catch (e: any) {
 		if (!e?.message?.startsWith("POS")) {
 			//Something went wrong with the POS request, we revoke the token so we don't end up spamming POS
-			console.log("EXTERNAL ERROR: ", e);
+			console.log("EXTERNAL ERROR: ", e?.data || e);
 			try {
 				console.log("Deleting pos token");
 				await axios({

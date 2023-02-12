@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import getProviderCredentials from "./_getcredentials";
+import { getProviderCredentials } from "./_getcredentials.js";
 
 export default async function (req: VercelRequest, res: VercelResponse) {
 	try {
@@ -13,7 +13,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 				accesstoken: result.accessToken,
 			},
 		});
-	} catch (e) {
+	} catch (e: any) {
 		console.log(e);
 		res.statusCode = 500;
 		res.json({ ok: false, error: e?.message });
