@@ -1,5 +1,5 @@
 <template>
-	<Modal v-show="user.loggedIn && user.user && !dragging" @toggle="(state: boolean) => open=state">
+	<Modal v-show="user.loggedIn && user.user && !dragging" @toggle="toggleModal">
 		<template #button>
 			<div class="absolute bottom-[-16px] justify-center flex w-full">
 				<div class="p-[4rem] m-[-4rem]" :class="{ appear: !open }">
@@ -69,6 +69,12 @@ export default defineComponent({
 		end() {
 			this.dragging = false;
 			this.$emit("dragging", false);
+		},
+		toggleModal(state: boolean) {
+			this.open = state;
+			if (!state) {
+				this.end();
+			}
 		},
 	},
 	setup() {

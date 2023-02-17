@@ -11,7 +11,7 @@ window.env = {
 window.openModals = 0;
 import { createApp } from "vue";
 import App from "./App.vue";
-import router from "./router";
+import router, { enableLogoutWatching } from "./router";
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -56,7 +56,7 @@ import { createPinia } from "pinia";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { getBaseURL } from "./helpers/auto-refresh-tokens";
-import { useUserStore } from "./store/user.store";
+import { enableSettingWatching, useUserStore } from "./store/user.store";
 
 import * as Sentry from "@sentry/vue";
 import { BrowserTracing } from "@sentry/tracing";
@@ -132,12 +132,8 @@ app.mount("#app");
 useUserStore()
 	.getUserData()
 	.catch((e) => {
-		console.error("Something went wrong with getting userdata");
+		console.error("Something went wrong with getting userdata", e);
 	});
 
-// Watch the store for changes, and when a user logs out, redirect to the login page if on auth-required page
-useUserStore().$subscribe((mut, state) => {
-	if (!state.loggedIn && router.currentRoute.value.meta.requiresLogin) {
-		router.push("/login?to=" + router.currentRoute.value.path);
-	}
-});
+enableLogoutWatching();
+enableSettingWatching();

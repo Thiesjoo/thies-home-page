@@ -9,7 +9,7 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["Battery", "Pauze", "Dummy", "RemoteDevices"];
+export const DEFAULT_WIDGETS = ["battery", "pauze", "dummy", "remotedevices"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
@@ -17,6 +17,12 @@ export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "toprigh
 export type Widget = {
 	name: ValidComponentNames;
 	id: string;
+};
+
+export type MeUserApi = {
+	uid: string;
+	name: string;
+	email: string;
 };
 
 export type User = {
@@ -29,10 +35,6 @@ export type User = {
 		backgroundURL: string;
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
-		devices: {
-			api: string;
-			enabled: boolean;
-		};
 	};
 };
 
@@ -46,15 +48,11 @@ const defaultUser: User = {
 		backgroundURL: "",
 		widgets: {
 			topleft: [],
-			topright: [{ name: "VIA", id: "pos" }],
+			topright: [],
 			bottomleft: [],
 			bottomright: [],
 		},
 		widgetsAvailable: [],
-		devices: {
-			api: "",
-			enabled: false,
-		},
 	},
 };
 
@@ -62,12 +60,13 @@ export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
 			// Always loading userdata, because we want to check if the user is logged in
-			loading: { form: false, userdata: true },
+			loading: { form: false, userdata: true, settings: false },
 			loggedIn: useLocalStorage("loggedIn", false),
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
 			accessToken: useLocalStorage("accessToken", ""),
+			// TODO: Refresh token not passed to refresh endpoint
 			refreshToken: useLocalStorage("refreshToken", ""),
 		};
 	},
@@ -100,6 +99,26 @@ export const useUserStore = defineStore("user", {
 			});
 		},
 
+		async getBasicUserInformation() {
+			const userInformation = (await axios.get("/api/users/me")).data;
+			this.applyNewUserInformation(userInformation);
+			return userInformation;
+		},
+
+		async getBasicUserSettings() {
+			const syncedUserSettings = (await axios.get("/api/settings/me")).data;
+			this.user!.settings = syncedUserSettings;
+		},
+
+		createUser() {
+			return JSON.parse(JSON.stringify(defaultUser)) as User;
+		},
+
+		applyNewUserInformation({ name, email }: MeUserApi) {
+			this.user!.name = name;
+			this.user!.email = email;
+		},
+
 		async getUserData() {
 			if (!this.loggedIn) {
 				this.loading.userdata = false;
@@ -109,63 +128,23 @@ export const useUserStore = defineStore("user", {
 			this.loading.userdata = true;
 
 			try {
-				const userInformation = (await axios.get("/api/users/me")).data;
-				const syncedUserSettings = (await axios.get("/api/settings/me")).data;
-				// TODO: Sync this data with the server
-
-				console.log("Got user data: ", userInformation, "and settings: ", syncedUserSettings);
 				if (!this.user) {
-					// Default user data for testing
-					this.user = JSON.parse(JSON.stringify(defaultUser)) as User;
-
-					// Sync the user settings with the default user object
-					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
-				} else {
-					this.user.settings = { ...this.user.settings, ...syncedUserSettings };
-
-					// Check if the user has the required properties
-					this.user = {
-						...defaultUser,
-						...this.user,
-						settings: {
-							...defaultUser.settings,
-							...this.user.settings,
-							widgets: {
-								...defaultUser.settings.widgets,
-								...this.user.settings.widgets,
-							},
-							devices: {
-								...defaultUser.settings.devices,
-								...this.user.settings.devices,
-							},
-						},
-					};
+					this.user = this.createUser();
 				}
 
-				this.user.name = userInformation.name;
-				this.user.email = userInformation.email;
-
-				const allWidgetsAvailable: Widget[] = (await axios("/api/providers/me")).data;
-				this.user.settings.widgetsAvailable = allWidgetsAvailable.map((x) => {
-					if (x.name.toLowerCase() === "via") {
-						return {
-							name: "VIA",
-							id: x.id,
-						};
-					}
-
-					return x;
-				});
+				const promises = [this.getBasicUserInformation(), this.getBasicUserSettings()];
+				await Promise.all(promises);
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
 				// Add in dummy widget on preview and development
 				if (
-					!DEFAULT_WIDGETS.includes("Dummy") &&
+					!DEFAULT_WIDGETS.includes("dummy") &&
+					// TODO: Test env with vite
 					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
 				) {
-					DEFAULT_WIDGETS.push("Dummy");
-					DEFAULT_WIDGETS.push("RemoteDevices");
+					DEFAULT_WIDGETS.push("dummy");
+					DEFAULT_WIDGETS.push("remotedevices");
 				}
 
 				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
@@ -193,6 +172,18 @@ export const useUserStore = defineStore("user", {
 			}
 
 			this.loading.userdata = false;
+		},
+
+		async saveSettings() {
+			this.loading.settings = true;
+			try {
+				const copy = JSON.parse(JSON.stringify(this.user!.settings));
+				delete copy.widgetsAvailable;
+				await axios.patch("/api/settings/me", copy);
+			} catch (e) {
+				console.log("Something went wrong with saving settings", e);
+			}
+			this.loading.settings = false;
 		},
 
 		async logout() {
@@ -268,3 +259,19 @@ export const useUserStore = defineStore("user", {
 		},
 	},
 });
+
+export function enableSettingWatching() {
+	const store = useUserStore();
+	let prevSettings = JSON.stringify(store.user?.settings);
+
+	store.$subscribe((mutation, state) => {
+		if (state.user && !state.loading.userdata && !state.loading.form) {
+			const newSettings = JSON.stringify(state.user.settings);
+			if (prevSettings !== newSettings) {
+				console.log("Settings changed, saving");
+				prevSettings = newSettings;
+				store.saveSettings();
+			}
+		}
+	});
+}

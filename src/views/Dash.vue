@@ -1,23 +1,23 @@
 <template>
 	<span
-		v-if="user.isLoading"
+		v-if="userStore.isLoading"
 		class="w-3 h-3 m-2 animate-ping absolute inline-flex rounded-full bg-sky-400 opacity-75"></span>
 	<div class="background" :style="{ backgroundImage: background }"></div>
 
 	<div class="centered">
 		<div class="info">
 			<div class="flex items-center justify-center">
-				<span class="seconds absolute text-neutral-200" v-if="true || user.user?.settings?.showSeconds"
+				<span class="seconds absolute text-neutral-200" v-if="userStore.user?.settings?.showSeconds"
 					>{{ seconds }}
 				</span>
 				<h2 class="time">{{ time }}</h2>
 			</div>
-			<span class="date text-neutral-200" v-if="user.user?.settings?.showDate">{{ date }}</span>
+			<span class="date text-neutral-200" v-if="userStore.user?.settings?.showDate">{{ date }}</span>
 			<h3 class="greeting">Good {{ greeting }}{{ name }}.</h3>
 		</div>
 	</div>
 
-	<div v-if="user.loggedIn && !user.loading.userdata && user.user">
+	<div v-if="userStore.loggedIn && !userStore.loading.userdata && userStore.user">
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{
@@ -31,7 +31,7 @@
 			}"
 			:id="location"
 			class="widget"
-			v-model="user.user.settings.widgets[location]"
+			v-model="userStore.user.settings.widgets[location]"
 			group="widgets"
 			:item-key="generateKey"
 			@start="start"
@@ -116,14 +116,14 @@ export default defineComponent({
 	},
 	errorCaptured,
 	setup() {
-		return { user: useUserStore() };
+		return { userStore: useUserStore() };
 	},
 	computed: {
 		name(): string {
-			return this.user.user?.name ? `, ${this.user.user.name}` : ``;
+			return this.userStore.user?.name ? `, ${this.userStore.user.name}` : ``;
 		},
 		background(): string {
-			const url = this.user.user?.settings.backgroundURL;
+			const url = this.userStore.user?.settings.backgroundURL;
 
 			return (url ? `url("${url}"),` : "") + `url("https://source.unsplash.com/random/1920x1080/?landscape")`;
 		},
