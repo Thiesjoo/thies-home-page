@@ -28,4 +28,13 @@ router.beforeEach((to, from, next) => {
 	}
 });
 
+export function enableLogoutWatching() {
+	// Watch the store for changes, and when a user logs out, redirect to the login page if on auth-required page
+	useUserStore().$subscribe((mut, state) => {
+		if (!state.loggedIn && router.currentRoute.value.meta.requiresLogin) {
+			router.push("/login?to=" + router.currentRoute.value.path);
+		}
+	});
+}
+
 export default router;

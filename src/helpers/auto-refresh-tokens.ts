@@ -16,6 +16,9 @@ const refreshAuthLogic: (error: any) => Promise<any> = async (failedRequest) => 
 	try {
 		const tokenRefreshResponse = await axios.get(getBaseURL() + "/auth/refresh/access", {
 			skipAuthRefresh: true,
+			headers: {
+				Authorization: "Bearer " + useUserStore().refreshToken,
+			},
 		} as AxiosAuthRefreshRequestConfig);
 		if (!tokenRefreshResponse.data.token) {
 			throw new Error("Refresh went wrong!");

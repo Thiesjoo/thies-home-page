@@ -9,7 +9,7 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["Battery", "Pauze", "Dummy", "RemoteDevices"];
+export const DEFAULT_WIDGETS = ["battery", "pauze", "dummy", "remotedevices"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
@@ -60,12 +60,13 @@ export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
 			// Always loading userdata, because we want to check if the user is logged in
-			loading: { form: false, userdata: true },
+			loading: { form: false, userdata: true, settings: false },
 			loggedIn: useLocalStorage("loggedIn", false),
 			user: useLocalStorage("user", null, {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
 			accessToken: useLocalStorage("accessToken", ""),
+			// TODO: Refresh token not passed to refresh endpoint
 			refreshToken: useLocalStorage("refreshToken", ""),
 		};
 	},
@@ -138,12 +139,12 @@ export const useUserStore = defineStore("user", {
 
 				// Add in dummy widget on preview and development
 				if (
-					!DEFAULT_WIDGETS.includes("Dummy") &&
+					!DEFAULT_WIDGETS.includes("dummy") &&
 					// TODO: Test env with vite
 					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
 				) {
-					DEFAULT_WIDGETS.push("Dummy");
-					DEFAULT_WIDGETS.push("RemoteDevices");
+					DEFAULT_WIDGETS.push("dummy");
+					DEFAULT_WIDGETS.push("remotedevices");
 				}
 
 				DEFAULT_WIDGETS.forEach((x) => validWidgetsNames.add(x));
@@ -171,6 +172,18 @@ export const useUserStore = defineStore("user", {
 			}
 
 			this.loading.userdata = false;
+		},
+
+		async saveSettings() {
+			this.loading.settings = true;
+			try {
+				const copy = JSON.parse(JSON.stringify(this.user!.settings));
+				delete copy.widgetsAvailable;
+				await axios.patch("/api/settings/me", copy);
+			} catch (e) {
+				console.log("Something went wrong with saving settings", e);
+			}
+			this.loading.settings = false;
 		},
 
 		async logout() {
@@ -246,3 +259,19 @@ export const useUserStore = defineStore("user", {
 		},
 	},
 });
+
+export function enableSettingWatching() {
+	const store = useUserStore();
+	let prevSettings = JSON.stringify(store.user?.settings);
+
+	store.$subscribe((mutation, state) => {
+		if (state.user && !state.loading.userdata && !state.loading.form) {
+			const newSettings = JSON.stringify(state.user.settings);
+			if (prevSettings !== newSettings) {
+				console.log("Settings changed, saving");
+				prevSettings = newSettings;
+				store.saveSettings();
+			}
+		}
+	});
+}
