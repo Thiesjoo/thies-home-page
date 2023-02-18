@@ -138,7 +138,6 @@ export const useUserStore = defineStore("user", {
 				// Add in dummy widget on preview and development
 				if (
 					!DEFAULT_WIDGETS.includes("dummy") &&
-					// TODO: Test env with vite
 					(window.env.VUE_APP_VERCEL_ENV === "preview" || window.env.VUE_APP_VERCEL_ENV === "development")
 				) {
 					DEFAULT_WIDGETS.push("dummy");

@@ -72,7 +72,7 @@ export default defineComponent({
 		ms,
 		loadImage(notf: Notification, retry = 0) {
 			axios
-				.get(getDeviceBaseURL() + `/notifications/image/${notf.icon}`, {
+				.get(getDeviceBaseURL() + `/notifications/image/${this.current.uid}/${notf.icon}`, {
 					responseType: "blob",
 				})
 				.then((response) => {
