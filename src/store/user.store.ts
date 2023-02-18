@@ -66,8 +66,6 @@ export const useUserStore = defineStore("user", {
 				serializer: StorageSerializers.object,
 			}) as RemovableRef<User | null>,
 			accessToken: useLocalStorage("accessToken", ""),
-			// TODO: Refresh token not passed to refresh endpoint
-			refreshToken: useLocalStorage("refreshToken", ""),
 		};
 	},
 
@@ -193,7 +191,6 @@ export const useUserStore = defineStore("user", {
 				toast.error("Something went wrong with token deletion");
 			}
 			this.accessToken = "";
-			this.refreshToken = "";
 			this.loggedIn = false;
 			this.user = null;
 			toast.warning("You have been logged out");
@@ -206,7 +203,6 @@ export const useUserStore = defineStore("user", {
 				tokens = await loginWithPasskey(recaptchaToken);
 
 				this.accessToken = tokens.access;
-				this.refreshToken = tokens.refresh;
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");
@@ -225,7 +221,6 @@ export const useUserStore = defineStore("user", {
 				let tokens: { access: string; refresh: string } = await loginService.login(data);
 
 				this.accessToken = tokens.access;
-				this.refreshToken = tokens.refresh;
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");

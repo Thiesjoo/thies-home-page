@@ -46,7 +46,6 @@ import {
 	faHouseSignal,
 } from "@fortawesome/free-solid-svg-icons";
 
-import "./helpers/auto-refresh-tokens";
 import { clickOutsideDirective } from "./helpers/clickOutside";
 
 /** Tailwind shizz */
@@ -55,7 +54,6 @@ import "./index.css";
 import { createPinia } from "pinia";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import { getBaseURL } from "./helpers/auto-refresh-tokens";
 import { enableSettingWatching, useUserStore } from "./store/user.store";
 
 import * as Sentry from "@sentry/vue";
@@ -63,6 +61,8 @@ import { BrowserTracing } from "@sentry/tracing";
 
 import axios from "axios";
 import ModalVue from "./components/Modal.vue";
+
+import { getBaseURL, setupRefreshAuth } from "./helpers/auto-refresh-tokens";
 axios.defaults.baseURL = getBaseURL();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
@@ -114,7 +114,9 @@ Sentry.init({
 
 app.use(router);
 
-app.use(createPinia());
+const piniaInstance = createPinia();
+setupRefreshAuth(piniaInstance);
+app.use(piniaInstance);
 app.use(Toast, {});
 
 clickOutsideDirective(app);
