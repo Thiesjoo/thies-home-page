@@ -12,7 +12,10 @@
 						:class="{
 							'bg-red-500': !images[notf.icon],
 						}">
-						<img v-if="images[notf.icon]" :src="getURLforImg(notf.icon)" class="w-8 h-8" />
+						<img
+							v-if="images[notf.icon] && images[notf.icon] !== 'loading'"
+							:src="getURLforImg(notf.icon)"
+							class="w-8 h-8" />
 					</div>
 					<span class="font-light"> {{ notf.appname }} </span>
 
@@ -71,6 +74,8 @@ export default defineComponent({
 		formatDate,
 		ms,
 		loadImage(notf: Notification, retry = 0) {
+			if (this.images[notf.icon]) return;
+			this.images[notf.icon] = "loading";
 			axios
 				.get(getDeviceBaseURL() + `/notifications/image/${this.current.uid}/${notf.icon}`, {
 					responseType: "blob",
@@ -124,7 +129,11 @@ export default defineComponent({
 						this.notifications = this.notifications.filter((y) => {
 							if (y.uid !== x.uid) return true;
 
-							if (y.icon) {
+							const iconUsedElsewhere = this.notifications.some(
+								(z) => z.uid !== x.uid && z.icon === y.icon
+							);
+
+							if (y.icon && !iconUsedElsewhere) {
 								console.log("Revoked removed image!", y.icon);
 								setTimeout((() => URL.revokeObjectURL(this.images[y.icon])).bind(this), 1);
 							}
