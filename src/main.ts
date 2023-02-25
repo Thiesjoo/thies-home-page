@@ -45,6 +45,10 @@ import {
 	faBan,
 	faHouseSignal,
 	faStar,
+	faPlay,
+	faBackward,
+	faForward,
+	faPause,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
@@ -94,7 +98,11 @@ library.add(
 	faLaptop,
 	faBan,
 	faHouseSignal,
-	faStar
+	faStar,
+	faPlay,
+	faBackward,
+	faForward,
+	faPause
 );
 
 const app = createApp(App, { router });

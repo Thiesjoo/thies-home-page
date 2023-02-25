@@ -6,15 +6,26 @@
 					<img :src="imageURL" class="h-12 rounded-full" />
 				</div>
 				<div class="w-full flex flex-col">
-					<span class="font-bold m-1 w-75 text-center text-ellipsis" style="overflow: hidden; white-space: pre-line">{{
-						nameArtist
-					}}</span>
+					<span
+						class="font-bold m-1 w-75 text-center text-ellipsis"
+						style="overflow: hidden; white-space: pre-line"
+						>{{ nameArtist }}</span
+					>
 					<div class="w-[85%] m-auto flex flex-row items-center">
 						{{ current }}
 						<div class="w-full rounded-full h-2.5 bg-gray-600 mx-2">
 							<div class="bg-green-200 h-2.5 rounded-full" :style="{ width: `${percentage}%` }"></div>
 						</div>
 						{{ end }}
+					</div>
+					<!-- Play button -->
+					<div class="flex flex-row items-center justify-center mt-1">
+						<font-awesome-icon @click="skipTrack(false)" class="p-2 w-3 h-3" :icon="['fas', 'backward']" />
+						<font-awesome-icon
+							@click="pausePlayTrack"
+							class="bg-white p-2 rounded-full w-3 h-3"
+							:icon="['fas', currentlyPlaying ? 'pause' : 'play']" />
+						<font-awesome-icon @click="skipTrack(true)" class="p-2 w-3 h-3" :icon="['fas', 'forward']" />
 					</div>
 				</div>
 			</div>
@@ -100,6 +111,11 @@ export default defineComponent({
 			this.refreshKey;
 			return secondsToTimeString((this.track?.item?.duration_ms || 0) / 1000);
 		},
+		currentlyPlaying() {
+			this.refreshKey;
+
+			return !this.track || this.track.is_playing;
+		},
 		percentage(): number {
 			this.refreshKey;
 
@@ -119,11 +135,49 @@ export default defineComponent({
 		},
 	},
 	methods: {
-		async refreshTrack() {
+		async pausePlayTrack() {
+			await axios.put(
+				`https://api.spotify.com/v1/me/player/${this.currentlyPlaying ? "pause" : "play"}`,
+				{},
+				{
+					withCredentials: false,
+					headers: {
+						Authorization: "Bearer " + this.spotifyAccesstoken,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			setTimeout(
+				(() => {
+					this.refreshTrack(true);
+				}).bind(this),
+				500
+			);
+		},
+		async skipTrack(forward: boolean) {
+			await axios.post(
+				`https://api.spotify.com/v1/me/player/${forward ? "next" : "previous"}`,
+				{},
+				{
+					withCredentials: false,
+					headers: {
+						Authorization: "Bearer " + this.spotifyAccesstoken,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			setTimeout(
+				(() => {
+					this.refreshTrack(true);
+				}).bind(this),
+				500
+			);
+		},
+		async refreshTrack(force = false) {
 			if (!this.spotifyAccesstoken || this.pendingRequest) return;
 			const offset = Date.now() - (this.track?.timestamp || 0);
 
-			if (offset < spotifyRefreshTimer - 500) {
+			if (!force && offset < spotifyRefreshTimer - 500) {
 				this.localProgress = (this.track?.progress_ms || 0) + offset;
 				console.log("There was data fetched more recently. Probably other tab?");
 				return;
