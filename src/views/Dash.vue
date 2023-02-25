@@ -18,6 +18,7 @@
 	</div>
 
 	<div v-if="userStore.loggedIn && !userStore.loading.userdata && userStore.user">
+		<FavoritesBar v-if="userStore.user.settings.showFavorites" />
 		<draggable
 			v-for="location in ALL_LOCATIONS"
 			:class="{
@@ -71,6 +72,8 @@ import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
 import draggable from "vuedraggable";
 import NewWidgetModal from "@/components/NewWidgetModal.vue";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
+import { lightenDarkenColor } from "@/helpers/colors";
+import FavoritesBar from "@/components/FavoritesBar.vue";
 
 function getCurrentDate() {
 	return Intl.DateTimeFormat("nl-NL", {
@@ -130,6 +133,7 @@ export default defineComponent({
 	},
 	methods: {
 		generateKey,
+		lightenDarkenColor,
 		start() {
 			this.dragging = 1;
 		},
@@ -148,7 +152,7 @@ export default defineComponent({
 			this.seconds = getSeconds();
 		}, 1000);
 	},
-	components: { ...Widgets, draggable, NewWidgetModal },
+	components: { ...Widgets, draggable, NewWidgetModal, FavoritesBar },
 });
 </script>
 <style>

@@ -29,10 +29,12 @@ export type User = {
 	name: string;
 	email: string;
 	settings: {
+		backgroundURL: string;
 		showSeconds: boolean;
 		showDate: boolean;
 		showVersion: boolean;
-		backgroundURL: string;
+		showFavorites: boolean;
+		favorites: { name: string; url: string }[];
 		widgets: { [key in ValidLocation]: Widget[] };
 		widgetsAvailable: Widget[];
 	};
@@ -45,6 +47,8 @@ const defaultUser: User = {
 		showDate: false,
 		showSeconds: true,
 		showVersion: false,
+		showFavorites: false,
+		favorites: [],
 		backgroundURL: "",
 		widgets: {
 			topleft: [],
@@ -179,6 +183,8 @@ export const useUserStore = defineStore("user", {
 				await axios.patch("/api/settings/me", copy);
 			} catch (e) {
 				console.log("Something went wrong with saving settings", e);
+				toast.error("Something went wrong with saving settings");
+				this.getUserData();
 			}
 			this.loading.settings = false;
 		},

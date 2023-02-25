@@ -44,6 +44,7 @@ import {
 	faXmark,
 	faBan,
 	faHouseSignal,
+	faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { clickOutsideDirective } from "./helpers/clickOutside";
@@ -92,7 +93,8 @@ library.add(
 	faDesktop,
 	faLaptop,
 	faBan,
-	faHouseSignal
+	faHouseSignal,
+	faStar
 );
 
 const app = createApp(App, { router });

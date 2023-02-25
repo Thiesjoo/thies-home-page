@@ -38,9 +38,24 @@
 				>Show version modal in bottom right</span
 			>
 		</label>
+		<label for="favorites-toggle" class="inline-flex relative items-center cursor-pointer">
+			<input
+				type="checkbox"
+				id="favorites-toggle"
+				class="sr-only peer"
+				@change="change"
+				:checked="user.user?.settings.showFavorites" />
+			<div
+				class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-teal-500 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show favorites</span>
+		</label>
 
 		<div class="flex flex-col items-center justify-center w-9/12 text-sm pt-5">
-			<h3>Link a new account</h3>
+			<div class="flex items-center w-full">
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+				<div class="flex-grow-0 mx-5 text dark:text-white">Link a new account</div>
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+			</div>
 			<div class="flex flex-row items-stretch py-5">
 				<div class="flex flex-col items-center" v-for="item in oauthApps">
 					<a
@@ -58,6 +73,18 @@
 						<font-awesome-icon :icon="[`fab`, `${item.name.toLowerCase()}`]" class="mr-2" />
 						{{ item.name }}
 					</a>
+				</div>
+			</div>
+
+			<div class="flex items-center w-full">
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+				<div class="flex-grow-0 mx-5 text dark:text-white">Favorites</div>
+				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
+			</div>
+
+			<div class="flex flex-row items-stretch py-5">
+				<div class="flex flex-row items-center">
+					<FavoritesManagerModal></FavoritesManagerModal>
 				</div>
 			</div>
 
@@ -125,6 +152,7 @@ import { registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
+import FavoritesManagerModal from "./FavoritesManagerModal.vue";
 import PasskeyManagerModal from "./PasskeyManagerModal.vue";
 
 export default defineComponent({
@@ -186,11 +214,11 @@ export default defineComponent({
 		canAddExtraAccount(name: string) {
 			name = name.toLowerCase();
 			if (name === "pos") {
-				return !!this.user.user?.settings.widgetsAvailable.find((x) => x.name === "VIA");
+				return !!this.user.user?.settings.widgetsAvailable.find((x) => x.name === "via");
 			}
 			return !true;
 		},
 	},
-	components: { PasskeyManagerModal },
+	components: { PasskeyManagerModal, FavoritesManagerModal },
 });
 </script>
