@@ -9,7 +9,7 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
-export const DEFAULT_WIDGETS = ["battery", "pauze", "dummy", "remotedevices"];
+export const DEFAULT_WIDGETS = ["battery", "dummy", "remotedevices"];
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];

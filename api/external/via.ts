@@ -26,7 +26,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 			try {
 				console.log("Deleting pos token");
 				await axios({
-					url: process.env.BASEURL + "/api/providers/me/via/" + result.id,
+					url: process.env.VITE_AUTHBASEURL + "/api/providers/me/via/" + result.id,
 					headers: {
 						Authorization: `Bearer ${
 							req.cookies.accesstoken || req.headers.authorization?.split(" ")?.[1]
