@@ -22,7 +22,7 @@ export default defineComponent({
 	},
 	methods: {
 		navigate(url: string) {
-			window.location.href = url;
+			(window.top || window.parent || window).location.href = url;
 		},
 		getFavoiconForSite(url: string) {
 			const favicon = new URL(url).origin + "/favicon.ico";
