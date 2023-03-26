@@ -124,7 +124,8 @@
 			<!-- Body -->
 			<!-- TODO: Blur body when information gets too old -->
 			<div class="flex flex-col space-y-2">
-				<Notifications :device="device" />
+				<Notifications :device="device" v-if="device.type === 'mobile'" />
+				<CPU :device="device" v-if="device.type === 'desktop'" />
 			</div>
 		</div>
 		<CreateDeviceModal></CreateDeviceModal>
@@ -141,7 +142,7 @@ import { defineComponent } from "@vue/runtime-core";
 
 import CreateDeviceModal from "@/components/CreateNewDeviceModal.vue";
 import DeviceModal from "@/components/DeviceModal.vue";
-import { Notifications } from "@/components/device_widgets";
+import { CPU, Notifications } from "@/components/device_widgets";
 import { FullDevice } from "@/helpers/types/pusher.types";
 
 export default defineComponent({
@@ -210,6 +211,7 @@ export default defineComponent({
 	},
 	components: {
 		Notifications,
+		CPU,
 		CreateDeviceModal,
 		DeviceModal,
 	},

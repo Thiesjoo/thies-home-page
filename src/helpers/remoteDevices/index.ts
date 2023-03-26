@@ -1,16 +1,18 @@
 import ms from "ms";
 import { FullDevice } from "../types/pusher.types";
 
-const MAX_AGE = ms("30m");
-const WARNING_AGE = ms("15m");
+const MAX_AGE = ms("15m");
+const WARNING_AGE = ms("7m");
 
 export function getColorForAge(device: FullDevice, now: number) {
-	const difference = device.livedata?.global?.connected
-		? 0
-		: now - (device.livedata?.global?.lastConnected?.time || 10000000);
+	let difference = device.livedata?.global?.connected ? 0 : MAX_AGE + 1;
+	if (device.type === "mobile") {
+		difference = now - (device.livedata?.global?.lastConnected?.time || 10000000);
+	}
+
 	if (difference > MAX_AGE) {
 		return "#FF5D5A";
-	} else if (difference > WARNING_AGE || (device.type !== "mobile" && !device.livedata?.global?.connected)) {
+	} else if (difference > WARNING_AGE) {
 		return "#f5c350";
 	} else {
 		return "#65cd57";
@@ -40,7 +42,7 @@ export function informationAgeShortText(device: FullDevice, now: number) {
 	if (device.livedata?.global?.connected) {
 		return "Connected";
 	}
-	if (!device.livedata?.global?.lastConnected?.time) {
+	if (device.livedata?.global?.lastConnected && !device.livedata?.global?.lastConnected?.time) {
 		return "Never connected";
 	}
 	let diff = now - (device.livedata?.global?.lastConnected?.time || 0);
@@ -62,7 +64,7 @@ export function getNetworkTypeTitle(device: FullDevice) {
 	if (!device.network) {
 		return "No network";
 	}
-	return device.livedata.network.type.charAt(0).toUpperCase() + device.livedata.network.type.slice(1);
+	return device.livedata?.network?.type?.charAt(0)?.toUpperCase() + device.livedata?.network?.type?.slice(1);
 }
 
 const MAX_WIFI_NAME_LENGTH = 11;
@@ -72,11 +74,11 @@ export function getNetworkTitle(device: FullDevice, ignoreLength = false) {
 		return "No network data";
 	}
 
-	if (device.livedata.network.type === "ethernet") {
+	if (device.livedata.network?.type === "ethernet") {
 		return "Ethernet";
 	}
 
-	const extraInfo = device.livedata.network.extraInfo?.split(" ")[0];
+	const extraInfo = device.livedata.network?.extraInfo?.split(" ")[0];
 
 	if (extraInfo === "undefined" || !extraInfo || extraInfo === "-") {
 		return "unknown";
@@ -119,7 +121,11 @@ export function getIconForNetworkStatus(device: FullDevice) {
 	}
 }
 export function hasBattery(device: FullDevice) {
-	return device.battery !== undefined;
+	if (device.battery) {
+		return device.battery.hasBattery;
+	} else {
+		return false;
+	}
 }
 
 export const allHelperFunctions = {

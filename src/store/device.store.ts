@@ -210,9 +210,10 @@ export const useDevicesStore = defineStore("devices", {
 			livedata[key]!.unshift(data);
 
 			if (livedata[key]!.length > MAX_ARRAY_LENGTH) {
+				// Remove old data from the end of the array
+
 				const diff = livedata[key]!.length - MAX_ARRAY_LENGTH;
-				//@ts-ignore Nested type errors
-				livedata[key] = livedata[key].slice(diff);
+				livedata[key]!.splice(livedata[key]!.length - diff, diff);
 			}
 		},
 	},
