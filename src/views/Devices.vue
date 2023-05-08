@@ -91,7 +91,8 @@
 								<span
 									class="text-sm font-bold whitespace-nowrap"
 									v-if="
-										(hasBattery(device) || device.livedata?.battery) &&
+										hasBattery(device) &&
+										device.livedata?.battery &&
 										device.livedata?.battery?.percent !== 0
 									">
 									<font-awesome-icon

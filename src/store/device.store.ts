@@ -143,8 +143,12 @@ export const useDevicesStore = defineStore("devices", {
 		async authorizeNewDeviceToken(deviceID: string) {
 			const toast = useToast();
 			try {
-				await DevicesService.devicesControllerAuthorizeNewToken(deviceID);
-				toast.success("New token authorized! Check your device for the new token.");
+				const response = await DevicesService.devicesControllerAuthorizeNewToken(deviceID);
+
+				toast.success("New token authorized! Check your device (or the redirect) for the new token.");
+				if (response.redirect) {
+					window.open(response.redirect, "_blank");
+				}
 			} catch (e: any) {
 				toast.error(e.message || e || "Something went wrong");
 			}

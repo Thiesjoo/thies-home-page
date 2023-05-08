@@ -53,8 +53,9 @@ export default defineComponent({
 	},
 	methods: {
 		linkTo() {
-			//@ts-ignore
-			if (this.link) window.top.location.href = this.link;
+			if (this.link) {
+				(window.top || window.parent || window).location.href = this.link;
+			}
 		},
 	},
 });
