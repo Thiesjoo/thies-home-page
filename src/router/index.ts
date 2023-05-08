@@ -1,5 +1,5 @@
 import { useUserStore } from "@/store/user.store";
-import { createWebHistory, createRouter } from "vue-router";
+import { createWebHistory, createRouter, RouteLocationNormalized } from "vue-router";
 import { routes } from "./routes";
 
 const router = createRouter({
@@ -10,9 +10,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	const userStore = useUserStore();
 
+	console.log("Routing to: ", to);
+
 	if (to.meta.requiresLogin && !userStore.loggedIn) {
 		console.log("User not logged in, redirecting to login page");
-		next("/login?to=" + to.path);
+		next(`/login?to=${to.fullPath}`);
 	} else if (to.meta.requiresLogin) {
 		console.log("User logged in, waiting for user data to be loaded");
 		userStore
@@ -21,7 +23,7 @@ router.beforeEach((to, from, next) => {
 				next();
 			})
 			.catch(() => {
-				next("/login?to=" + to.path);
+				next(`/login?to=${to.fullPath}`);
 			});
 	} else {
 		next();
