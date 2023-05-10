@@ -178,6 +178,9 @@ export const useDevicesStore = defineStore("devices", {
 		requestCPUData(device: string) {
 			this.requests = [...this.requests, { deviceID: device, type: ["cpu"] }];
 		},
+		requestRAMData(device: string) {
+			this.requests = [...this.requests, { deviceID: device, type: ["ram"] }];
+		},
 
 		emptyRequests() {
 			this.requests = [];
@@ -200,24 +203,26 @@ export const useDevicesStore = defineStore("devices", {
 
 		// Processing functions
 
-		updateLoad(id: string, type: keyof LiveData, data: (GlobalLoad | BatteryLoad) & Timestamp) {
+		updateLoad(id: string, type: keyof LiveData, data: GlobalLoad | BatteryLoad, timestamp: number) {
 			const { device, livedata } = this.findDevice(id);
 			if (!device) return;
 
-			this.updateLiveData(type, data, livedata);
+			this.updateLiveData(type, { ...data, dateReceived: timestamp }, livedata);
 		},
 
 		updateLiveData<T extends keyof LiveData>(key: T, data: LiveData[T] & Timestamp, livedata: LiveDataList) {
 			if (!(key in livedata)) {
 				livedata[key] = [] as any;
 			}
-			livedata[key]!.unshift(data);
+			livedata[key]!.push(data);
 
 			if (livedata[key]!.length > MAX_ARRAY_LENGTH) {
-				// Remove old data from the end of the array
+				// Remove old data from the start of the array
 
-				const diff = livedata[key]!.length - MAX_ARRAY_LENGTH;
-				livedata[key]!.splice(livedata[key]!.length - diff, diff);
+				// const diff = livedata[key]!.length - MAX_ARRAY_LENGTH;
+				// livedata[key]!.splice(livedata[key]!.length - diff, diff);
+
+				livedata[key]!.shift();
 			}
 		},
 	},

@@ -127,6 +127,7 @@
 			<div class="flex flex-col space-y-2">
 				<Notifications :device="device" v-if="device.type === 'mobile'" />
 				<CPU :device="device" v-if="device.type === 'desktop'" />
+				<RAM :device="device" v-if="device.type === 'desktop'" />
 			</div>
 		</div>
 		<CreateDeviceModal></CreateDeviceModal>
@@ -143,7 +144,7 @@ import { defineComponent } from "@vue/runtime-core";
 
 import CreateDeviceModal from "@/components/CreateNewDeviceModal.vue";
 import DeviceModal from "@/components/DeviceModal.vue";
-import { CPU, Notifications } from "@/components/device_widgets";
+import { ValidDeviceComponents } from "@/components/device_widgets";
 import { FullDevice } from "@/helpers/types/pusher.types";
 
 export default defineComponent({
@@ -211,8 +212,7 @@ export default defineComponent({
 		});
 	},
 	components: {
-		Notifications,
-		CPU,
+		...ValidDeviceComponents,
 		CreateDeviceModal,
 		DeviceModal,
 	},

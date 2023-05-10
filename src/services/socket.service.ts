@@ -81,12 +81,15 @@ class SocketService {
 					return;
 				}
 
-				const [data] = args as [{ type: keyof LiveData; data: any; deviceID: string }];
-				this.store.updateLoad(data.deviceID, data.type, data.data);
+				const [data] = args as [
+					{ type: keyof LiveData; data: any; dateReceived: number; userID: string; deviceID: string }
+				];
+				this.store.updateLoad(data.deviceID, data.type, data.data, data.dateReceived);
 			}
 		});
 	}
 
+	// TODO: Persist this data in the class somewhere to re-send it on reconnect
 	registerStoreEvents() {
 		// Check if we want new data
 		this.store?.$subscribe((mut, state) => {
@@ -94,8 +97,7 @@ class SocketService {
 				for (const request of state.requests) {
 					this.socket?.emit(
 						"request-live-updates",
-						// TODO: throttle is not used, used to be used with CPU data
-						{ deviceID: request.deviceID, properties: request.type, throttle: false },
+						{ deviceID: request.deviceID, properties: request.type },
 						(ack: any) => {
 							console.log("Ack for request:", request, ":", ack);
 						}

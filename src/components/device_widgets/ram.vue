@@ -1,7 +1,7 @@
 <template>
 	<div class="max-h-[10%]">
-		<button class="rounded-md bg-teal-400 p-2" @click="requestData">Request live CPU data</button>
-		<h2 class="text-2xl font-bold">CPU Usage</h2>
+		<button class="rounded-md bg-teal-400 p-2" @click="requestData">Request live RAM data</button>
+		<h2 class="text-2xl font-bold">RAM Usage</h2>
 		<Line
 			id="my-chart-id"
 			:options="{
@@ -15,7 +15,6 @@
 				scales: {
 					y: {
 						min: 0,
-						max: 100,
 					},
 				},
 				elements: {
@@ -60,38 +59,31 @@ export default defineComponent({
 	},
 	computed: {
 		chartData() {
-			if (!this.devices.livedata?.[this.current.uid]?.cpu) {
+			if (!this.devices.livedata?.[this.current.uid]?.ram) {
 				return {
 					datasets: [],
 				};
 			}
 
-			const amtOfCores = this.devices.livedata[this.current.uid].cpu![0].load.length;
-
 			return {
-				labels: this.devices.livedata[this.current.uid].cpu!.map((loadArr) => {
+				labels: this.devices.livedata[this.current.uid].ram!.map((loadArr) => {
 					return `${Math.round((Date.now() - loadArr.dateReceived) / 1000)}s ago`;
 				}),
 				datasets: [
-					...Array.from({ length: amtOfCores }, (_, i) => i).map((core) => ({
-						label: `Core ${core}`,
-						data:
-							this.devices.livedata[this.current.uid].cpu!.map((loadArr) => loadArr.load[core].load) ??
-							[],
-						backgroundColor: `hsl(${(core / amtOfCores) * 360}, 100%, 50%)`,
-						borderColor: `hsl(${(core / amtOfCores) * 360}, 100%, 50%)`,
-						fill: false,
+					{
+						data: this.devices.livedata[this.current.uid].ram!.map((loadArr) => loadArr.usage) ?? [],
 						pointRadius: 0,
 						pointHoverRadius: 0,
-						borderWidth: 1,
-					})),
+						borderWidth: 2,
+						borderColor: "#38B2AC",
+					},
 				],
 			};
 		},
 	},
 	methods: {
 		requestData() {
-			this.devices.requestCPUData(this.current.uid);
+			this.devices.requestRAMData(this.current.uid);
 		},
 	},
 	setup(props) {

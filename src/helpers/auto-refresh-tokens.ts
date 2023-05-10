@@ -59,6 +59,10 @@ export function setupRefreshAuth(pinia: Pinia) {
 			request.headers = {};
 		}
 
+		if (!request.url?.includes("access") && !request.headers["Authorization"] && userStore.accessToken) {
+			request.headers["Authorization"] = `Bearer ${userStore.accessToken}`;
+		}
+
 		// Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
 		if (
 			// Actually going to thies.dev domain
