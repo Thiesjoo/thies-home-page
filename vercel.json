@@ -8,6 +8,10 @@
 					"value": "nosniff"
 				},
 				{
+					"key": "Permissions-Policy",
+					"value": "publickey-credentials-get=(self \"chrome-extension://ghjlkdhcijpomopkolgnoejjkdbmhdci\")"
+				},
+				{
 					"key": "Content-Security-Policy",
 					"value": "frame-ancestors https://*.thies.dev chrome-extension://ghjlkdhcijpomopkolgnoejjkdbmhdci;"
 				},
