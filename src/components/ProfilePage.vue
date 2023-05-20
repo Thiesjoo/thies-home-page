@@ -125,7 +125,6 @@
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { lightenDarkenColor } from "@/helpers/colors";
-import { registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
@@ -166,15 +165,6 @@ export default defineComponent({
 		return { user: useUserStore() };
 	},
 	methods: {
-		registerNewToken() {
-			const name = prompt("Enter a name for your new token");
-			if (!name) {
-				const toast = useToast();
-				toast.warning("You need to enter a name for your new token");
-				return;
-			}
-			registerNewToken(name);
-		},
 		async logout() {
 			this.user.logout();
 		},
@@ -203,6 +193,6 @@ export default defineComponent({
 			return !true;
 		},
 	},
-	components: { PasskeyManagerModal, FavoritesManagerModal },
+	components: { FavoritesManagerModal },
 });
 </script>
