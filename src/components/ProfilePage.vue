@@ -1,7 +1,6 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
-		<span>Username: {{ user.user?.name }}</span>
-		<span>Email: {{ user.user?.email }}</span>
+		<passage-profile app-id="wdOiIQrP7mIDfV5wJwE1tco5"></passage-profile>
 
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
@@ -94,28 +93,6 @@
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
 
-			<!-- 2FA Management -->
-			<div class="flex flex-row items-stretch py-5">
-				<div class="flex flex-row items-center">
-					<a
-						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
-						:style="{
-							'background-color': lightenDarkenColor('#000000', 35),
-						}"
-						@click="registerNewToken">
-						<font-awesome-icon :icon="[`fas`, `fingerprint`]" class="mr-2" />
-						New Passkey
-					</a>
-					<PasskeyManagerModal></PasskeyManagerModal>
-				</div>
-			</div>
-
-			<div class="flex items-center w-full">
-				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
-				<div class="flex-grow-0 mx-5 text dark:text-white">or</div>
-				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
-			</div>
-
 			<!-- Logout -->
 			<button
 				@click="logout"
@@ -154,6 +131,8 @@ import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
 import FavoritesManagerModal from "./FavoritesManagerModal.vue";
 import PasskeyManagerModal from "./PasskeyManagerModal.vue";
+
+import "@passageidentity/passage-elements/passage-profile";
 
 export default defineComponent({
 	data() {

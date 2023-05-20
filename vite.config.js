@@ -22,7 +22,13 @@ export default defineConfig({
             preventAssignment: true
         },),
         // Vue
-        vue(),
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag.startsWith('passage-'),
+                }
+            }
+        }),
         // Typescript checker
         checker({
             typescript: true,
