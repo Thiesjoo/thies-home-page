@@ -21,7 +21,6 @@
 		"@passageidentity/passage-elements": "^1.5.1",
 		"@sentry/tracing": "^7.51.2",
 		"@sentry/vue": "^7.51.2",
-		"@simplewebauthn/browser": "^6.2.2",
 		"@vueuse/core": "^10.1.2",
 		"axios": "^0.27.2",
 		"axios-auth-refresh": "^3.3.6",
@@ -43,7 +42,6 @@
 	},
 	"devDependencies": {
 		"@rollup/plugin-replace": "^5.0.2",
-		"@simplewebauthn/typescript-types": "^6.2.1",
 		"@types/tmi.js": "^1.8.3",
 		"@vitejs/plugin-vue": "^4.2.1",
 		"autoprefixer": "^10.4.14",

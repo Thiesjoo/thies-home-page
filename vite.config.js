@@ -35,7 +35,7 @@ export default defineConfig({
         }),
         // CSP
         ViteCspPlugin({
-            'script-src': ["'self'", "https://challenges.cloudflare.com"],
+            'script-src': ["'self'", "'unsafe-eval'"],
             'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
             'object-src': ["'none'"],
         }, {
@@ -55,6 +55,7 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
+            'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js'
         },
     }
 });
