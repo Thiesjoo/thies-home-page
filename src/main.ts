@@ -10,9 +10,12 @@ window.env = {
 };
 
 window.openModals = 0;
+import "./helpers/shareCookieAccrossDomain";
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import router, { enableLogoutWatching } from "./router";
+
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
