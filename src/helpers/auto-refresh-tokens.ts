@@ -1,6 +1,5 @@
 import axios from "axios";
-import { AxiosAuthRefreshRequestConfig, default as createAuthRefreshInterceptor } from "axios-auth-refresh";
-
+import { Passage } from "@passageidentity/passage-js";
 import { Pinia } from "pinia";
 
 export const getBaseURL = () => {
@@ -12,7 +11,7 @@ export const getDeviceBaseURL = () => {
 };
 
 export function setupRefreshAuth(pinia: Pinia) {
-	axios.interceptors.request.use((request) => {
+	axios.interceptors.request.use(async (request) => {
 		// If you make changes to window api, you can also change every request after that
 		if (!request.baseURL) {
 			request.baseURL = getBaseURL();
@@ -20,6 +19,9 @@ export function setupRefreshAuth(pinia: Pinia) {
 		if (!request.headers) {
 			request.headers = {};
 		}
+
+		const passage = new Passage(window.env.PASSAGE_APP_ID);
+		request.headers.Authorization = `Bearer ${await passage.getCurrentSession().getAuthToken()}`;
 
 		// // Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
 		// if (
