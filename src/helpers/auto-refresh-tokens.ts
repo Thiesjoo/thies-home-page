@@ -10,6 +10,8 @@ export const getDeviceBaseURL = () => {
 	return window?.env?.DEVICEBASEURL || "https://testing.thies.dev";
 };
 
+let currentRefresh: Promise<string> | null = null;
+
 export function setupRefreshAuth(pinia: Pinia) {
 	axios.interceptors.request.use(async (request) => {
 		// If you make changes to window api, you can also change every request after that
@@ -21,7 +23,18 @@ export function setupRefreshAuth(pinia: Pinia) {
 		}
 
 		const passage = new Passage(window.env.PASSAGE_APP_ID);
-		request.headers.Authorization = `Bearer ${await passage.getCurrentSession().getAuthToken()}`;
+
+		let token;
+		if (currentRefresh) {
+			token = await currentRefresh;
+		} else {
+			currentRefresh = passage.getCurrentSession().getAuthToken();
+
+			token = await currentRefresh;
+			currentRefresh = null;
+		}
+
+		request.headers.Authorization = `Bearer ${token}`;
 
 		// // Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
 		// if (
