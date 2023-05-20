@@ -1,6 +1,6 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
-		<passage-profile app-id="wdOiIQrP7mIDfV5wJwE1tco5"></passage-profile>
+		<passage-profile :app-id="passageAppID"></passage-profile>
 
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
@@ -156,6 +156,11 @@ export default defineComponent({
 				},
 			],
 		};
+	},
+	computed: {
+		passageAppID() {
+			return window.env.PASSAGE_APP_ID;
+		},
 	},
 	setup() {
 		return { user: useUserStore() };
