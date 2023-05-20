@@ -123,12 +123,10 @@ export const useUserStore = defineStore("user", {
 		},
 
 		applyNewUserInformation({ user_metadata, email }: PassageUserInfo) {
-			if (!user_metadata) throw new Error("User metadata is null");
-
-			const { first_name, last_name } = user_metadata;
+			const { first_name, last_name } = user_metadata || {};
 			this.user!.name = {
-				first: first_name as string,
-				last: last_name as string,
+				first: (first_name as string) || "no first name set",
+				last: (last_name as string) || "no last name",
 			};
 			this.user!.email = email;
 		},

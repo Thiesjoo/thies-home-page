@@ -127,9 +127,7 @@ import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { lightenDarkenColor } from "@/helpers/colors";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
-import { useToast } from "vue-toastification";
 import FavoritesManagerModal from "./FavoritesManagerModal.vue";
-import PasskeyManagerModal from "./PasskeyManagerModal.vue";
 
 import "@passageidentity/passage-elements/passage-profile";
 
