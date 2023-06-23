@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Passage } from "@passageidentity/passage-js";
 import { Pinia } from "pinia";
+import * as Sentry from "@sentry/vue";
 
 export const getBaseURL = () => {
 	return window?.env?.AUTHBASEURL || "https://auth.thies.dev";
@@ -25,13 +26,20 @@ export function setupRefreshAuth(pinia: Pinia) {
 		const passage = new Passage(window.env.PASSAGE_APP_ID);
 
 		let token;
-		if (currentRefresh) {
-			token = await currentRefresh;
-		} else {
-			currentRefresh = passage.getCurrentSession().getAuthToken();
-
-			token = await currentRefresh;
-			currentRefresh = null;
+		try {
+			if (currentRefresh) {
+				Sentry.captureMessage("Waiting on pending refresh token");
+				token = await currentRefresh;
+			} else {
+				currentRefresh = passage.getCurrentSession().getAuthToken();
+				Sentry.captureMessage("Getting new refresh token");
+				token = await currentRefresh;
+				currentRefresh = null;
+			}
+		} catch (e) {
+			Sentry.captureException(e);
+			console.error(e);
+			throw e;
 		}
 
 		request.headers.Authorization = `Bearer ${token}`;
@@ -54,5 +62,3 @@ export function setupRefreshAuth(pinia: Pinia) {
 
 	axios.defaults.withCredentials = true;
 }
-
-//TODO: Spotify accesstoken expiry error

@@ -4,7 +4,7 @@ import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core"
 import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
-
+import * as Sentry from "@sentry/vue";
 import { Passage, PassageUserInfo } from "@passageidentity/passage-js";
 
 const toast = useToast();
@@ -123,6 +123,8 @@ export const useUserStore = defineStore("user", {
 		},
 
 		applyNewUserInformation({ user_metadata, email }: PassageUserInfo) {
+			Sentry.setUser({ email });
+
 			const { first_name, last_name } = user_metadata || {};
 			this.user!.name = {
 				first: (first_name as string) || "no first name set",
@@ -138,7 +140,7 @@ export const useUserStore = defineStore("user", {
 				return;
 			}
 			this.loading.userdata = true;
-
+			Sentry.captureMessage("Getting user data");
 			try {
 				if (!this.user) {
 					this.user = this.createUser();
@@ -173,8 +175,11 @@ export const useUserStore = defineStore("user", {
 						return validWidgetsNames.has(x.name);
 					}) as Widget[];
 				}
+				Sentry.captureMessage("Got user data");
 			} catch (e) {
 				toast.warning("Please login again");
+				Sentry.captureException(e);
+
 				console.error(e);
 
 				window.localStorage.clear();
