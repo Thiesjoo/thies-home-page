@@ -7,7 +7,7 @@ const router = createRouter({
 	routes: routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 	const userStore = useUserStore();
 
 	console.log("Routing to: ", to);
@@ -23,6 +23,8 @@ router.beforeEach((to, from, next) => {
 			.catch(() => {
 				next(`/login?to=${to.fullPath}`);
 			});
+	} else {
+		next();
 	}
 });
 
