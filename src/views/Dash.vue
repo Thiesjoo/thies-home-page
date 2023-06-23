@@ -127,7 +127,7 @@ export default defineComponent({
 	},
 	computed: {
 		name(): string {
-			return this.userStore.user?.name ? `, ${this.userStore.user.name}` : ``;
+			return this.userStore.user?.name ? `, ${this.userStore.user.name.first}` : ``;
 		},
 		background(): string {
 			const url = this.userStore.user?.settings.backgroundURL;

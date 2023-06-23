@@ -1,7 +1,6 @@
 <template>
 	<div class="flex items-center flex-col space-y-2" v-if="!user.loading.userdata">
-		<span>Username: {{ user.user?.name }}</span>
-		<span>Email: {{ user.user?.email }}</span>
+		<passage-profile :app-id="passageAppID"></passage-profile>
 
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
@@ -94,28 +93,6 @@
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
 
-			<!-- 2FA Management -->
-			<div class="flex flex-row items-stretch py-5">
-				<div class="flex flex-row items-center">
-					<a
-						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
-						:style="{
-							'background-color': lightenDarkenColor('#000000', 35),
-						}"
-						@click="registerNewToken">
-						<font-awesome-icon :icon="[`fas`, `fingerprint`]" class="mr-2" />
-						New Passkey
-					</a>
-					<PasskeyManagerModal></PasskeyManagerModal>
-				</div>
-			</div>
-
-			<div class="flex items-center w-full">
-				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
-				<div class="flex-grow-0 mx-5 text dark:text-white">or</div>
-				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
-			</div>
-
 			<!-- Logout -->
 			<button
 				@click="logout"
@@ -148,12 +125,11 @@
 <script lang="ts">
 import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { lightenDarkenColor } from "@/helpers/colors";
-import { registerNewToken } from "@/helpers/webauthn";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
-import { useToast } from "vue-toastification";
 import FavoritesManagerModal from "./FavoritesManagerModal.vue";
-import PasskeyManagerModal from "./PasskeyManagerModal.vue";
+
+import "@passageidentity/passage-elements/passage-profile";
 
 export default defineComponent({
 	data() {
@@ -178,19 +154,15 @@ export default defineComponent({
 			],
 		};
 	},
+	computed: {
+		passageAppID() {
+			return window.env.PASSAGE_APP_ID;
+		},
+	},
 	setup() {
 		return { user: useUserStore() };
 	},
 	methods: {
-		registerNewToken() {
-			const name = prompt("Enter a name for your new token");
-			if (!name) {
-				const toast = useToast();
-				toast.warning("You need to enter a name for your new token");
-				return;
-			}
-			registerNewToken(name);
-		},
 		async logout() {
 			this.user.logout();
 		},
@@ -219,6 +191,6 @@ export default defineComponent({
 			return !true;
 		},
 	},
-	components: { PasskeyManagerModal, FavoritesManagerModal },
+	components: { FavoritesManagerModal },
 });
 </script>

@@ -22,14 +22,20 @@ export default defineConfig({
             preventAssignment: true
         },),
         // Vue
-        vue(),
+        vue({
+            template: {
+                compilerOptions: {
+                    isCustomElement: (tag) => tag.startsWith('passage-'),
+                }
+            }
+        }),
         // Typescript checker
         checker({
             typescript: true,
         }),
         // CSP
         ViteCspPlugin({
-            'script-src': ["'self'", "https://challenges.cloudflare.com"],
+            'script-src': ["'self'", "'unsafe-eval'"],
             'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
             'object-src': ["'none'"],
         }, {
@@ -49,6 +55,7 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
+            'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js'
         },
     }
 });

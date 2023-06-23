@@ -6,12 +6,16 @@ window.env = {
 		import.meta.env.VITE_VERCEL_GIT_COMMIT_MESSAGE || "PLACEHOLDERPLACEHOLDERPLACEHOLDER",
 	AUTHBASEURL: import.meta.env.VITE_AUTHBASEURL || "https://auth.thies.dev",
 	DEVICEBASEURL: import.meta.env.VITE_DEVICEBASEURL || "https://testing.thies.dev",
+	PASSAGE_APP_ID: import.meta.env.VITE_PASSAGE_APP_ID || "DIDNTSETAPPID",
 };
 
 window.openModals = 0;
+import "./helpers/shareCookieAccrossDomain";
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import router, { enableLogoutWatching } from "./router";
+
 /* Fontawesome shizz */
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";

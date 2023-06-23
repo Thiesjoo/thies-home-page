@@ -1,11 +1,11 @@
 import { ValidComponentNames } from "@/components/widgets";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
-import { loginWithPasskey } from "@/helpers/webauthn";
-import { LoginInformation, loginService, RegisterInformation } from "@/services/login.service";
 import { RemovableRef, StorageSerializers, useLocalStorage } from "@vueuse/core";
 import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
+import * as Sentry from "@sentry/vue";
+import { Passage, PassageUserInfo } from "@passageidentity/passage-js";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
@@ -19,14 +19,11 @@ export type Widget = {
 	id: string;
 };
 
-export type MeUserApi = {
-	uid: string;
-	name: string;
-	email: string;
-};
-
 export type User = {
-	name: string;
+	name: {
+		first: string;
+		last: string;
+	};
 	email: string;
 	settings: {
 		backgroundURL: string;
@@ -41,7 +38,10 @@ export type User = {
 };
 
 const defaultUser: User = {
-	name: "",
+	name: {
+		first: "",
+		last: "",
+	},
 	email: "",
 	settings: {
 		showDate: false,
@@ -102,7 +102,13 @@ export const useUserStore = defineStore("user", {
 		},
 
 		async getBasicUserInformation() {
-			const userInformation = (await axios.get("/api/users/me")).data;
+			const passage = new Passage(window.env.PASSAGE_APP_ID);
+			const currentUser = passage.getCurrentUser();
+
+			const userInformation = await currentUser.userInfo();
+			if (!userInformation) throw new Error("User information is null");
+
+			// Use passage to get user information
 			this.applyNewUserInformation(userInformation);
 			return userInformation;
 		},
@@ -116,8 +122,14 @@ export const useUserStore = defineStore("user", {
 			return JSON.parse(JSON.stringify(defaultUser)) as User;
 		},
 
-		applyNewUserInformation({ name, email }: MeUserApi) {
-			this.user!.name = name;
+		applyNewUserInformation({ user_metadata, email }: PassageUserInfo) {
+			Sentry.setUser({ email });
+
+			const { first_name, last_name } = user_metadata || {};
+			this.user!.name = {
+				first: (first_name as string) || "no first name set",
+				last: (last_name as string) || "no last name",
+			};
 			this.user!.email = email;
 		},
 
@@ -128,7 +140,7 @@ export const useUserStore = defineStore("user", {
 				return;
 			}
 			this.loading.userdata = true;
-
+			Sentry.captureMessage("Getting user data");
 			try {
 				if (!this.user) {
 					this.user = this.createUser();
@@ -163,8 +175,11 @@ export const useUserStore = defineStore("user", {
 						return validWidgetsNames.has(x.name);
 					}) as Widget[];
 				}
+				Sentry.captureMessage("Got user data");
 			} catch (e) {
 				toast.warning("Please login again");
+				Sentry.captureException(e);
+
 				console.error(e);
 
 				window.localStorage.clear();
@@ -190,71 +205,29 @@ export const useUserStore = defineStore("user", {
 		},
 
 		async logout() {
-			try {
-				await loginService.logout();
-			} catch (e) {
-				toast.error("Something went wrong with token deletion");
-			}
+			const passage = new Passage(window.env.PASSAGE_APP_ID);
+			const result = await passage.getCurrentSession().signOut();
+
 			this.accessToken = "";
 			this.loggedIn = false;
 			this.user = null;
-			toast.warning("You have been logged out");
+			const text = "You have been logged out";
+			if (result) {
+				toast.success(text);
+			} else {
+				toast.warning(text);
+			}
 		},
 
-		async loginWithWebauth(recaptchaToken: string) {
+		async passageLoginSuccess(accessToken: string) {
 			try {
-				this.loading.form = true;
-				let tokens: { access: string; refresh: string };
-				tokens = await loginWithPasskey(recaptchaToken);
-
-				this.accessToken = tokens.access;
+				this.accessToken = accessToken;
 
 				this.loggedIn = true;
 				toast.success("Logged in!!");
 				this.getUserData();
 			} catch (e) {
 				this.accessToken = "";
-			} finally {
-				this.loading.form = false;
-			}
-		},
-
-		async login(data: LoginInformation) {
-			this.loading.form = true;
-			this.loggedIn = false;
-			try {
-				let tokens: { access: string; refresh: string } = await loginService.login(data);
-
-				this.accessToken = tokens.access;
-
-				this.loggedIn = true;
-				toast.success("Logged in!!");
-				await this.getUserData();
-			} catch (e) {
-				console.warn("Login failed inside store: ", e);
-				toast.error("Something went wrong");
-				this.accessToken = "";
-				throw e;
-			} finally {
-				this.loading.form = false;
-			}
-		},
-
-		async register(data: RegisterInformation) {
-			this.loading.form = true;
-			this.loggedIn = false;
-			try {
-				const tokens = await loginService.register(data);
-				this.accessToken = tokens.access;
-
-				this.loggedIn = true;
-				toast.success("Created new account!!");
-				await this.getUserData();
-			} catch (e) {
-				toast.error("Something went wrong");
-				throw e;
-			} finally {
-				this.loading.form = false;
 			}
 		},
 	},

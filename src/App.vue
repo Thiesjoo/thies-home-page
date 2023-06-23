@@ -83,6 +83,23 @@ body {
 	font-family: "Montserrat", sans-serif;
 }
 
+:root {
+	--passage-container-background: #191919;
+	--passage-container-background-color: #181818;
+
+	--passage-body-text-color: #fff;
+
+	--passage-header-text-color: #fff;
+	--passage-onprimary-color: #000;
+
+	--passage-primary-color: #fff;
+
+	--passage-onhover-color: #000;
+	--passage-onactive-color: #000;
+
+	--passage-table-header-background: #181818;
+}
+
 .container {
 	max-width: 80%;
 	margin: 0 auto;

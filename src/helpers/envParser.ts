@@ -7,6 +7,7 @@ declare global {
 			VUE_APP_VERCEL_GIT_COMMIT_MESSAGE: string;
 			AUTHBASEURL: string;
 			DEVICEBASEURL: string;
+			PASSAGE_APP_ID: string;
 		};
 		openModals: number;
 		turnstile?: {
