@@ -178,8 +178,8 @@ export const useUserStore = defineStore("user", {
 				Sentry.captureMessage("Got user data");
 			} catch (e: any) {
 				// If a passage error occurs, retry it
-				if (e?.name === "PassageError" && !secondTime) {
-					Sentry.captureMessage("Passage threw an error, retrying");
+				if (!secondTime) {
+					Sentry.captureMessage("Threw an error, retrying");
 					await this.getUserData(true);
 					return;
 				}
