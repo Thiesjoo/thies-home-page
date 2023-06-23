@@ -186,7 +186,17 @@ export const useUserStore = defineStore("user", {
 
 				toast.warning("Please login again");
 				Sentry.captureException(e);
-
+				Sentry.captureEvent({
+					message: "User data error",
+					extra: {
+						error: e,
+						user: this.user,
+						loggedIn: this.loggedIn,
+						accessToken: this.accessToken,
+						accessTokenLocal: window.localStorage.getItem("psg_access_token"),
+						refreshTokenLocal: window.localStorage.getItem("psg_refresh_token"),
+					},
+				});
 				console.error(e);
 
 				window.localStorage.clear();

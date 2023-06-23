@@ -32,7 +32,8 @@ export function setupRefreshAuth(pinia: Pinia) {
 				token = await currentRefresh;
 			} else {
 				currentRefresh = passage.getCurrentSession().getAuthToken();
-				Sentry.captureMessage("Getting new refresh token");
+				Sentry.captureMessage("Getting new token from passage");
+				Sentry.captureMessage(`tkn has length: ${localStorage.getItem("psg_refresh_token")}`);
 				token = await currentRefresh;
 				currentRefresh = null;
 			}
