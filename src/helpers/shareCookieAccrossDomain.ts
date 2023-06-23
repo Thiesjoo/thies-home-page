@@ -4,19 +4,12 @@ CookieInterceptor.init();
 
 CookieInterceptor.write.use(function (cookie) {
 	const [cookieValue, props] = cookie.split(";");
-	Sentry.captureEvent({
-		message: "Cookie intercepted",
-		extra: {
-			cookie,
-			cookieValue,
-			props,
-		},
-	});
 
 	try {
 		const [key, val] = cookieValue.split(" = ");
 
 		if (key === "psg_auth_token" && val !== "") {
+			Sentry.captureMessage("Cookie intercepted, rewriting auth to include domain");
 			const currentDomain = window.location.hostname;
 			const domainProp = `domain=${currentDomain}`;
 
