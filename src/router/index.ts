@@ -12,21 +12,17 @@ router.beforeEach((to, from, next) => {
 
 	console.log("Routing to: ", to);
 
-	if (to.meta.requiresLogin && !userStore.loggedIn) {
-		console.log("User not logged in, redirecting to login page");
-		next(`/login?to=${to.fullPath}`);
-	} else if (to.meta.requiresLogin) {
-		console.log("User logged in, waiting for user data to be loaded");
+	if (to.meta.requiresLogin) {
+		console.log("Requires login");
+
 		userStore
-			.waitUntilLoaded()
+			.waitUntilLoggedinAndLoaded()
 			.then(() => {
 				next();
 			})
 			.catch(() => {
 				next(`/login?to=${to.fullPath}`);
 			});
-	} else {
-		next();
 	}
 });
 

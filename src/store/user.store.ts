@@ -80,7 +80,7 @@ export const useUserStore = defineStore("user", {
 	},
 
 	actions: {
-		waitUntilLoaded() {
+		waitUntilLoggedinAndLoaded() {
 			return new Promise<void>((resolve, reject) => {
 				if (this.loggedIn && !this.loading.userdata) {
 					resolve();
@@ -133,7 +133,7 @@ export const useUserStore = defineStore("user", {
 			this.user!.email = email;
 		},
 
-		async getUserData() {
+		async getUserData(secondTime = false) {
 			if (!this.loggedIn) {
 				this.loading.userdata = false;
 				this.user = null;
@@ -176,7 +176,14 @@ export const useUserStore = defineStore("user", {
 					}) as Widget[];
 				}
 				Sentry.captureMessage("Got user data");
-			} catch (e) {
+			} catch (e: any) {
+				// If a passage error occurs, retry it
+				if (e?.name === "PassageError" && !secondTime) {
+					Sentry.captureMessage("Passage threw an error, retrying");
+					await this.getUserData(true);
+					return;
+				}
+
 				toast.warning("Please login again");
 				Sentry.captureException(e);
 
