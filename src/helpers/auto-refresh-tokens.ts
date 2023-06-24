@@ -36,6 +36,7 @@ export function setupRefreshAuth(pinia: Pinia) {
 				Sentry.captureMessage(`tkn has length: ${localStorage.getItem("psg_refresh_token")?.length}`);
 				token = await currentRefresh;
 				currentRefresh = null;
+				document.cookie = `psg_auth_token=${token}; path=/; domain=${window.location.hostname}; SameSite=None; Secure`;
 			}
 		} catch (e) {
 			Sentry.captureException(e);
