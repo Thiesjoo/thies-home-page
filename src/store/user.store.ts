@@ -83,6 +83,7 @@ export const useUserStore = defineStore("user", {
 		waitUntilLoggedinAndLoaded() {
 			return new Promise<void>((resolve, reject) => {
 				if (this.loggedIn && !this.loading.userdata) {
+					// TODO: Wait if we are not loading, and loggedin is false
 					resolve();
 					return;
 				}
@@ -93,6 +94,7 @@ export const useUserStore = defineStore("user", {
 							resolve();
 							unsub();
 						} else {
+							Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`)
 							reject();
 							unsub();
 						}

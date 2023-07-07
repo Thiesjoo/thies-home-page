@@ -1,6 +1,7 @@
 import { useUserStore } from "@/store/user.store";
 import { createWebHistory, createRouter, RouteLocationNormalized } from "vue-router";
 import { routes } from "./routes";
+import * as Sentry from "@sentry/vue";
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -32,6 +33,7 @@ export function enableLogoutWatching() {
 	// Watch the store for changes, and when a user logs out, redirect to the login page if on auth-required page
 	useUserStore().$subscribe((mut, state) => {
 		if (!state.loggedIn && router.currentRoute.value.meta.requiresLogin) {
+			Sentry.captureMessage("Logout watching redirected to login page")
 			router.push("/login?to=" + router.currentRoute.value.path);
 		}
 	});
