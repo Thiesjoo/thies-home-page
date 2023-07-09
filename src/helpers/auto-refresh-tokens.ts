@@ -13,7 +13,7 @@ export const getDeviceBaseURL = () => {
 
 let currentRefresh: Promise<string> | null = null;
 
-export function setupRefreshAuth(pinia: Pinia) {
+export function setupRefreshAuth() {
 	axios.interceptors.request.use(async (request) => {
 		// If you make changes to window api, you can also change every request after that
 		if (!request.baseURL) {
@@ -32,11 +32,15 @@ export function setupRefreshAuth(pinia: Pinia) {
 				token = await currentRefresh;
 			} else {
 				currentRefresh = passage.getCurrentSession().getAuthToken();
-				Sentry.captureMessage("Getting new token from passage");
-				Sentry.captureMessage(`tkn has length: ${localStorage.getItem("psg_refresh_token")?.length}`);
+				Sentry.captureMessage("Fetching new tkn from passage");
 				token = await currentRefresh;
+				Sentry.captureMessage(
+					`tkn local has length: ${localStorage.getItem("psg_refresh_token")?.length}, tkn here ${
+						token.length
+					}`
+				);
 				currentRefresh = null;
-				document.cookie = `psg_auth_token=${token}; path=/; domain=${window.location.hostname}; SameSite=None; Secure`;
+				document.cookie = `psg_auth_token=${token}; path=/; domain=.${window.location.hostname}; Secure; `;
 			}
 		} catch (e) {
 			Sentry.captureException(e);

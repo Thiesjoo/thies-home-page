@@ -73,6 +73,7 @@ import ModalVue from "./components/Modal.vue";
 
 import { getBaseURL, setupRefreshAuth } from "./helpers/auto-refresh-tokens";
 axios.defaults.baseURL = getBaseURL();
+setupRefreshAuth();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(
@@ -129,7 +130,6 @@ Sentry.init({
 app.use(router);
 
 const piniaInstance = createPinia();
-setupRefreshAuth(piniaInstance);
 app.use(piniaInstance);
 app.use(Toast, {});
 

@@ -94,7 +94,7 @@ export const useUserStore = defineStore("user", {
 							resolve();
 							unsub();
 						} else {
-							Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`)
+							Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`);
 							reject();
 							unsub();
 						}
@@ -177,7 +177,7 @@ export const useUserStore = defineStore("user", {
 						return validWidgetsNames.has(x.name);
 					}) as Widget[];
 				}
-				Sentry.captureMessage("Got user data");
+				Sentry.captureMessage("Finished getting user data");
 			} catch (e: any) {
 				// If a passage error occurs, retry it
 				if (!secondTime) {
@@ -224,6 +224,8 @@ export const useUserStore = defineStore("user", {
 		},
 
 		async logout() {
+			Sentry.captureMessage("Logout method called");
+
 			const passage = new Passage(window.env.PASSAGE_APP_ID);
 			const result = await passage.getCurrentSession().signOut();
 
@@ -246,6 +248,7 @@ export const useUserStore = defineStore("user", {
 				toast.success("Logged in!!");
 				this.getUserData();
 			} catch (e) {
+				Sentry.captureMessage("Error in passage login success");
 				this.accessToken = "";
 			}
 		},
