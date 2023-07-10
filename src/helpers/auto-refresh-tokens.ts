@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Passage } from "@passageidentity/passage-js";
-import { Pinia } from "pinia";
 import * as Sentry from "@sentry/vue";
 
 export const getBaseURL = () => {
@@ -23,45 +22,34 @@ export function setupRefreshAuth() {
 			request.headers = {};
 		}
 
-		const passage = new Passage(window.env.PASSAGE_APP_ID);
+		if (request.url?.includes("thies.dev")) {
+			const passage = new Passage(window.env.PASSAGE_APP_ID);
 
-		let token;
-		try {
-			if (currentRefresh) {
-				Sentry.captureMessage("Waiting on pending refresh token");
-				token = await currentRefresh;
-			} else {
-				currentRefresh = passage.getCurrentSession().getAuthToken();
-				Sentry.captureMessage("Fetching new tkn from passage");
-				token = await currentRefresh;
-				Sentry.captureMessage(
-					`tkn local has length: ${localStorage.getItem("psg_refresh_token")?.length}, tkn here ${
-						token.length
-					}`
-				);
-				currentRefresh = null;
-				document.cookie = `psg_auth_token=${token}; path=/; domain=.${window.location.hostname}; Secure; `;
+			let token;
+			try {
+				if (currentRefresh) {
+					Sentry.captureMessage("Waiting on pending refresh token");
+					token = await currentRefresh;
+				} else {
+					currentRefresh = passage.getCurrentSession().getAuthToken();
+					Sentry.captureMessage("Fetching new tkn from passage");
+					token = await currentRefresh;
+					Sentry.captureMessage(
+						`tkn local has length: ${localStorage.getItem("psg_refresh_token")?.length}, tkn here ${
+							token?.length
+						}`
+					);
+					currentRefresh = null;
+					document.cookie = `psg_auth_token=${token}; path=/; domain=.${window.location.hostname}; Secure; `;
+				}
+			} catch (e) {
+				Sentry.captureException(e);
+				console.error(e);
+				throw e;
 			}
-		} catch (e) {
-			Sentry.captureException(e);
-			console.error(e);
-			throw e;
+
+			request.headers.Authorization = `Bearer ${token}`;
 		}
-
-		request.headers.Authorization = `Bearer ${token}`;
-
-		// // Never cache API requests going to thies.dev, because something weird is going on with caching CORS URL's
-		// if (
-		// 	// Actually going to thies.dev domain
-		// 	(request.url?.includes("thies.dev") ||
-		// 		// Axios shortcut. If you do not specify a domain, it will use the baseURL
-		// 		(request.baseURL?.includes("thies.dev") && !request.url?.includes("http"))) &&
-		// 	// We ALWAYS want to cache the rooster_parser, because it is a static file
-		// 	!request.url?.includes("rooster_parser")
-		// ) {
-		// 	request.headers["pragma"] = "no-cache";
-		// 	request.headers["cache-control"] = "no-cache";
-		// }
 
 		return request;
 	});
