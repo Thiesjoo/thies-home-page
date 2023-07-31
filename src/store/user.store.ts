@@ -63,13 +63,15 @@ const defaultUser: User = {
 export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
-			// Always loading userdata, because we want to check if the user is logged in
 			loading: { form: false, userdata: true, settings: false },
-			loggedIn: useLocalStorage("loggedIn", false),
-			user: useLocalStorage("user", null, {
-				serializer: StorageSerializers.object,
-			}) as RemovableRef<User | null>,
+			user: null,
 			accessToken: useLocalStorage("accessToken", ""),
+			loggedIn: false,
+		} as {
+			loading: { form: boolean; userdata: boolean; settings: boolean };
+			user: User | null;
+			accessToken: RemovableRef<string>;
+			loggedIn: boolean;
 		};
 	},
 
@@ -82,22 +84,22 @@ export const useUserStore = defineStore("user", {
 	actions: {
 		waitUntilLoggedinAndLoaded() {
 			return new Promise<void>((resolve, reject) => {
-				if (this.loggedIn && !this.loading.userdata) {
-					// TODO: Wait if we are not loading, and loggedin is false
-					resolve();
-					return;
-				}
+				// if (this.loggedIn && !this.loading.userdata) {
+				// 	// TODO: Wait if we are not loading, and loggedin is false
+				// 	resolve();
+				// 	return;
+				// }
 
 				const unsub = this.$subscribe((mut, state) => {
 					if (!state.loading.userdata) {
-						if (state.loggedIn) {
-							resolve();
-							unsub();
-						} else {
-							Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`);
-							reject();
-							unsub();
-						}
+						// if (state.loggedIn) {
+						// 	resolve();
+						// 	unsub();
+						// } else {
+						// 	Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`);
+						reject();
+						unsub();
+						// }
 					}
 				});
 			});

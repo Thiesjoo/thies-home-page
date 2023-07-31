@@ -12,6 +12,7 @@ import { useToast } from "vue-toastification";
 import TurnstileComponent from "@/components/Turnstile.vue";
 
 import "@passageidentity/passage-elements/passage-auth";
+import { popup } from "@/helpers/oidc";
 
 // TODO: Implement social logins right here and link with accounts
 // Backend should have a pending user list?
@@ -21,6 +22,8 @@ export default defineComponent({
 		return { login: useUserStore(), toast: useToast() };
 	},
 	mounted() {
+		popup();
+
 		const self = this;
 		const onSuccess = (authResult: {
 			redirect_url: string;

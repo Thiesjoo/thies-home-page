@@ -144,12 +144,15 @@ if (/\blinux\b/i.test(navigator.userAgent)) {
 
 app.mount("#app");
 
-// Update userdata!
-useUserStore()
-	.getUserData()
-	.catch((e) => {
-		console.error("Something went wrong with getting userdata", e);
-	});
+console.log("App mounted!");
+import { callback } from "@/helpers/oidc";
+callback();
+// // Update userdata!
+// useUserStore()
+// 	.getUserData()
+// 	.catch((e) => {
+// 		console.error("Something went wrong with getting userdata", e);
+// 	});
 
-enableLogoutWatching();
-enableSettingWatching();
+// enableLogoutWatching();
+// enableSettingWatching();
