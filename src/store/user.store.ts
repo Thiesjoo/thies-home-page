@@ -5,7 +5,7 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import * as Sentry from "@sentry/vue";
-import { ALL_LOCATIONS, User, UserFromAPI, Widget } from "@/helpers/types/user";
+import { ALL_LOCATIONS, User, UserFromAPI, UserWidget, Widget } from "@/helpers/types/user";
 
 import auth from "@/auth";
 
@@ -13,7 +13,11 @@ const toast = useToast();
 // Default widgets are widgets that are available for everyone
 export const DEFAULT_WIDGETS = ["battery", "dummy", "remotedevices"];
 
-const defaultUser: User = {
+// User but partial settings
+type PartialUser = Omit<User, "settings"> & {
+	settings: Partial<User["settings"]>;
+};
+const defaultUser: PartialUser = {
 	name: {
 		first: "",
 		last: "",
@@ -24,16 +28,10 @@ const defaultUser: User = {
 		showSeconds: true,
 		showVersion: false,
 		showFavorites: false,
-		favorites: [],
 		backgroundURL: "",
-		widgets: {
-			topleft: [],
-			topright: [],
-			bottomleft: [],
-			bottomright: [],
-		},
+		// TODO: Implement available widgets
 		widgetsAvailable: [],
-	},
+	} as Partial<User["settings"]>,
 };
 
 export const useUserStore = defineStore("user", {
@@ -83,23 +81,52 @@ export const useUserStore = defineStore("user", {
 			});
 		},
 
-		createUser() {
+		createUser(): User {
 			return JSON.parse(JSON.stringify(defaultUser)) as User;
 		},
 
-		// Sentry.setUser({ email });
-		async getUserData(secondTime = false) {
-			if (!this.loggedIn) {
-				this.loading.userdata = false;
-				this.user = null;
-				return;
+		mergeApiUser(user: UserFromAPI): User {
+			let temp_user: User | null = this.user;
+			if (!temp_user) {
+				temp_user = this.createUser();
 			}
+
+			temp_user.name = user.name;
+			temp_user.email = user.email;
+			temp_user.settings = {
+				...defaultUser.settings,
+				widgetsAvailable: [],
+				widgets: useLocalStorage<UserWidget>("user.settings.widgets", temp_user.settings.widgets, {
+					serializer: StorageSerializers.object,
+				}),
+				favorites: useLocalStorage<{ name: string; url: string }[]>(
+					"user.settings.favorites",
+					temp_user.settings.favorites,
+					{
+						serializer: StorageSerializers.object,
+					}
+				),
+				...user.settings,
+			};
+
+			return temp_user;
+		},
+
+		async getUserData(cachedUser?: UserFromAPI) {
 			this.loading.userdata = true;
 			Sentry.captureMessage("Getting user data");
 			try {
-				if (!this.user) {
-					this.user = this.createUser();
+				const userFromAuthService = cachedUser || (await auth.getUser());
+				if (!userFromAuthService) {
+					this.loading.userdata = false;
+					this.user = null;
+					return;
 				}
+
+				let temp = this.mergeApiUser(userFromAuthService);
+				this.user = temp;
+
+				Sentry.setUser({ email: this.user.email });
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
@@ -163,22 +190,27 @@ export const useUserStore = defineStore("user", {
 
 		async logout() {
 			Sentry.captureMessage("Logout method called");
-
+			await auth.logout();
 			this.user = null;
 			const text = "You have been logged out";
-			if (result) {
-				toast.success(text);
-			} else {
-				toast.warning(text);
-			}
+			toast.success(text);
 		},
 	},
 });
 
+/**
+ * Add callbacks that modify the store when a user authenticates
+ */
 export function enableAuth() {
 	const store = useUserStore();
 
-	const authed = () => {};
+	const authed = (user: UserFromAPI) => {
+		store.getUserData(user);
+	};
+	const unauthed = () => {
+		store.user = null;
+	};
+	auth.registerCallbacks(authed, unauthed);
 }
 
 export function enableSettingWatching() {

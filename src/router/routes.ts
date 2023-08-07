@@ -66,7 +66,7 @@ export const routes: Route[] = [
 	{
 		path: "/login/callback",
 		name: "Login Callback",
-		component: () => import(/* webpackChunkName: "login" */ "../views/LoginCallback.vue"),
+		component: () => import(/* webpackChunkName: "login" */ "../views/OIDCLoginCallback.vue"),
 		exclude: true,
 	},
 ];

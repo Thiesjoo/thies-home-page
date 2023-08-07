@@ -18,11 +18,11 @@ class SocketService {
 		const url = await this.waitForDeviceURL();
 		console.log("Got base URL:", url);
 		// Append auth token as a query parameter, because websocket initialization requests do not carry extra headers
-		const finalURL = `${url}?access_token=${userStore.accessToken}`;
+		const finalURL = `${url}?access_token=${`TODO: THIS HAS TO BE IMPLEMENTED`}`;
 
 		this.socket = io(finalURL, {
 			extraHeaders: {
-				Authorization: `Bearer ${userStore.accessToken}`,
+				Authorization: `Bearer ACCESS TOKEN HERE`,
 			},
 			transports: ["websocket"],
 		});
@@ -121,7 +121,7 @@ class SocketService {
 			const store = useDevicesStore();
 			const userStore = useUserStore();
 			const interval = setInterval(() => {
-				if (!store.loading.userdata && userStore.accessToken && !userStore.isLoading) {
+				if (!store.loading.userdata && !!userStore.user && !userStore.isLoading) {
 					clearInterval(interval);
 					resolve(getDeviceBaseURL());
 				}

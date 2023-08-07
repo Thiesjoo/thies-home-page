@@ -1,4 +1,5 @@
-import { useUserStore, Widget } from "@/store/user.store";
+import { useUserStore } from "@/store/user.store";
+import { Widget } from "./types/user";
 
 export function generateKey(a: Widget): string {
 	return a.name + a.id;

@@ -5,7 +5,7 @@ import { UserFromAPI } from "@/helpers/types/user";
 const userManager = new UserManager({
 	authority: "https://authentik.thies.dev/application/o/thies-home-page/",
 	client_id: "thies-home-page",
-	redirect_uri: "http://localhost:3000/login/callback",
+	redirect_uri: `${window.location.origin}/login/callback`,
 	response_type: "code",
 	scope: "openid profile email settings spotify-access",
 	userStore: new WebStorageStateStore({ store: window.localStorage }),
@@ -16,10 +16,9 @@ const userManager = new UserManager({
 //@ts-ignore
 window.test = userManager;
 
-export function popup() {
+function popup() {
 	userManager.signinPopup().then(async (user) => {
 		console.log("User signed in", user);
-		console.log(await userManager.getUser());
 	});
 }
 
@@ -84,36 +83,29 @@ async function getToken() {
 }
 
 function registerCallbacks(signedInCallback: (user: UserFromAPI) => void, signedOutCallback: () => void) {
-	console.error("TODO");
+	console.log("Registering callbacks inside oidc service!");
+	userManager.events.addUserLoaded(async () => {
+		console.log("User signed in event, passing through to callback!");
+		const user = await getUser();
+		if (user) {
+			signedInCallback(user);
+		} else {
+			throw new Error("User is null when signed in!");
+		}
+	});
+	userManager.events.addUserSignedOut(() => {
+		signedOutCallback();
+	});
 }
 
 async function logout() {
 	await userManager.signoutRedirect();
 }
 
-// userManager.events.addSilentRenewError((e) => {
-// 	console.error("Silent renew error", e);
-// });
-
-// userManager.events.addUserLoaded((user) => {
-// 	console.log("User loaded", user);
-// });
-
-// userManager.events.addUserUnloaded(() => {
-// 	console.log("User unloaded");
-// });
-
-// userManager.events.addUserSignedIn(() => {
-// 	console.log("User signed in event!");
-// });
-
-// userManager.events.addUserSignedOut(() => {
-// 	console.log("User signed out");
-// });
-
 export default {
 	getUser,
 	getToken,
 	logout,
 	registerCallbacks,
+	startAuthentication: popup,
 } satisfies AuthMethod;

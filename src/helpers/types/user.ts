@@ -1,4 +1,5 @@
 import { ValidComponentNames } from "@/components/widgets";
+import { RemovableRef } from "@vueuse/core";
 
 export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
 export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
@@ -7,6 +8,8 @@ export type Widget = {
 	name: ValidComponentNames;
 	id: string;
 };
+
+export type UserWidget = { [key in ValidLocation]: Widget[] };
 
 export type User = {
 	name: {
@@ -20,8 +23,8 @@ export type User = {
 		showDate: boolean;
 		showVersion: boolean;
 		showFavorites: boolean;
-		favorites: { name: string; url: string }[];
-		widgets: { [key in ValidLocation]: Widget[] };
+		favorites: RemovableRef<{ name: string; url: string }[]>;
+		widgets: RemovableRef<UserWidget>;
 		widgetsAvailable: Widget[];
 	};
 };

@@ -63,7 +63,7 @@ import "./index.css";
 import { createPinia } from "pinia";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
-import { enableSettingWatching, useUserStore } from "./store/user.store";
+import { enableAuth, enableSettingWatching, useUserStore } from "./store/user.store";
 
 import * as Sentry from "@sentry/vue";
 import { BrowserTracing } from "@sentry/tracing";
@@ -145,15 +145,7 @@ if (/\blinux\b/i.test(navigator.userAgent)) {
 app.mount("#app");
 
 console.log("App mounted!");
-import { getUser } from "@/helpers/oidc";
-getUser();
 
-// // Update userdata!
-// useUserStore()
-// 	.getUserData()
-// 	.catch((e) => {
-// 		console.error("Something went wrong with getting userdata", e);
-// 	});
-
-// enableLogoutWatching();
-// enableSettingWatching();
+enableAuth();
+useUserStore().getUserData();
+enableLogoutWatching();

@@ -8,14 +8,14 @@ import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
 
-import { popup, callback } from "@/helpers/oidc";
+import auth from "@/auth";
 
 export default defineComponent({
 	setup() {
 		return { login: useUserStore(), toast: useToast() };
 	},
 	mounted() {
-		popup();
+		auth.startAuthentication();
 	},
 });
 </script>

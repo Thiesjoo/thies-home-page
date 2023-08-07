@@ -8,6 +8,8 @@ export interface AuthMethod {
 	logout: () => Promise<void>;
 
 	registerCallbacks: (signedInCallback: (user: UserFromAPI) => void, signedOutCallback: () => void) => void;
+
+	startAuthentication: () => Promise<void> | void;
 }
 
 export default oidc satisfies AuthMethod;
