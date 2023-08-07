@@ -145,8 +145,9 @@ if (/\blinux\b/i.test(navigator.userAgent)) {
 app.mount("#app");
 
 console.log("App mounted!");
-import { callback } from "@/helpers/oidc";
-callback();
+import { getUser } from "@/helpers/oidc";
+getUser();
+
 // // Update userdata!
 // useUserStore()
 // 	.getUserData()

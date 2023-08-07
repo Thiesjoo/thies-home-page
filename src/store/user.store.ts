@@ -5,37 +5,13 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import * as Sentry from "@sentry/vue";
-import { Passage, PassageUserInfo } from "@passageidentity/passage-js";
+import { ALL_LOCATIONS, User, UserFromAPI, Widget } from "@/helpers/types/user";
+
+import auth from "@/auth";
 
 const toast = useToast();
 // Default widgets are widgets that are available for everyone
 export const DEFAULT_WIDGETS = ["battery", "dummy", "remotedevices"];
-
-export type ValidLocation = "topleft" | "bottomleft" | "topright" | "bottomright";
-export const ALL_LOCATIONS: ValidLocation[] = ["topleft", "bottomleft", "topright", "bottomright"];
-
-export type Widget = {
-	name: ValidComponentNames;
-	id: string;
-};
-
-export type User = {
-	name: {
-		first: string;
-		last: string;
-	};
-	email: string;
-	settings: {
-		backgroundURL: string;
-		showSeconds: boolean;
-		showDate: boolean;
-		showVersion: boolean;
-		showFavorites: boolean;
-		favorites: { name: string; url: string }[];
-		widgets: { [key in ValidLocation]: Widget[] };
-		widgetsAvailable: Widget[];
-	};
-};
 
 const defaultUser: User = {
 	name: {
@@ -63,80 +39,55 @@ const defaultUser: User = {
 export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
-			loading: { form: false, userdata: true, settings: false },
+			loading: { userdata: true, settings: false },
 			user: null,
-			accessToken: useLocalStorage("accessToken", ""),
-			loggedIn: false,
 		} as {
-			loading: { form: boolean; userdata: boolean; settings: boolean };
+			loading: { userdata: boolean; settings: boolean };
 			user: User | null;
-			accessToken: RemovableRef<string>;
-			loggedIn: boolean;
 		};
 	},
 
 	getters: {
 		isLoading(state) {
-			return state.loading.form || state.loading.userdata;
+			return state.loading.settings || state.loading.userdata;
+		},
+		loggedIn(state) {
+			return !!state.user;
 		},
 	},
 
 	actions: {
 		waitUntilLoggedinAndLoaded() {
 			return new Promise<void>((resolve, reject) => {
-				// if (this.loggedIn && !this.loading.userdata) {
-				// 	// TODO: Wait if we are not loading, and loggedin is false
-				// 	resolve();
-				// 	return;
-				// }
+				if (!this.loading.userdata) {
+					if (this.loggedIn) {
+						resolve();
+					} else {
+						reject();
+					}
+					return;
+				}
 
 				const unsub = this.$subscribe((mut, state) => {
 					if (!state.loading.userdata) {
-						// if (state.loggedIn) {
-						// 	resolve();
-						// 	unsub();
-						// } else {
-						// 	Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`);
-						reject();
-						unsub();
-						// }
+						if (!!state.user) {
+							resolve();
+							unsub();
+						} else {
+							Sentry.captureMessage(`Rejected wait until logged in: ${JSON.stringify(state)}`);
+							reject();
+							unsub();
+						}
 					}
 				});
 			});
-		},
-
-		async getBasicUserInformation() {
-			const passage = new Passage(window.env.PASSAGE_APP_ID);
-			const currentUser = passage.getCurrentUser();
-
-			const userInformation = await currentUser.userInfo();
-			if (!userInformation) throw new Error("User information is null");
-
-			// Use passage to get user information
-			this.applyNewUserInformation(userInformation);
-			return userInformation;
-		},
-
-		async getBasicUserSettings() {
-			const syncedUserSettings = (await axios.get("/api/settings/me")).data;
-			this.user!.settings = syncedUserSettings;
 		},
 
 		createUser() {
 			return JSON.parse(JSON.stringify(defaultUser)) as User;
 		},
 
-		applyNewUserInformation({ user_metadata, email }: PassageUserInfo) {
-			Sentry.setUser({ email });
-
-			const { first_name, last_name } = user_metadata || {};
-			this.user!.name = {
-				first: (first_name as string) || "no first name set",
-				last: (last_name as string) || "no last name",
-			};
-			this.user!.email = email;
-		},
-
+		// Sentry.setUser({ email });
 		async getUserData(secondTime = false) {
 			if (!this.loggedIn) {
 				this.loading.userdata = false;
@@ -149,9 +100,6 @@ export const useUserStore = defineStore("user", {
 				if (!this.user) {
 					this.user = this.createUser();
 				}
-
-				const promises = [this.getBasicUserInformation(), this.getBasicUserSettings()];
-				await Promise.all(promises);
 
 				const validWidgetsNames = new Set<string>(this.user.settings.widgetsAvailable.map((x) => x.name));
 
@@ -181,13 +129,6 @@ export const useUserStore = defineStore("user", {
 				}
 				Sentry.captureMessage("Finished getting user data");
 			} catch (e: any) {
-				// If a passage error occurs, retry it
-				if (!secondTime) {
-					Sentry.captureMessage("Threw an error, retrying");
-					await this.getUserData(true);
-					return;
-				}
-
 				toast.warning("Please login again");
 				Sentry.captureException(e);
 				Sentry.captureEvent({
@@ -196,16 +137,9 @@ export const useUserStore = defineStore("user", {
 						error: e,
 						user: this.user,
 						loggedIn: this.loggedIn,
-						accessToken: this.accessToken,
-						accessTokenLocal: window.localStorage.getItem("psg_access_token"),
-						refreshTokenLocal: window.localStorage.getItem("psg_refresh_token"),
 					},
 				});
 				console.error(e);
-
-				window.localStorage.clear();
-				this.$reset();
-				window.localStorage.clear();
 			}
 
 			this.loading.userdata = false;
@@ -213,26 +147,23 @@ export const useUserStore = defineStore("user", {
 
 		async saveSettings() {
 			this.loading.settings = true;
-			try {
-				const copy = JSON.parse(JSON.stringify(this.user!.settings));
-				delete copy.widgetsAvailable;
-				await axios.patch("/api/settings/me", copy);
-			} catch (e) {
-				console.log("Something went wrong with saving settings", e);
-				toast.error("Something went wrong with saving settings");
-				this.getUserData();
-			}
+			// TODO: Fix this
+			console.warn("Saving settings is disabled");
+			// try {
+			// 	const copy = JSON.parse(JSON.stringify(this.user!.settings));
+			// 	delete copy.widgetsAvailable;
+			// 	await axios.patch("/api/settings/me", copy);
+			// } catch (e) {
+			// 	console.log("Something went wrong with saving settings", e);
+			// 	toast.error("Something went wrong with saving settings");
+			// 	this.getUserData();
+			// }
 			this.loading.settings = false;
 		},
 
 		async logout() {
 			Sentry.captureMessage("Logout method called");
 
-			const passage = new Passage(window.env.PASSAGE_APP_ID);
-			const result = await passage.getCurrentSession().signOut();
-
-			this.accessToken = "";
-			this.loggedIn = false;
 			this.user = null;
 			const text = "You have been logged out";
 			if (result) {
@@ -241,28 +172,21 @@ export const useUserStore = defineStore("user", {
 				toast.warning(text);
 			}
 		},
-
-		async passageLoginSuccess(accessToken: string) {
-			try {
-				this.accessToken = accessToken;
-
-				this.loggedIn = true;
-				toast.success("Logged in!!");
-				this.getUserData();
-			} catch (e) {
-				Sentry.captureMessage("Error in passage login success");
-				this.accessToken = "";
-			}
-		},
 	},
 });
+
+export function enableAuth() {
+	const store = useUserStore();
+
+	const authed = () => {};
+}
 
 export function enableSettingWatching() {
 	const store = useUserStore();
 	let prevSettings = JSON.stringify(store.user?.settings);
 
 	store.$subscribe((mutation, state) => {
-		if (state.user && !state.loading.userdata && !state.loading.form) {
+		if (state.user && !state.loading.userdata && !state.loading.settings) {
 			const newSettings = JSON.stringify(state.user.settings);
 			if (prevSettings !== newSettings) {
 				console.log("Settings changed, saving");

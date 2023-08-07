@@ -136,7 +136,7 @@ export type NotificationLoad =
 			removed: false;
 	  });
 
-export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number };
+// export type PossibleInfo = (HardwareInfo | MobileInfo) & { dateCreated: number };
 
 export type PossibleWidgets = "os" | "cpu" | "storage" | "ram" | "network" | "bluetooth" | "battery" | "mobile";
 export type LiveData = {
