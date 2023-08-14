@@ -12,9 +12,9 @@
 		<template #title>Manage Favorites</template>
 
 		<template #content>
-			<div class="flex items-center flex-col min-w-[25vw]" v-if="!user.loading.userdata">
+			<div class="flex items-center flex-col min-w-[25vw]" v-if="!userStore.isLoading">
 				<draggable
-					v-model="user.user!.settings.favorites"
+					v-model="userStore.favorites"
 					group="favorites"
 					:item-key="(item: any) => item.url + item.name">
 					<template #item="{ element, index }">
@@ -61,12 +61,12 @@ export default defineComponent({
 				return;
 			}
 
-			this.user.user?.settings.favorites.push({ name, url });
+			this.userStore.favorites.push({ name, url });
 		},
 	},
 	setup() {
 		const userStore = useUserStore();
-		return { user: userStore, favorites: userStore.user?.settings.favorites || [], toast: useToast() };
+		return { userStore, favorites: userStore.favorites, toast: useToast() };
 	},
 	components: {
 		draggable,

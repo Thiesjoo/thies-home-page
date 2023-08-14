@@ -13,35 +13,31 @@ const toast = useToast();
 // Default widgets are widgets that are available for everyone
 export const DEFAULT_WIDGETS = ["battery", "dummy", "remotedevices"];
 
-// User but partial settings
-type PartialUser = Omit<User, "settings"> & {
-	settings: Partial<User["settings"]>;
-};
-const defaultUser: PartialUser = {
-	name: {
-		first: "",
-		last: "",
-	},
-	email: "",
-	settings: {
-		showDate: false,
-		showSeconds: true,
-		showVersion: false,
-		showFavorites: false,
-		backgroundURL: "",
-		// TODO: Implement available widgets
-		widgetsAvailable: [],
-	} as Partial<User["settings"]>,
-};
-
 export const useUserStore = defineStore("user", {
 	state: () => {
 		return {
 			loading: { userdata: true, settings: false },
 			user: null,
+			favorites: useLocalStorage<{ name: string; url: string }[]>("user.settings.favorites", [], {
+				serializer: StorageSerializers.object,
+			}),
+			widgets: useLocalStorage<UserWidget>(
+				"widgets",
+				{
+					topleft: [],
+					topright: [],
+					bottomleft: [],
+					bottomright: [],
+				},
+				{
+					serializer: StorageSerializers.object,
+				}
+			),
 		} as {
 			loading: { userdata: boolean; settings: boolean };
 			user: User | null;
+			favorites: RemovableRef<{ name: string; url: string }[]>;
+			widgets: RemovableRef<UserWidget>;
 		};
 	},
 
@@ -81,50 +77,16 @@ export const useUserStore = defineStore("user", {
 			});
 		},
 
-		createUser(): User {
-			return JSON.parse(JSON.stringify(defaultUser)) as User;
-		},
-
-		mergeApiUser(user: UserFromAPI): User {
-			let temp_user: User | null = this.user;
-			if (!temp_user) {
-				temp_user = this.createUser();
-			}
-
-			temp_user.name = user.name;
-			temp_user.email = user.email;
-			temp_user.settings = {
-				...defaultUser.settings,
-				widgetsAvailable: [],
-				widgets: useLocalStorage<UserWidget>("user.settings.widgets", temp_user.settings.widgets, {
-					serializer: StorageSerializers.object,
-				}),
-				favorites: useLocalStorage<{ name: string; url: string }[]>(
-					"user.settings.favorites",
-					temp_user.settings.favorites,
-					{
-						serializer: StorageSerializers.object,
-					}
-				),
-				...user.settings,
-			};
-
-			return temp_user;
-		},
-
 		async getUserData(cachedUser?: UserFromAPI) {
 			this.loading.userdata = true;
 			Sentry.captureMessage("Getting user data");
 			try {
-				const userFromAuthService = cachedUser || (await auth.getUser());
-				if (!userFromAuthService) {
+				this.user = cachedUser || (await auth.getUser());
+				if (!this.user) {
 					this.loading.userdata = false;
 					this.user = null;
 					return;
 				}
-
-				let temp = this.mergeApiUser(userFromAuthService);
-				this.user = temp;
 
 				Sentry.setUser({ email: this.user.email });
 
@@ -144,7 +106,7 @@ export const useUserStore = defineStore("user", {
 				// Always filter to prevent invalidity when changing localstorage yourself
 				const uniqueCount = new Set<String>();
 				for (const x of ALL_LOCATIONS) {
-					this.user.settings.widgets[x] = this.user.settings.widgets[x].filter((x) => {
+					this.widgets[x] = this.widgets[x].filter((x) => {
 						if (!x || uniqueCount.has(generateKey(x))) {
 							return false;
 						}
@@ -190,6 +152,13 @@ export const useUserStore = defineStore("user", {
 
 		async logout() {
 			Sentry.captureMessage("Logout method called");
+			this.widgets = {
+				topleft: [],
+				topright: [],
+				bottomleft: [],
+				bottomright: [],
+			};
+			this.favorites = [];
 			await auth.logout();
 			this.user = null;
 			const text = "You have been logged out";

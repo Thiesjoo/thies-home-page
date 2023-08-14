@@ -18,7 +18,6 @@
 		"@fortawesome/free-regular-svg-icons": "^6.4.0",
 		"@fortawesome/free-solid-svg-icons": "^6.4.0",
 		"@fortawesome/vue-fontawesome": "^3.0.3",
-		"@passageidentity/passage-elements": "^1.7.2",
 		"@sentry/tracing": "^7.57.0",
 		"@sentry/vue": "^7.57.0",
 		"@vueuse/core": "^10.2.1",

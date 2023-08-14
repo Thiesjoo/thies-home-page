@@ -67,6 +67,7 @@ async function getUser(): Promise<UserFromAPI | null> {
 			showVersion: parseBoolean(settings.showVersion),
 			showFavorites: parseBoolean(settings.showFavorites),
 			backgroundURL: (settings.backgroundURL as string) || "",
+			widgetsAvailable: [],
 		},
 	} satisfies UserFromAPI;
 

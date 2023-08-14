@@ -33,7 +33,7 @@
 				}"
 				:id="location"
 				class="widget"
-				v-model="userStore.user.settings.widgets[location]"
+				v-model="userStore.widgets[location]"
 				group="widgets"
 				:item-key="generateKey"
 				@start="start"

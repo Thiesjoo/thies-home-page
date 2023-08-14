@@ -10,6 +10,10 @@ export type Widget = {
 };
 
 export type UserWidget = { [key in ValidLocation]: Widget[] };
+export type UserFavorite = {
+	name: string;
+	url: string;
+};
 
 export type User = {
 	name: {
@@ -23,13 +27,11 @@ export type User = {
 		showDate: boolean;
 		showVersion: boolean;
 		showFavorites: boolean;
-		favorites: RemovableRef<{ name: string; url: string }[]>;
-		widgets: RemovableRef<UserWidget>;
 		widgetsAvailable: Widget[];
 	};
 };
 
 // Make a copy of the User type, but exclude some settings like widgets, favorites, etc.
 export type UserFromAPI = Omit<User, "settings"> & {
-	settings: Omit<User["settings"], "widgets" | "favorites" | "widgetsAvailable">;
+	settings: Omit<User["settings"], "widgets" | "favorites">;
 };

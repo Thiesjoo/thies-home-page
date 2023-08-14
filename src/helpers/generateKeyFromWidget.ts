@@ -11,7 +11,7 @@ export function makeUnique(a: Widget[], filterOnExisting = false): Widget[] {
 	if (filterOnExisting) {
 		const userStore = useUserStore();
 		if (userStore.user) {
-			const entries = Object.entries(userStore.user.settings.widgets);
+			const entries = Object.entries(userStore.widgets);
 			entries.forEach((x) => {
 				x[1].forEach((y) => {
 					alreadyFound.add(generateKey(y));

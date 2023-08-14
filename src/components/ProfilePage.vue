@@ -1,7 +1,5 @@
 <template>
 	<div class="flex items-center flex-col space-y-2 max-h-[70vh] overflow-y-scroll" v-if="!user.loading.userdata">
-		<passage-profile :app-id="passageAppID"></passage-profile>
-
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
 				type="checkbox"
