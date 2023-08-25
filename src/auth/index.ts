@@ -2,7 +2,9 @@ import { UserFromAPI } from "@/helpers/types/user";
 import oidc from "./oidc";
 
 export interface AuthMethod {
-	getUser: () => Promise<UserFromAPI | null>;
+	getURLToShowUser(): string;
+
+	getUser: (fullRefresh?: boolean) => Promise<UserFromAPI | null>;
 	getToken: () => Promise<string | null>;
 
 	logout: () => Promise<void>;

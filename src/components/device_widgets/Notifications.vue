@@ -42,7 +42,6 @@
 
 <script lang="ts">
 import { Device, Notification, NotificationsService } from "@/generated";
-import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import { formatDate } from "@/helpers/formatDate";
 import { useDevicesStore } from "@/store/device.store";
 import axios from "axios";
@@ -77,7 +76,7 @@ export default defineComponent({
 			if (this.images[notf.icon]) return;
 			this.images[notf.icon] = "loading";
 			axios
-				.get(getDeviceBaseURL() + `/notifications/image/${this.current.uid}/${notf.icon}`, {
+				.get("TODO: IMPLEMENT THIS" + `/notifications/image/${this.current.uid}/${notf.icon}`, {
 					responseType: "blob",
 				})
 				.then((response) => {

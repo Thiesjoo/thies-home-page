@@ -3,8 +3,8 @@ import { AuthMethod } from ".";
 import { UserFromAPI } from "@/helpers/types/user";
 
 const userManager = new UserManager({
-	authority: "https://authentik.thies.dev/application/o/thies-home-page/",
-	client_id: "thies-home-page",
+	authority: `${import.meta.env.VITE_OIDC_AUTHORITY}`,
+	client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
 	redirect_uri: `${window.location.origin}/login/callback`,
 	response_type: "code",
 	scope: "openid profile email settings spotify-access",
@@ -16,9 +16,18 @@ const userManager = new UserManager({
 //@ts-ignore
 window.test = userManager;
 
-function popup() {
-	userManager.signinPopup().then(async (user) => {
-		console.log("User signed in", user);
+function popup(): Promise<void> {
+	return new Promise((resolve, reject) => {
+		userManager
+			.signinPopup()
+			.then(async (user) => {
+				console.log("User signed in", user);
+				resolve();
+			})
+			.catch((err) => {
+				console.error(err);
+				reject(err);
+			});
 	});
 }
 
@@ -38,10 +47,17 @@ function parseBoolean(str: string | boolean | undefined) {
 	}
 }
 
-async function getUser(): Promise<UserFromAPI | null> {
-	const tempuser = await userManager.getUser();
+async function getUser(fullRefresh = false): Promise<UserFromAPI | null> {
+	let tempuser = await userManager.getUser();
 	if (!tempuser) {
 		return null;
+	}
+
+	if (fullRefresh) {
+		tempuser = await userManager.signinSilent();
+		if (!tempuser) {
+			return null;
+		}
 	}
 
 	const prof = tempuser.profile;
@@ -103,7 +119,13 @@ async function logout() {
 	await userManager.signoutRedirect();
 }
 
+function getHostFromAuthority() {
+	const url = new URL(import.meta.env.VITE_OIDC_AUTHORITY);
+	return url.host;
+}
+
 export default {
+	getURLToShowUser: getHostFromAuthority,
 	getUser,
 	getToken,
 	logout,

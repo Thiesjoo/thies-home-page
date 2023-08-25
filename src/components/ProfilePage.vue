@@ -1,12 +1,23 @@
 <template>
-	<div class="flex items-center flex-col space-y-2 max-h-[70vh] overflow-y-scroll" v-if="!user.loading.userdata">
+	<div class="flex items-center flex-col space-y-2 max-h-[70vh] overflow-y-auto" v-if="!userStore.loading.userdata">
+		<h2>These values cannot be edited on this website</h2>
+		<h3>
+			Please do it on:
+			<a :href="authURL.startsWith('http') ? authURL : `https://${authURL}`" target="_blank" class="text-blue-100"
+				>{{ authURL }}
+			</a>
+			and click refresh authentication
+		</h3>
+		<span> Email: {{ userStore.user?.email }} </span>
+		<span> First name: {{ userStore.user?.name.first }} </span>
+		<span> Last name: {{ userStore.user?.name.last }} </span>
 		<label for="seconds-toggle" class="inline-flex relative items-center cursor-pointer">
 			<input
 				type="checkbox"
 				id="seconds-toggle"
 				class="sr-only peer"
 				@change="change"
-				:checked="user.user?.settings.showSeconds" />
+				:checked="userStore.user?.settings.showSeconds" />
 			<div
 				class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-teal-500 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show seconds on time</span>
@@ -17,7 +28,7 @@
 				id="date-toggle"
 				class="sr-only peer"
 				@change="change"
-				:checked="user.user?.settings.showDate" />
+				:checked="userStore.user?.settings.showDate" />
 			<div
 				class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-teal-500 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show date on top of screen</span>
@@ -28,7 +39,7 @@
 				id="version-toggle"
 				class="sr-only peer"
 				@change="change"
-				:checked="user.user?.settings.showVersion" />
+				:checked="userStore.user?.settings.showVersion" />
 			<div
 				class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-teal-500 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -41,20 +52,20 @@
 				id="favorites-toggle"
 				class="sr-only peer"
 				@change="change"
-				:checked="user.user?.settings.showFavorites" />
+				:checked="userStore.user?.settings.showFavorites" />
 			<div
 				class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-teal-500 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
 			<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Show favorites</span>
 		</label>
 
 		<div class="flex flex-col items-center justify-center w-9/12 text-sm pt-5">
-			<div class="flex items-center w-full">
+			<!-- <div class="flex items-center w-full">
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 				<div class="flex-grow-0 mx-5 text dark:text-white">Link a new account</div>
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
-			<div class="flex flex-row items-stretch py-5">
-				<div class="flex flex-col items-center" v-for="item in oauthApps">
+			<div class="flex flex-row items-stretch py-5"> 
+				 <div class="flex flex-col items-center" v-for="item in oauthApps">
 					<a
 						class="text-white no-underline border border-transparent py-2 px-4 flex flex-row justify-center items-center rounded-md mx-2"
 						:style="{
@@ -70,8 +81,8 @@
 						<font-awesome-icon :icon="[`fab`, `${item.name.toLowerCase()}`]" class="mr-2" />
 						{{ item.name }}
 					</a>
-				</div>
-			</div>
+				</div> 
+			</div>-->
 
 			<div class="flex items-center w-full">
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
@@ -87,24 +98,38 @@
 
 			<div class="flex items-center w-full">
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
-				<div class="flex-grow-0 mx-5 text dark:text-white">Authentication Methods</div>
+				<div class="flex-grow-0 mx-5 text dark:text-white">Authentication</div>
 				<div class="flex-grow bg bg-gray-300 h-0.5"></div>
 			</div>
 
-			<!-- Logout -->
-			<button
-				@click="logout"
-				type="button"
-				class="mt-5 inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto sm:text-sm">
-				<div class="flex flex-row justify-center items-center">
-					<font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="mr-2" />
-					<span>Logout</span>
+			<div class="flex flex-row items-stretch">
+				<div class="flex flex-row items-center">
+					<button
+						@click="refresh"
+						type="button"
+						class="mt-5 mr-5 inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
+						<div class="flex flex-row justify-center items-center">
+							<font-awesome-icon :icon="['fas', 'refresh']" class="mr-2" />
+							<span>Refresh userinfo</span>
+						</div>
+					</button>
+					<button
+						@click="logout"
+						type="button"
+						class="mt-5 inline-flex justify-center rounded-md border border-transparent shadow-sm px-5 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto sm:text-sm">
+						<div class="flex flex-row justify-center items-center">
+							<font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="mr-2" />
+							<span>Logout</span>
+						</div>
+					</button>
 				</div>
-			</button>
+			</div>
+
+			<!-- Logout -->
 		</div>
 	</div>
 
-	<span class="w-full flex items-center align-center" v-if="user.loading.userdata">
+	<span class="w-full flex items-center align-center" v-if="userStore.loading.userdata">
 		<svg
 			role="status"
 			class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
@@ -121,13 +146,11 @@
 	</span>
 </template>
 <script lang="ts">
-import { getBaseURL } from "@/helpers/auto-refresh-tokens";
 import { lightenDarkenColor } from "@/helpers/colors";
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import FavoritesManagerModal from "./FavoritesManagerModal.vue";
-
-import "@passageidentity/passage-elements/passage-profile";
+import auth from "@/auth";
 
 export default defineComponent({
 	data() {
@@ -152,42 +175,45 @@ export default defineComponent({
 			],
 		};
 	},
-	computed: {
-		passageAppID() {
-			return window.env.PASSAGE_APP_ID;
-		},
-	},
 	setup() {
-		return { user: useUserStore() };
+		return { userStore: useUserStore() };
+	},
+	computed: {
+		authURL() {
+			return auth.getURLToShowUser();
+		},
 	},
 	methods: {
 		async logout() {
-			this.user.logout();
+			this.userStore.logout();
+		},
+		async refresh() {
+			this.userStore.refreshUserInfo();
 		},
 		change(event: Event) {
-			if (this.user.user) {
+			if (this.userStore.user) {
 				//@ts-ignore
 				const string = event.target.id.split("-")?.[0];
 				//@ts-ignore
-				this.user.user.settings["show" + string.charAt(0).toUpperCase() + string.slice(1)] =
+				this.userStore.user.settings["show" + string.charAt(0).toUpperCase() + string.slice(1)] =
 					//@ts-ignore
 					event.target.checked;
 			}
 		},
 		lightenDarkenColor,
-		getURL(name: string) {
-			if (name == "POS") {
-				return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
-			}
-			return `${getBaseURL()}/auth/${name.toLowerCase()}/login`;
-		},
-		canAddExtraAccount(name: string) {
-			name = name.toLowerCase();
-			if (name === "pos") {
-				return !!this.user.user?.settings.widgetsAvailable.find((x) => x.name === "via");
-			}
-			return !true;
-		},
+		// getURL(name: string) {
+		// 	if (name == "POS") {
+		// 		return "https://chrome.google.com/webstore/detail/homeex/ghjlkdhcijpomopkolgnoejjkdbmhdci";
+		// 	}
+		// 	// return `${getBaseURL()}/auth/${name.toLowerCase()}/login`;
+		// },
+		// canAddExtraAccount(name: string) {
+		// 	name = name.toLowerCase();
+		// 	if (name === "pos") {
+		// 		return !!this.user.user?.settings.widgetsAvailable.find((x) => x.name === "via");
+		// 	}
+		// 	return !true;
+		// },
 	},
 	components: { FavoritesManagerModal },
 });

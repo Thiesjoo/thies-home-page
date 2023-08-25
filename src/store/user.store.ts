@@ -77,10 +77,15 @@ export const useUserStore = defineStore("user", {
 			});
 		},
 
+		async refreshUserInfo() {
+			await this.getUserData((await auth.getUser(true)) || undefined);
+		},
+
 		async getUserData(cachedUser?: UserFromAPI) {
 			this.loading.userdata = true;
 			Sentry.captureMessage("Getting user data");
 			try {
+				console.log("Getting user data");
 				this.user = cachedUser || (await auth.getUser());
 				if (!this.user) {
 					this.loading.userdata = false;

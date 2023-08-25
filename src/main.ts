@@ -4,13 +4,11 @@ window.env = {
 	VUE_APP_VERCEL_GIT_COMMIT_SHA: import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA || "PLACEHOLDERPLACEHOLDER",
 	VUE_APP_VERCEL_GIT_COMMIT_MESSAGE:
 		import.meta.env.VITE_VERCEL_GIT_COMMIT_MESSAGE || "PLACEHOLDERPLACEHOLDERPLACEHOLDER",
-	AUTHBASEURL: import.meta.env.VITE_AUTHBASEURL || "https://auth.thies.dev",
+	AUTHBASEURL: import.meta.env.VITE_AUTHBASEURL || "https://authentik.thies.dev",
 	DEVICEBASEURL: import.meta.env.VITE_DEVICEBASEURL || "https://testing.thies.dev",
-	PASSAGE_APP_ID: import.meta.env.VITE_PASSAGE_APP_ID || "DIDNTSETAPPID",
 };
 
 window.openModals = 0;
-import "./helpers/shareCookieAccrossDomain";
 
 import { createApp } from "vue";
 import App from "./App.vue";
@@ -68,12 +66,7 @@ import { enableAuth, enableSettingWatching, useUserStore } from "./store/user.st
 import * as Sentry from "@sentry/vue";
 import { BrowserTracing } from "@sentry/tracing";
 
-import axios from "axios";
 import ModalVue from "./components/Modal.vue";
-
-import { getBaseURL, setupRefreshAuth } from "./helpers/auto-refresh-tokens";
-axios.defaults.baseURL = getBaseURL();
-setupRefreshAuth();
 
 library.add(faTwitch, faSpotify, faDiscord, faGithub);
 library.add(

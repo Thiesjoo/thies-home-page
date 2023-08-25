@@ -10,7 +10,8 @@ interface ImportMetaEnv {
 	VITE_VERCEL_URL: string;
 	VITE_VERCEL_GIT_COMMIT_SHA: string;
 	VITE_VERCEL_GIT_COMMIT_MESSAGE: string;
-	VITE_AUTHBASEURL: string;
+	VITE_OIDC_AUTHORITY: string;
+	VITE_OIDC_CLIENT_ID: string;
 	VITE_DEVICEBASEURL: string;
 }
 
