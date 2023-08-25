@@ -1,7 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import type { ApiRequestOptions } from "./ApiRequestOptions";
 
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
@@ -20,7 +19,7 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-	BASE: getDeviceBaseURL(),
+	BASE: "IMPLEMENT THIS",
 	VERSION: "1.0.0",
 	WITH_CREDENTIALS: true,
 	CREDENTIALS: "include",

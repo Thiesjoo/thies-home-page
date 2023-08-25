@@ -33,7 +33,7 @@
 				}"
 				:id="location"
 				class="widget"
-				v-model="userStore.user.settings.widgets[location]"
+				v-model="userStore.widgets[location]"
 				group="widgets"
 				:item-key="generateKey"
 				@start="start"
@@ -70,7 +70,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import * as Widgets from "@/components/widgets";
 import errorCaptured from "@/components/widgets/errorCaptured";
-import { ALL_LOCATIONS, useUserStore, Widget } from "@/store/user.store";
+import { useUserStore } from "@/store/user.store";
 import draggable from "vuedraggable";
 import NewWidgetModal from "@/components/NewWidgetModal.vue";
 import { generateKey } from "@/helpers/generateKeyFromWidget";
@@ -78,6 +78,7 @@ import { lightenDarkenColor } from "@/helpers/colors";
 import FavoritesBar from "@/components/FavoritesBar.vue";
 import { useIdle } from "@vueuse/core";
 import ms from "ms";
+import { ALL_LOCATIONS } from "@/helpers/types/user";
 
 function getCurrentDate() {
 	return Intl.DateTimeFormat("nl-NL", {

@@ -1,43 +1,29 @@
 <template>
-	<div class="min-h-full flex items-center justify-center pb-8 px-4 sm:px-6 lg:px-8">
-		<div class="max-w-sm w-full">
-			<passage-auth :app-id="passageAppID"></passage-auth>
-		</div>
+	<div class="min-h-full flex flex-col items-center justify-center pb-8 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-s">Please wait, opening the popup dialog!</div>
+
+		<button @click="() => auth" class="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+			Click here to reopen the dialog
+		</button>
 	</div>
 </template>
 <script lang="ts">
 import { useUserStore } from "@/store/user.store";
 import { defineComponent } from "vue";
 import { useToast } from "vue-toastification";
-import TurnstileComponent from "@/components/Turnstile.vue";
 
-import "@passageidentity/passage-elements/passage-auth";
-
-// TODO: Implement social logins right here and link with accounts
-// Backend should have a pending user list?
+import auth from "@/auth";
 
 export default defineComponent({
 	setup() {
 		return { login: useUserStore(), toast: useToast() };
 	},
 	mounted() {
-		const self = this;
-		const onSuccess = (authResult: {
-			redirect_url: string;
-			auth_token: string;
-			refresh_token?: string; // only if you have refresh tokens enabled.
-			refresh_token_expiration?: number; // only if you have refresh tokens enabled
-		}) => {
-			console.log("got here", authResult);
-			self.login.passageLoginSuccess(authResult.auth_token);
-		};
-		const passageAuth = document.querySelector("passage-auth");
-		//@ts-ignore
-		passageAuth.onSuccess = onSuccess;
+		auth.startAuthentication();
 	},
-	computed: {
-		passageAppID() {
-			return window.env.PASSAGE_APP_ID;
+	methods: {
+		auth() {
+			auth.startAuthentication();
 		},
 	},
 });

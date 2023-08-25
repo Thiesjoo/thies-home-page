@@ -1,4 +1,3 @@
-import { getDeviceBaseURL } from "@/helpers/auto-refresh-tokens";
 import { LiveData } from "@/helpers/types/pusher.types";
 import { useDevicesStore } from "@/store/device.store";
 import { useUserStore } from "@/store/user.store";
@@ -18,11 +17,11 @@ class SocketService {
 		const url = await this.waitForDeviceURL();
 		console.log("Got base URL:", url);
 		// Append auth token as a query parameter, because websocket initialization requests do not carry extra headers
-		const finalURL = `${url}?access_token=${userStore.accessToken}`;
+		const finalURL = `${url}?access_token=${`TODO: THIS HAS TO BE IMPLEMENTED`}`;
 
 		this.socket = io(finalURL, {
 			extraHeaders: {
-				Authorization: `Bearer ${userStore.accessToken}`,
+				Authorization: `Bearer ACCESS TOKEN HERE`,
 			},
 			transports: ["websocket"],
 		});
@@ -117,13 +116,14 @@ class SocketService {
 	}
 
 	waitForDeviceURL(): Promise<string> {
-		return new Promise((resolve) => {
+		return new Promise((resolve, reject) => {
 			const store = useDevicesStore();
 			const userStore = useUserStore();
 			const interval = setInterval(() => {
-				if (!store.loading.userdata && userStore.accessToken && !userStore.isLoading) {
+				if (!store.loading.userdata && !!userStore.user && !userStore.isLoading) {
 					clearInterval(interval);
-					resolve(getDeviceBaseURL());
+					reject("TODO: IMPLEMENT THIS");
+					// resolve(getDeviceBaseURL());
 				}
 			}, 750);
 		});

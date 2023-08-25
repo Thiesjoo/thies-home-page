@@ -5,7 +5,7 @@
 			class="absolute w-[300px] top-[20px] ml-[-90px] mt-[10px] left-0 p-3 -rotate-45 flex flex-col text-center bg-red-800/[40%] z-[10]">
 			<span class="font-extrabold text-sm"> {{ version }} </span>
 			<span class="text-xs">{{ gitSHA }}</span>
-			<span class="text-[10px]">{{ getBaseURL() }}</span>
+			<span class="text-[10px]">{{ getBaseURL }}</span>
 		</div>
 		<header class="header" v-if="show">
 			<div class="container">
@@ -33,7 +33,7 @@ import { routes } from "./router/routes";
 import VersionModalVue from "./components/VersionModal.vue";
 import LoginVue from "./components/LoginModal.vue";
 import { isProduction } from "./helpers/envParser";
-import { getBaseURL } from "./helpers/auto-refresh-tokens";
+import auth from "@/auth";
 
 export default defineComponent({
 	computed: {
@@ -45,10 +45,9 @@ export default defineComponent({
 		preview: () => !isProduction(),
 		gitSHA: () => window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7),
 		version: () => window.env.VUE_APP_VERCEL_ENV.toUpperCase(),
+		getBaseURL: () => auth.getURLToShowUser(),
 	},
-	methods: {
-		getBaseURL,
-	},
+
 	watch: {
 		$route: {
 			immediate: true,
@@ -81,23 +80,6 @@ body {
 	height: 100vh;
 	background: #76a0bc;
 	font-family: "Montserrat", sans-serif;
-}
-
-:root {
-	--passage-container-background: #191919;
-	--passage-container-background-color: #181818;
-
-	--passage-body-text-color: #fff;
-
-	--passage-header-text-color: #fff;
-	--passage-onprimary-color: #000;
-
-	--passage-primary-color: #fff;
-
-	--passage-onhover-color: #000;
-	--passage-onactive-color: #000;
-
-	--passage-table-header-background: #181818;
 }
 
 .container {

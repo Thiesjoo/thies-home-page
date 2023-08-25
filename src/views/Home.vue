@@ -4,9 +4,7 @@
 			<h1>GuanTheThird | Thies</h1>
 			<div class="buttons">
 				<div class="btn" style="order: 0" id="discord_id" :title="discordID">
-					<a href="#">
-						<font-awesome-icon :icon="['fab', 'discord']" />GuanTheThird#<span>{{ discordTag }}</span></a
-					>
+					<a href="#"> <font-awesome-icon :icon="['fab', 'discord']" />GuanTheThird</a>
 				</div>
 				<div class="btn" style="order: 1">
 					<a href="https://github.com/thiesjoo" rel="noreferrer" target="_blank">
@@ -26,10 +24,9 @@
 						width="56"
 						height="56"
 						alt="Waving frog"
-						src="https://cdn.betterttv.net/emote/5c0e1a3c6c146e7be4ff5c0c/2x"
-					/>
-					Welcome on the website of Thies. This website hosts school stuff (PWS), linux stuff (Linuxinstall) and some
-					random other projects (ElectroAPI)
+						src="https://cdn.betterttv.net/emote/5c0e1a3c6c146e7be4ff5c0c/2x" />
+					Welcome on the website of Thies. This website hosts school stuff (PWS), linux stuff (Linuxinstall)
+					and some random other projects (ElectroAPI)
 				</p>
 			</div>
 		</section>
@@ -42,8 +39,8 @@
 					<a href="https://github.com/thiesjoo/guanthebot" rel="noreferrer" target="_blank">
 						<font-awesome-icon :icon="['fas', 'robot']" /> GuanTheBot</a
 					>
-					is a Twitch/Discord text bot. It detects typo's in certain emotes and uses a real time database to respond
-					with a mocking comment. It was my first project which was completely tested using Jest
+					is a Twitch/Discord text bot. It detects typo's in certain emotes and uses a real time database to
+					respond with a mocking comment. It was my first project which was completely tested using Jest
 				</div>
 
 				<div class="btn">
@@ -73,17 +70,15 @@ import { changeFavicon } from "@/helpers/favoicon";
 import { defineComponent } from "vue";
 export default defineComponent({
 	data() {
-		return { discordTag: "....", discordID: "...." };
+		return { discordID: "...." };
 	},
 	async created() {
 		try {
 			const fetchResp = await fetch("api/discord_tag");
 			const response = await fetchResp.json();
-			this.discordTag = response.tag;
 			this.discordID = response.id;
 			changeFavicon(response.avatar);
 		} catch (e) {
-			this.discordTag = "????";
 			this.discordID = "????";
 		}
 	},
@@ -91,7 +86,6 @@ export default defineComponent({
 </script>
 <style>
 .intro {
-	/* height: 400px; */
 	background: #2c2f33;
 	margin-top: 70px;
 	text-align: center;
