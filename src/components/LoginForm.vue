@@ -1,6 +1,10 @@
 <template>
-	<div class="min-h-full flex items-center justify-center pb-8 px-4 sm:px-6 lg:px-8">
-		<div class="max-w-sm w-full">Please wait, opening the popup dialog!</div>
+	<div class="min-h-full flex flex-col items-center justify-center pb-8 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-s">Please wait, opening the popup dialog!</div>
+
+		<button @click="() => auth" class="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+			Click here to reopen the dialog
+		</button>
 	</div>
 </template>
 <script lang="ts">
@@ -16,6 +20,11 @@ export default defineComponent({
 	},
 	mounted() {
 		auth.startAuthentication();
+	},
+	methods: {
+		auth() {
+			auth.startAuthentication();
+		},
 	},
 });
 </script>

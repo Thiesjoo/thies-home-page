@@ -1,6 +1,7 @@
 import { UserManager, WebStorageStateStore } from "oidc-client-ts";
 import { AuthMethod } from ".";
 import { UserFromAPI } from "@/helpers/types/user";
+import { useToast } from "vue-toastification";
 
 const userManager = new UserManager({
 	authority: `${import.meta.env.VITE_OIDC_AUTHORITY}`,
@@ -25,6 +26,8 @@ function popup(): Promise<void> {
 				resolve();
 			})
 			.catch((err) => {
+				const toast = useToast();
+				toast.error("Something went wrong while logging in!");
 				console.error(err);
 				reject(err);
 			});
@@ -50,12 +53,14 @@ function parseBoolean(str: string | boolean | undefined) {
 async function getUser(fullRefresh = false): Promise<UserFromAPI | null> {
 	let tempuser = await userManager.getUser();
 	if (!tempuser) {
+		console.warn("Getting user, but user is null");
 		return null;
 	}
 
 	if (fullRefresh) {
 		tempuser = await userManager.signinSilent();
 		if (!tempuser) {
+			console.log("Full refresh failed, returning null");
 			return null;
 		}
 	}
