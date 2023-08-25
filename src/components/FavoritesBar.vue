@@ -25,8 +25,12 @@ export default defineComponent({
 			(window.top || window.parent || window).location.href = url;
 		},
 		getFavoiconForSite(url: string) {
-			const favicon = new URL(url).origin + "/favicon.ico";
-			return favicon;
+			try {
+				const favicon = new URL(url).origin + "/favicon.ico";
+				return favicon;
+			} catch (e) {
+				return "https://www.google.com/s2/favicons?sz=64&domain_url=" + url;
+			}
 		},
 		lightenDarkenColor,
 	},

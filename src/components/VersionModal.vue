@@ -6,10 +6,10 @@
 			</div>
 		</template>
 
-		<template #title> Current version: {{ VUE_APP_VERCEL_GIT_COMMIT_SHA }} </template>
+		<template #title> Current version: {{ VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7) }} </template>
 
 		<template #content>
-			<p>
+			<p class="w-full text-center">
 				This information is gathered from
 				<a class="no-underline" href="https://vercel.com" target="_blank" rel="noopener noreferrer">
 					<svg height="24" viewBox="0 0 284 65" fill="var(--geist-foreground)" aria-label="Vercel Logotype">
