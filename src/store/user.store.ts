@@ -83,7 +83,6 @@ export const useUserStore = defineStore("user", {
 
 		async getUserData(cachedUser?: UserFromAPI) {
 			this.loading.userdata = true;
-			Sentry.captureMessage("Getting user data");
 			try {
 				console.log("Getting user data");
 				this.user = cachedUser || (await auth.getUser());
@@ -121,10 +120,8 @@ export const useUserStore = defineStore("user", {
 						return validWidgetsNames.has(x.name);
 					}) as Widget[];
 				}
-				Sentry.captureMessage("Finished getting user data");
 			} catch (e: any) {
 				toast.warning("Please login again");
-				Sentry.captureException(e);
 				Sentry.captureEvent({
 					message: "User data error",
 					extra: {
@@ -156,7 +153,6 @@ export const useUserStore = defineStore("user", {
 		},
 
 		async logout() {
-			Sentry.captureMessage("Logout method called");
 			this.widgets = {
 				topleft: [],
 				topright: [],
