@@ -1,4 +1,4 @@
-import { UserManager, WebStorageStateStore } from "oidc-client-ts";
+import { User, UserManager, WebStorageStateStore } from "oidc-client-ts";
 import { AuthMethod } from ".";
 import { UserFromAPI } from "@/helpers/types/user";
 import { useToast } from "vue-toastification";
@@ -51,7 +51,13 @@ function parseBoolean(str: string | boolean | undefined) {
 }
 
 async function getUser(fullRefresh = false): Promise<UserFromAPI | null> {
-	let tempuser = await userManager.getUser();
+	let tempuser: null | User = null;
+    try {
+        tempuser = await userManager.getUser();
+    } catch(e) {
+        console.error("Failed to get user: ", e);
+    }
+
 	if (!tempuser) {
 		console.warn("Getting user, but user is null");
 		return null;

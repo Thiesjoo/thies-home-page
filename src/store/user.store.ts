@@ -78,7 +78,11 @@ export const useUserStore = defineStore("user", {
 		},
 
 		async refreshUserInfo() {
-			await this.getUserData((await auth.getUser(true)) || undefined);
+            try {
+                await this.getUserData((await auth.getUser(true)) || undefined);
+            } catch(e) {
+                this.logout()
+            }
 		},
 
 		async getUserData(cachedUser?: UserFromAPI) {
