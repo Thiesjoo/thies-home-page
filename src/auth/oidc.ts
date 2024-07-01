@@ -7,8 +7,9 @@ const userManager = new UserManager({
 	authority: `${import.meta.env.VITE_OIDC_AUTHORITY}`,
 	client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
 	redirect_uri: `${window.location.origin}/login/callback`,
+    silent_redirect_uri: `${window.location.origin}/login/silent-callback`,
 	response_type: "code",
-	scope: "openid profile email settings spotify-access",
+	scope: "openid profile email settings spotify-access offline_access",
 	userStore: new WebStorageStateStore({ store: window.localStorage }),
 	monitorSession: true,
 	monitorAnonymousSession: true,
@@ -38,6 +39,12 @@ export function callback() {
 	userManager.signinPopupCallback().then(() => {
 		console.log("CALLBACK: User signed in!");
 	});
+}
+
+export function silentCallback() {
+    userManager.signinSilentCallback().then(() => {
+        console.log('SILENT CALLBACK: User signed in!')
+    })
 }
 
 function parseBoolean(str: string | boolean | undefined) {

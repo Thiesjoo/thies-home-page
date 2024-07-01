@@ -69,4 +69,10 @@ export const routes: Route[] = [
 		component: () => import(/* webpackChunkName: "login" */ "../views/OIDCLoginCallback.vue"),
 		exclude: true,
 	},
+    {
+		path: "/login/silent-callback",
+		name: "Login Silent Callback",
+		component: () => import(/* webpackChunkName: "login" */ "../views/OIDCLoginCallbackSilent.vue"),
+		exclude: true,
+	},
 ];

@@ -105,20 +105,20 @@ library.add(
 
 const app = createApp(App, { router });
 
-Sentry.init({
-	app,
-	dsn: "https://6cedfceff1414c40a3850e36e6302816@o4504384319258624.ingest.sentry.io/4504384441417728",
-	integrations: [
-		new BrowserTracing({
-			routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-			tracePropagationTargets: ["localhost", "thies.dev", /^\//],
-		}),
-	],
-	tracesSampleRate: 0.5,
-	environment: window.env.VUE_APP_VERCEL_ENV,
-	enabled: window.env.VUE_APP_VERCEL_ENV !== "development",
-	release: "thies-home-page@" + window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA,
-});
+// Sentry.init({
+// 	app,
+// 	dsn: "https://6cedfceff1414c40a3850e36e6302816@o4504384319258624.ingest.sentry.io/4504384441417728",
+// 	integrations: [
+// 		new BrowserTracing({
+// 			routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+// 			tracePropagationTargets: ["localhost", "thies.dev", /^\//],
+// 		}),
+// 	],
+// 	tracesSampleRate: 0.5,
+// 	environment: window.env.VUE_APP_VERCEL_ENV,
+// 	enabled: window.env.VUE_APP_VERCEL_ENV !== "development",
+// 	release: "thies-home-page@" + window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA,
+// });
 
 app.use(router);
 
