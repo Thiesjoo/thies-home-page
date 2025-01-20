@@ -15,16 +15,13 @@ export const routes: Route[] = [
 		path: "/",
 		name: "About me!",
 		component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
-		meta: {
-			header: true,
-		},
 	},
 	{
 		path: "/users",
 		name: "Twitch Viewer list",
 		component: () => import(/* webpackChunkName: "users" */ "../views/Users.vue"),
 		meta: {
-			header: true,
+			exclude: true,
 		},
 	},
 	{
@@ -32,9 +29,6 @@ export const routes: Route[] = [
 		name: "Twitch Chat Tricks",
 		component: () => import(/* webpackChunkName: "rainbow" */ "../views/RainbowTwitch.vue"),
 		exclude: true,
-		meta: {
-			header: true,
-		},
 	},
 	{
 		path: "/gh*",

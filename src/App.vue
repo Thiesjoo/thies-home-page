@@ -7,17 +7,6 @@
 			<span class="text-xs">{{ gitSHA }}</span>
 			<span class="text-[10px]">{{ getBaseURL }}</span>
 		</div>
-		<header class="header" v-if="show">
-			<div class="container">
-				<nav class="header_menu">
-					<ul>
-						<li v-for="item in routes" :key="item.name">
-							<router-link :to="item.path">{{ item.name }}</router-link>
-						</li>
-					</ul>
-				</nav>
-			</div>
-		</header>
 		<div v-if="show" style="margin-top: 80px"></div>
 		<router-view></router-view>
 		<footer class="flex mx-2 fixed bottom-0 justify-center text-xs space-x-5">
@@ -38,10 +27,6 @@ import auth from "@/auth";
 export default defineComponent({
 	computed: {
 		routes: () => routes.filter((x) => !x.exclude),
-		show: function () {
-			let header = this.$route.meta.header;
-			return header === undefined ? false : header;
-		},
 		preview: () => !isProduction(),
 		gitSHA: () => window.env.VUE_APP_VERCEL_GIT_COMMIT_SHA.slice(0, 7),
 		version: () => window.env.VUE_APP_VERCEL_ENV.toUpperCase(),
